@@ -1,0 +1,22 @@
+{
+  "name": "Pretty Good Plugin",
+  "version": "0.0.1",
+  "authors": [
+    "Stefan Geneshky <stefanguen@gmail.com>"
+  ],
+  "description": "PGP",
+  "main": "src/settings.js",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "~1.4.1",
+    "openpgp": "~1.2.0",
+    "less": ""
+  }
+}

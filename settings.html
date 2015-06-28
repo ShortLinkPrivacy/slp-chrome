@@ -1,0 +1,28 @@
+<!doctype html>
+<html data-ng-app="Settings" data-ng-csp="">
+  <head>
+    <meta charset="UTF-8">
+    <title>Pretty Good Plugin (Settings)</title>
+    <link rel="stylesheet" href="css/mincss.css">
+    <link rel="stylesheet/less" type="text/css" href="css/style.less">
+    <link rel="stylesheet" href="bower_components/angular/angular-csp.css">
+    <script src="./bower_components/angular/angular.min.js"></script>
+    <script src="./bower_components/openpgp/dist/openpgp.min.js"></script>
+    <script src="./bower_components/less/dist/less.js"></script>
+    <script src="./src/app.js"></script>
+    <script src="./src/storage/storage_chrome.js"></script>
+    <script src="./src/controllers/main.js"></script>
+    <script src="./src/controllers/create_keys.js"></script>
+  </head>
+  <body>
+    <div id="container" ng-controller="MainController">
+      <div class="row">
+        <div class="col c8" ng-include="'templates/create_keys.html'">
+        </div><!-- keys -->
+        <div class="col c4">
+        </div><!-- .c6 -->
+      </div><!-- .row -->
+    </div><!-- #container -->
+
+  </body>
+</html>
