@@ -1,2 +1,3 @@
-window.app.controller 'MainController', [ '$scope', ($scope)->
+window.app.controller 'MainController', [ '$scope', 'config', ($scope, config)->
+    $scope.createKeys = false
 ]

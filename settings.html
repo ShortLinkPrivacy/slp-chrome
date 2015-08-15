@@ -9,18 +9,21 @@
     <script src="./bower_components/angular/angular.min.js"></script>
     <script src="./bower_components/openpgp/dist/openpgp.min.js"></script>
     <script src="./bower_components/less/dist/less.js"></script>
+    <script src="./src/classes/keyring.js"></script>
     <script src="./src/app.js"></script>
-    <script src="./src/storage/storage_chrome.js"></script>
     <script src="./src/controllers/main.js"></script>
     <script src="./src/controllers/create_keys.js"></script>
+    <script src="./src/controllers/list_keys.js"></script>
   </head>
   <body>
     <div id="container" ng-controller="MainController">
       <div class="row">
-        <div class="col c8" ng-include="'templates/create_keys.html'">
+        <div class="col c12" ng-include="'templates/list_keys.html'">
         </div><!-- keys -->
-        <div class="col c4">
-        </div><!-- .c6 -->
+      </div><!-- .row -->
+      <div class="row" ng-if="createKeys">
+        <div class="col c12" ng-include="'templates/create_keys.html'">
+        </div><!-- keys -->
       </div><!-- .row -->
     </div><!-- #container -->
 

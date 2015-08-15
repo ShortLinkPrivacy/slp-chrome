@@ -1,4 +1,4 @@
-window.app.controller 'CreateKeysController', [ '$scope', 'config', 'storage', ($scope, config, storage)->
+window.app.controller 'CreateKeysController', [ '$scope', 'config', 'keyring', ($scope, config, keyring)->
     $scope.form =
         bits: config.defaultBits
         name: null
@@ -19,6 +19,10 @@ window.app.controller 'CreateKeysController', [ '$scope', 'config', 'storage', (
 
         if $scope.form.passphrase != $scope.form.confirm
             $scope.error = "The passphrase and the passphrase confirmation do not match"
+            return
+
+        if keyring.findByIdOrEmail($scope.form.email, $scope.form.name)
+            $scope.error = "A key with this name or email already exists"
             return
 
         $scope.spinner = on

@@ -17,6 +17,7 @@
   "dependencies": {
     "angular": "~1.4.1",
     "openpgp": "~1.2.0",
-    "less": ""
+    "less": "",
+    "jasmine": ""
   }
 }
