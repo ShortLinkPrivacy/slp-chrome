@@ -37,11 +37,14 @@ describe "A keyring", ->
         keyring.purge()
 
     it "is empty in the begining", ->
-        expect(keyring.length()).toBe(0)
+        expect(keyring.all()).toEqual([])
+
+    it "has zero length", ->
+        expect(keyring.length()).toEqual(0)
 
     it "can add keys", ->
         keyring.add(key)
-        expect(keyring.length()).toBe(1)
+        expect(keyring.length()).toEqual(1)
 
     it "can save", ->
         keyring.save()
@@ -49,5 +52,5 @@ describe "A keyring", ->
 
     it "can load", ->
         kr = new window.KeyRing(config)
-        expect(kr.length()).toBe(1)
+        expect(kr.length()).toEqual(1)
         expect(kr.at(0).toJSON().id).toBe(key.toJSON().id)

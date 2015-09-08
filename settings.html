@@ -3,26 +3,49 @@
   <head>
     <meta charset="UTF-8">
     <title>Pretty Good Plugin (Settings)</title>
+
+    <!-- Vendors CSS -->
     <link rel="stylesheet" href="css/mincss.css">
-    <link rel="stylesheet/less" type="text/css" href="css/style.less">
     <link rel="stylesheet" href="bower_components/angular/angular-csp.css">
+
+    <!-- Local CSS -->
+    <link rel="stylesheet/less" type="text/css" href="css/style.less">
+
+    <!-- Vendors JS -->
     <script src="./bower_components/angular/angular.min.js"></script>
     <script src="./bower_components/openpgp/dist/openpgp.min.js"></script>
     <script src="./bower_components/less/dist/less.js"></script>
+
+    <!-- Code -->
+    <script src="./src/classes/config.js"></script>
     <script src="./src/classes/keyring.js"></script>
     <script src="./src/app.js"></script>
-    <script src="./src/controllers/main.js"></script>
-    <script src="./src/controllers/create_keys.js"></script>
-    <script src="./src/controllers/list_keys.js"></script>
   </head>
   <body>
+    <nav class="nav" tabindex="-1" onclick="this.focus()">
+        <div class="container">
+            <a ng-click="switch('list')" class="pagename current" href="#">My Keys</a>
+            <a href="#">Friend's Keys</a>
+            <a href="#">Settings</a> 
+            <a href="#">About</a>
+        </div>
+    </nav>
+    <button class="btn-close btn btn-sm">×</button>
     <div id="container" ng-controller="MainController">
-      <div class="row">
-        <div class="col c12" ng-include="'templates/list_keys.html'">
+      <div class="row" ng-if="false">
+        <div class="col c12" ng-include="'templates/keys/paste.html'">
         </div><!-- keys -->
       </div><!-- .row -->
-      <div class="row" ng-if="createKeys">
-        <div class="col c12" ng-include="'templates/create_keys.html'">
+      <div class="row" ng-if="false">
+        <div class="col c12" ng-include="'templates/keys/view.html'">
+        </div><!-- keys -->
+      </div><!-- .row -->
+      <div class="row" ng-if="true">
+        <div class="col c12" ng-include="'templates/keys/list.html'">
+        </div><!-- keys -->
+      </div><!-- .row -->
+      <div class="row" ng-if="false">
+        <div class="col c12" ng-include="'templates/keys/create.html'">
         </div><!-- keys -->
       </div><!-- .row -->
     </div><!-- #container -->

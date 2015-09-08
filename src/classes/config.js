@@ -4,14 +4,16 @@
 
   Config = (function() {
     function Config(opts) {
-      var prop, result, _i, _len;
+      var prop, result;
+      if (opts == null) {
+        opts = {};
+      }
       result = {
         defaultBits: 2048,
         keyringTag: 'keyring'
       };
-      for (_i = 0, _len = opts.length; _i < _len; _i++) {
-        prop = opts[_i];
-        if (opts.hasOwnPropety(prop)) {
+      for (prop in opts) {
+        if (opts.hasOwnProperty(prop)) {
           result[prop] = opts[prop];
         }
       }

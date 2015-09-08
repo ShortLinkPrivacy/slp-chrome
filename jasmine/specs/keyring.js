@@ -33,11 +33,14 @@
       return keyring.purge();
     });
     it("is empty in the begining", function() {
-      return expect(keyring.length()).toBe(0);
+      return expect(keyring.all()).toEqual([]);
+    });
+    it("has zero length", function() {
+      return expect(keyring.length()).toEqual(0);
     });
     it("can add keys", function() {
       keyring.add(key);
-      return expect(keyring.length()).toBe(1);
+      return expect(keyring.length()).toEqual(1);
     });
     it("can save", function() {
       keyring.save();
@@ -46,7 +49,7 @@
     return it("can load", function() {
       var kr;
       kr = new window.KeyRing(config);
-      expect(kr.length()).toBe(1);
+      expect(kr.length()).toEqual(1);
       return expect(kr.at(0).toJSON().id).toBe(key.toJSON().id);
     });
   });

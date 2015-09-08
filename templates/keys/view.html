@@ -1,0 +1,24 @@
+<table class="key-info" ng-if="selectedKey" ng-controller="ViewKeysController">
+  <tbody>
+    <tr>
+      <td class="hd">ID:</td><td>{{ selectedKey.userId }}</td>
+    </tr>
+    <tr>
+      <td class="hd">Fingerprint:</td><td>{{ selectedKey.fingerprint }}</td>
+    </tr>
+    <tr>
+      <td class="hd">Created:</td><td>{{ createdDate.toLocaleString() }}</td>
+    </tr>
+    <tr>
+      <td class="hd">Algorithm:</td><td>{{ selectedKey.algorithm }}</td>
+    </tr>
+    <tr>
+      <td colspan="2" class="armor">
+        <a href="" ng-click="toggle()">show {{ showPublic ? 'private' : 'public' }}</a>
+        <pre ng-class="showPublic ? '' : 'private'">
+          {{ showPublic ? selectedKey.publicKeyArmored : selectedKey.privateKeyArmored }}
+        </pre>
+      </td>
+    </tr>
+  </tbody>
+</table>

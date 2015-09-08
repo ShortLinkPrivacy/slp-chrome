@@ -1,0 +1,15 @@
+<div ng-controller="ListKeysController">
+  <div class="row" ng-if="keyring.length()">
+    <div class="col c5">
+      <form>
+        <select ng-model="selectedKey" ng-options="k.userId for k in keyring.all() track by k.fingerprint" size=10> 
+        </select>
+      </form>
+    </div>
+    <div class="col c7" ng-include="'templates/keys/view.html'">
+    </div>
+  </div>
+  <div class="row" ng-if="!keyring.length()">
+    You have no keys.
+  </div>
+</div>
