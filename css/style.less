@@ -1,55 +1,68 @@
-#container { margin: 10px; }
+@navBg: #000;
+@navFg: #ccc;
+@navHoverBg: #368;
+@navHoverFg: #fff;
 
-.form-stacked { 
-  input, textarea, label {
-    display: block;
-  }
+nav {
+  color: @navFg;
+  background: @navBg;
+}
 
-  legend {
-    font-size: 110%;
-    font-weight: bold;
-  }
+article {
+  padding: 5px;
+}
 
-  fieldset {
-    border: 1px solid #aaa;
-  }
-
-  input, textarea {
-    margin-bottom: 10px;
-  }
-
-  pre {
-    background: #eee;
-    overflow: scroll;
-    font-size: 80%;
+.pure-menu-link, .pure-menu-link:visited  {
+  color: @navFg !important;
+  background: @navBg;
+  font-size: 1.2em;
+  &:hover {
+    background: @navHoverBg;
+    color: @navHoverFg;
   }
 
 }
 
+.pure-form {
+  legend {
+    font-size: 1.5em;
+    font-weight: bold;
+  }
+}
+
+//--------------------------------------------------------
+// Widgets
+//--------------------------------------------------------
 .warning {
-  border-color: #e44;
+  padding: 1em;
+  margin: 1em;
+  color: #000;
+  border-left: 3px solid #e44;
   background: #fdd;
 }
 
+//--------------------------------------------------------
+// Key Info
+//--------------------------------------------------------
 .key-info {
+  padding: 0 7px;
+
   td { 
     padding: 4px;
   }
 
   .hd {
-    background: #ddd;
     font-weight: bold;
     text-align: right;
   }
 
   .armor {
     pre {
-      font-size: 0.7em;
       overflow: auto;
-      border: 1px solid #999;
-      background: #ffe;
+      background: #efe;
       padding: 3px;
-      height: 100px;
+      min-height: 200px;
+      //max-height: 300px;
       margin: 0;
     }
 
@@ -66,5 +79,12 @@
       margin: 0;
       padding: 0;
     }
+  }
+}
+
+// Import
+form[name=importKeysForm] {
+  textarea {
+    height: 400px;
   }
 }

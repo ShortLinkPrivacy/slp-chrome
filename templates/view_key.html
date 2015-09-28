@@ -14,7 +14,7 @@
     </tr>
     <tr>
       <td colspan="2" class="armor">
-        <a href="" ng-click="toggle()">show {{ showPublic ? 'private' : 'public' }}</a>
+        <a href="" ng-show="canShowPrivate" ng-click="toggle()">show {{ showPublic ? 'private' : 'public' }}</a>
         <pre ng-class="showPublic ? '' : 'private'">
           {{ showPublic ? selectedKey.publicKeyArmored : selectedKey.privateKeyArmored }}
         </pre>

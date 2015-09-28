@@ -1,54 +1,53 @@
 <!doctype html>
-<html data-ng-app="Settings" data-ng-csp="">
+<html>
   <head>
     <meta charset="UTF-8">
     <title>Pretty Good Plugin (Settings)</title>
 
     <!-- Vendors CSS -->
-    <link rel="stylesheet" href="css/mincss.css">
-    <link rel="stylesheet" href="bower_components/angular/angular-csp.css">
+    <link rel="stylesheet" href="css/pure-min.css">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
 
     <!-- Local CSS -->
     <link rel="stylesheet/less" type="text/css" href="css/style.less">
 
     <!-- Vendors JS -->
-    <script src="./bower_components/angular/angular.min.js"></script>
+    <script src="./bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="./bower_components/rivets/dist/rivets.bundled.min.js"></script>
     <script src="./bower_components/openpgp/dist/openpgp.min.js"></script>
     <script src="./bower_components/less/dist/less.js"></script>
 
     <!-- Code -->
-    <script src="./src/classes/config.js"></script>
-    <script src="./src/classes/keyring.js"></script>
-    <script src="./src/app.js"></script>
+    <script src="src/classes/config.js"></script>
+    <script src="src/classes/storage.js"></script>
+    <script src="src/classes/keyring.js"></script>
+    <script src="src/app.js"></script>
   </head>
   <body>
-    <nav class="nav" tabindex="-1" onclick="this.focus()">
-        <div class="container">
-            <a ng-click="switch('list')" class="pagename current" href="#">My Keys</a>
-            <a href="#">Friend's Keys</a>
-            <a href="#">Settings</a> 
-            <a href="#">About</a>
-        </div>
-    </nav>
-    <button class="btn-close btn btn-sm">×</button>
-    <div id="container" ng-controller="MainController">
-      <div class="row" ng-if="false">
-        <div class="col c12" ng-include="'templates/keys/paste.html'">
-        </div><!-- keys -->
-      </div><!-- .row -->
-      <div class="row" ng-if="false">
-        <div class="col c12" ng-include="'templates/keys/view.html'">
-        </div><!-- keys -->
-      </div><!-- .row -->
-      <div class="row" ng-if="true">
-        <div class="col c12" ng-include="'templates/keys/list.html'">
-        </div><!-- keys -->
-      </div><!-- .row -->
-      <div class="row" ng-if="false">
-        <div class="col c12" ng-include="'templates/keys/create.html'">
-        </div><!-- keys -->
-      </div><!-- .row -->
+    <div id="container" >
+      <nav class="pure-menu pure-menu-horizontal">
+          <ul class="pure-menu-list">
+            <li class="pure-menu-item pure-menu-selected"><a href="#" class="pure-menu-link"><i class="fa fa-home"></i> Dashboard</a></li>
+              <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+                <a href="#" class="pure-menu-link"><i class="fa fa-user"></i> My Keys</a>
+                <ul class="pure-menu-children">
+                  <li class="pure-menu-item"><a href="#" class="pure-menu-link"><i class="fa fa-shield"></i> Generate</a></li>
+                  <li class="pure-menu-item"><a href="#" class="pure-menu-link"><i class="fa fa-clipboard"></i> Import</a></li>
+                  <li class="pure-menu-item"><a href="#" class="pure-menu-link"> List</a></li>
+                </ul>
+              </li>
+              <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+                <a href="#" class="pure-menu-link"><i class="fa fa-group"></i> Friend's Keys</a>
+                <ul class="pure-menu-children">
+                  <li class="pure-menu-item"><a href="#" class="pure-menu-link"><i class="fa fa-clipboard"></i> Import</a></li>
+                  <li class="pure-menu-item"><a href="#" class="pure-menu-link">List</a></li>
+                </ul>
+              </li>
+              <li class="pure-menu-item"><a href="#" class="pure-menu-link"><i class="fa fa-gear"></i> Settings</a></li>
+          </ul>
+      </nav>
+      <article>
+      </article>
     </div><!-- #container -->
-
   </body>
 </html>

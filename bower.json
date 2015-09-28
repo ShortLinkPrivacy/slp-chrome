@@ -15,9 +15,8 @@
     "tests"
   ],
   "dependencies": {
-    "react": "",
-    "knockout": "",
-    "angular": "~1.4.1",
+    "jquery": "",
+    "rivets": "",
     "openpgp": "~1.2.0",
     "less": "",
     "jasmine": ""

@@ -1,7 +1,7 @@
 # A keyring is an array of Key structures. It contains all own PGP keys 
 # possesed by the user of the application.
 #
-class KeyRing
+class Keyring
     keyring = []
 
     constructor: (@config)->
@@ -46,4 +46,4 @@ class KeyRing
     all: ->
         keyring
 
-window.KeyRing = KeyRing
+window.Keyring = Keyring

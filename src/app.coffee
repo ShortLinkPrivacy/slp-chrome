@@ -1,109 +1,129 @@
-app = angular.module 'Settings', []
+app     = null
+config  = new window.Config()
+keyring = new window.Keyring(config)
+storage = new window.Storage(config)
 
-# ----------------------------------------
-# Config factory
-# ----------------------------------------
-.factory 'config', ->
-    new window.Config()
+##########################################################
+# Article
+##########################################################
+#
+class Article
+    constructor: ->
+        @error = null
+        @note = null
+        @initialize()
 
-# ----------------------------------------
-# Keyring factory
-# ----------------------------------------
-.factory 'keyring', ['config', (config)->
-    new window.KeyRing(config)
-]
+    # Override with the name of the template
+    filename: null
 
-# ----------------------------------------
-# MainController
-# ----------------------------------------
-.controller 'MainController', [ '$scope', 'config', ($scope, config)->
-    $scope.view = 'list'
-    $scope.switch = (to)->
-        $scope.view = to
+    # Runs right after the constructor. Use it to
+    # initialize defaults and variables
+    initialize: ->
 
-    $scope.selectedKey = null
-#    $scope.$watch "selectedKey", (o, n)->
-#        "selectedKey changed to #{n}"
-]
+    # Fires when the article is inserted into the page
+    # and all events are attached
+    # Use it to find elements within the article.
+    onBind: ->
 
-# ----------------------------------------
-# ListKeysController
-# ----------------------------------------
-.controller 'ListKeysController', [ '$scope', 'keyring', ( $scope, keyring )->
-    $scope.keyring = keyring
-    $scope.selectedKey = if keyring.length() then keyring.at(0) else null
-]
+class MyKeysList extends Article
+    filename: 'mykeys/list.html'
 
-# ----------------------------------------
-# KeyInfoController
-# ----------------------------------------
-.controller 'ViewKeysController', [ '$scope', 'keyring', ( $scope, keyring ) ->
-    return unless $scope.selectedKey?
-    $scope.showPublic = yes
-    $scope.toggle = ->
-        $scope.showPublic = not $scope.showPublic
+class KeyPairGenerate extends Article
+    filename: 'mykeys/generate.html'
 
-    $scope.createdDate = new Date()
-    $scope.createdDate.setTime($scope.selectedKey.created)
-]
+    onBind: ->
+        @form = (document.getElementsByName 'newKeysForm')[0]
 
-# ----------------------------------------
-# CreateKeysController
-# ----------------------------------------
-.controller 'CreateKeysController', [ '$scope', 'config', 'keyring', ($scope, config, keyring)->
-    $scope.form =
-        bits: config.defaultBits
-        name: null
-        email: null
-        passphrase: null
-        confirm: null
+    submit: =>
+        return unless @form.checkValidity()
 
-    $scope.error = null
-    $scope.spinner = null
-    $scope.keypair = null
-
-    $scope.generateKeys = ->
-        $scope.error = null
-
-        unless $scope.newKeysForm.$valid
-            $scope.error = "Form error. Please see below for more information."
+        if @passphrase != @confirm
+            @error = "The passphrase and the passphrase confirmation do not match"
             return
 
-        if $scope.form.passphrase != $scope.form.confirm
-            $scope.error = "The passphrase and the passphrase confirmation do not match"
-            return
-
-        if keyring.find($scope.form.email)
-            $scope.error = "A key with this email already exists"
-            return
-
-        $scope.spinner = on
+        @spinner = on
 
         options =
             numBits: config.defaultBits
-            userId: "#{$scope.form.name} <#{$scope.form.email}>"
-            passphrase: $scope.passphrase
+            userId: "#{@name} <#{@email}>"
+            passphrase: @passphrase
 
         openpgp.generateKeyPair(options)
         .then (keypair)=>
-            $scope.spinner = off
+            storage.set { key: keypair.key }, =>
+                @spinner = off
 
-            # Collect needed props in the key object
-            $scope.selectedKey =
-                userId: options.userId
-                publicKeyArmored: keypair.publicKeyArmored
-                privateKeyArmored: keypair.privateKeyArmored
-                fingerprint: keypair.key.primaryKey.fingerprint
-                created: keypair.key.primaryKey.created.getTime()
-                algorithm: keypair.key.primaryKey.algorithm
-
-            # .. and add it to the keyring
-            keyring.add $scope.selectedKey
 
         .catch (error)=>
-            $scope.spinner = off
-            $scope.error = "Can not create a new key - #{error}"
-]
+            @spinner = off
+            @error = "Can not create a new key - #{error}"
+
+        return no
 
 
-window.app = app
+class KeyPairImport extends Article
+    filename: 'mykeys/import.html'
+
+    onBind: ->
+        @form = (document.getElementsByName 'importKeysForm')[0]
+
+    submit: =>
+        return unless @form.checkValidity()
+
+        key = openpgp.key.readArmored(@key)
+        if key.err?.length or not key.isPrivate()
+            @error = "This does not seem to be a valid private key"
+            return
+
+        storage.set { key: key }, =>
+            @note = "Your key has been imported"
+
+        return no
+
+
+class ArticleSwitcher
+    constructor: ->
+        @path = "templates"
+        @articles =
+            keyPairGenerate: new KeyPairGenerate()
+            keyPairImport: new KeyPairImport()
+            myKeysList: new MyKeysList()
+
+        @curent = null
+        @binding = null
+        @element = $('article')
+
+    error: (message)->
+        @element.html(message).addClass('warning')
+
+    to: (name)->
+        @binding.unbind() if @binding?
+        @current = name
+        article = @articles[name]
+
+        # Sanity check - do we have this article?
+        if not article?
+            @error "Article #{name} not initialized"
+            return
+
+        # Get the fullpath of the aricle
+        fullpath = "#{@path}/#{article.filename}"
+
+        # Load it into the element
+        @element.load fullpath, (res, status, xhr)=>
+
+            # Error
+            if status == "error"
+                @error "Can not load #{fullpath}"
+                return
+
+            @binding = rivets.bind @element, article
+            article.onBind()
+
+class App
+    constructor: ->
+        @switch = new ArticleSwitcher()
+        @switch.to 'keyPairImport'
+
+$ ->
+    window.app = new App()

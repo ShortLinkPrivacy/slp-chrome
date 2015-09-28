@@ -28,4 +28,6 @@ node_modules
 bower_components
 .module_cache
 src/*.js
+src/classes/*.js
 jasmine/*.js
+private.txt
