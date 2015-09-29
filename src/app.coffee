@@ -25,17 +25,11 @@ class Article
     # Use it to find elements within the article.
     onBind: ->
 
-class MyKeysList extends Article
-    filename: 'mykeys/list.html'
-
 class KeyPairGenerate extends Article
     filename: 'mykeys/generate.html'
 
-    onBind: ->
-        @form = (document.getElementsByName 'newKeysForm')[0]
-
-    submit: =>
-        return unless @form.checkValidity()
+    submit: (e)=>
+        e.preventDefault()
 
         if @passphrase != @confirm
             @error = "The passphrase and the passphrase confirmation do not match"
@@ -50,7 +44,7 @@ class KeyPairGenerate extends Article
 
         openpgp.generateKeyPair(options)
         .then (keypair)=>
-            storage.set { key: keypair.key }, =>
+            storage.set { key: keypair.publicKeyArmored }, =>
                 @spinner = off
 
 
@@ -58,28 +52,34 @@ class KeyPairGenerate extends Article
             @spinner = off
             @error = "Can not create a new key - #{error}"
 
-        return no
-
 
 class KeyPairImport extends Article
     filename: 'mykeys/import.html'
 
-    onBind: ->
-        @form = (document.getElementsByName 'importKeysForm')[0]
+    submit: (e)=>
+        e.preventDefault()
 
-    submit: =>
-        return unless @form.checkValidity()
-
-        key = openpgp.key.readArmored(@key)
-        if key.err?.length or not key.isPrivate()
+        result = openpgp.key.readArmored(@key)
+        if result.err?.length > 0 or result.keys?.length == 0
             @error = "This does not seem to be a valid private key"
             return
 
-        storage.set { key: key }, =>
-            @note = "Your key has been imported"
+        key = result.keys[0]
+        if not key.isPrivate()
+            @error = "This does not seem to be a valid private key"
+            return
 
-        return no
+        storage.set { key: key.armor() }, =>
+            @note = "Your key has been imported" # XXX
 
+class KeyPairView extends Article
+    filename: 'mykeys/view.html'
+
+    onBind: =>
+        if app.key then return @key = app.key
+        app.readKey (key)=>
+            @key = key
+            @public = key.toPublic()
 
 class ArticleSwitcher
     constructor: ->
@@ -87,7 +87,7 @@ class ArticleSwitcher
         @articles =
             keyPairGenerate: new KeyPairGenerate()
             keyPairImport: new KeyPairImport()
-            myKeysList: new MyKeysList()
+            keyPairView: new KeyPairView()
 
         @curent = null
         @binding = null
@@ -122,8 +122,26 @@ class ArticleSwitcher
 
 class App
     constructor: ->
+        @element = (document.getElementsByTagName('body'))[0]
+        @key = null
+
         @switch = new ArticleSwitcher()
-        @switch.to 'keyPairImport'
+        @switch.to 'keyPairView'
+
+    template: (e)=>
+        e.preventDefault()
+        @switch.to e.target.rel
+
+    readKey: (callback)=>
+        storage.get 'key', (result)=>
+            if not result.key?
+                throw "Can't read private key"
+
+            @key = (openpgp.key.readArmored result.key).keys[0]
+            window.key = @key
+            callback @key
+
 
 $ ->
-    window.app = new App()
+    app = window.app = new App()
+    rivets.bind app.element, app

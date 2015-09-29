@@ -27,23 +27,9 @@
     <div id="container" >
       <nav class="pure-menu pure-menu-horizontal">
           <ul class="pure-menu-list">
-            <li class="pure-menu-item pure-menu-selected"><a href="#" class="pure-menu-link"><i class="fa fa-home"></i> Dashboard</a></li>
-              <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
-                <a href="#" class="pure-menu-link"><i class="fa fa-user"></i> My Keys</a>
-                <ul class="pure-menu-children">
-                  <li class="pure-menu-item"><a href="#" class="pure-menu-link"><i class="fa fa-shield"></i> Generate</a></li>
-                  <li class="pure-menu-item"><a href="#" class="pure-menu-link"><i class="fa fa-clipboard"></i> Import</a></li>
-                  <li class="pure-menu-item"><a href="#" class="pure-menu-link"> List</a></li>
-                </ul>
-              </li>
-              <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
-                <a href="#" class="pure-menu-link"><i class="fa fa-group"></i> Friend's Keys</a>
-                <ul class="pure-menu-children">
-                  <li class="pure-menu-item"><a href="#" class="pure-menu-link"><i class="fa fa-clipboard"></i> Import</a></li>
-                  <li class="pure-menu-item"><a href="#" class="pure-menu-link">List</a></li>
-                </ul>
-              </li>
-              <li class="pure-menu-item"><a href="#" class="pure-menu-link"><i class="fa fa-gear"></i> Settings</a></li>
+            <li class="pure-menu-item"><a rv-on-click="template" href="#" rel="keyPairGenerate" class="pure-menu-link"> Generate</a></li>
+            <li class="pure-menu-item"><a rv-on-click="template" href="#" rel="keyPairImport" class="pure-menu-link"> Import</a></li>
+            <li class="pure-menu-item"><a rv-on-click="template" href="#" rel="keyPairView" class="pure-menu-link"> View</a></li>
           </ul>
       </nav>
       <article>
