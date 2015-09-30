@@ -1,0 +1,28 @@
+<div rv-show="key">
+  <h1>Your PGP key</h1>
+  <table class="pure-table">
+    <tbody>
+      <tr>
+        <td>Fingerprint</td>
+        <td>{ public.primaryKey.fingerprint }</td>
+      </tr>
+      <tr>
+        <td>User IDs</td>
+        <td>
+          <ul>
+            <li rv-each-user="key.getUserIds">{ user }</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2"><pre>{ public.armor }</pre></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div rv-hide="key">
+  <h1>No personal PGP key found</h1>
+  <button rv-on-click="toGenerate" class="pure-button">Create a new PGP key</button>
+  <button rv-on-click="toImport" class="pure-button">Import an existing PGP key</button>
+</div>

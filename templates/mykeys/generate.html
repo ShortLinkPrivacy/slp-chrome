@@ -1,6 +1,6 @@
 <div class="pure-g">
   <div class="pure-u-2-5">
-    <form name="newKeysForm" class="pure-form pure-form-aligned">
+    <form name="newKeysForm" rv-on-submit="submit" class="pure-form pure-form-aligned">
       <fieldset>
         <legend>Generate a new key pair</legend>
         <div class="pure-g" rv-show="error">
@@ -24,7 +24,7 @@
             <input rv-value="confirm" type="password" required="yes" minlength="10" />
           </div>
           <div class="pure-control-group">
-            <button rv-on-click="submit" class="pure-button pure-button-primary">Create</button>
+            <button type="submit" class="pure-button pure-button-primary">Create</button>
             <span rv-show="spinner"><i class="fa fa-cog fa-spin"></i></span>
           </div>
       </fieldset>

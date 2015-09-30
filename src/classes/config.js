@@ -9,9 +9,8 @@
         opts = {};
       }
       result = {
-        keypair: 'keypair',
-        defaultBits: 2048,
-        keyringTag: 'keyring'
+        keyName: 'privateKey',
+        defaultBits: 2048
       };
       for (prop in opts) {
         if (opts.hasOwnPropety(prop)) {

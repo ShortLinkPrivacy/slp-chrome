@@ -25,6 +25,7 @@ class Article
     # Use it to find elements within the article.
     onBind: ->
 
+
 class KeyPairGenerate extends Article
     filename: 'mykeys/generate.html'
 
@@ -44,8 +45,9 @@ class KeyPairGenerate extends Article
 
         openpgp.generateKeyPair(options)
         .then (keypair)=>
-            storage.set { key: keypair.publicKeyArmored }, =>
+            storage.set config.keyName, keypair.publicKeyArmored, =>
                 @spinner = off
+                app.switch.to 'keyPairView'
 
 
         .catch (error)=>
@@ -69,8 +71,9 @@ class KeyPairImport extends Article
             @error = "This does not seem to be a valid private key"
             return
 
-        storage.set { key: key.armor() }, =>
-            @note = "Your key has been imported" # XXX
+        storage.set config.keyName, key.armor(), =>
+            app.switch.to 'keyPairView'
+
 
 class KeyPairView extends Article
     filename: 'mykeys/view.html'
@@ -79,7 +82,23 @@ class KeyPairView extends Article
         if app.key then return @key = app.key
         app.readKey (key)=>
             @key = key
-            @public = key.toPublic()
+            @public = key?.toPublic()
+
+    toGenerate: ->
+        app.switch.to 'keyPairGenerate'
+
+    toImport: ->
+        app.switch.to 'keyPairImport'
+
+
+class KeyPairRemove extends Article
+    filename: 'mykeys/remove.html'
+
+    doRemove: ->
+        storage.remove config.keyName
+        app.key = null
+        app.switch.to 'keyPairView'
+
 
 class ArticleSwitcher
     constructor: ->
@@ -88,6 +107,7 @@ class ArticleSwitcher
             keyPairGenerate: new KeyPairGenerate()
             keyPairImport: new KeyPairImport()
             keyPairView: new KeyPairView()
+            keyPairRemove: new KeyPairRemove()
 
         @curent = null
         @binding = null
@@ -120,6 +140,7 @@ class ArticleSwitcher
             @binding = rivets.bind @element, article
             article.onBind()
 
+
 class App
     constructor: ->
         @element = (document.getElementsByTagName('body'))[0]
@@ -133,11 +154,10 @@ class App
         @switch.to e.target.rel
 
     readKey: (callback)=>
-        storage.get 'key', (result)=>
-            if not result.key?
-                throw "Can't read private key"
+        storage.get config.keyName, (key)=>
+            return callback() unless key?
 
-            @key = (openpgp.key.readArmored result.key).keys[0]
+            @key = (openpgp.key.readArmored key).keys[0]
             window.key = @key
             callback @key
 
