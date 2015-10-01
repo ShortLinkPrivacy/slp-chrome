@@ -3,6 +3,33 @@ config  = new window.Config()
 storage = new window.Storage(config)
 
 ##########################################################
+# PublicKey
+##########################################################
+#
+class PublicKey
+    constructor: (@key)->
+
+    fingerprint: ->
+        @key.primaryKey.fingerprint
+
+    save: ->
+        storage.get 'directory', (dir)=>
+            dir = {} unless dir?
+
+            for userId in @key.getUserIds()
+                dir[userId] = @fingerprint()
+
+            value =
+                userIds: @key.getUserIds()
+                armor: @key.armor()
+
+            storage.set @fingerprint(), value, =>
+                # XXX
+                console.log "Saved #{@fingerprint()}"
+                console.log dir
+
+
+##########################################################
 # Article
 ##########################################################
 #
@@ -25,6 +52,10 @@ class Article
     onBind: ->
 
 
+##########################################################
+# KeyGenerate
+##########################################################
+#
 class KeyGenerate extends Article
     filename: 'key/generate.html'
 
@@ -54,6 +85,10 @@ class KeyGenerate extends Article
             @error = "Can not create a new key - #{error}"
 
 
+##########################################################
+# KeyImport
+##########################################################
+#
 class KeyImport extends Article
     filename: 'key/import.html'
 
@@ -74,6 +109,10 @@ class KeyImport extends Article
             app.switch.to 'keyView'
 
 
+##########################################################
+# KeyView
+##########################################################
+#
 class KeyView extends Article
     filename: 'key/view.html'
 
@@ -90,6 +129,10 @@ class KeyView extends Article
         app.switch.to 'keyImport'
 
 
+##########################################################
+# KeyRemove
+##########################################################
+#
 class KeyRemove extends Article
     filename: 'key/remove.html'
 
@@ -98,7 +141,34 @@ class KeyRemove extends Article
         app.key = null
         app.switch.to 'keyView'
 
+##########################################################
+# PublicImport
+##########################################################
+#
+class PublicImport extends Article
+    filename: 'public/import.html'
 
+    submit: (e)=>
+        e.preventDefault()
+
+        result = openpgp.key.readArmored(@key)
+        if result.err?.length > 0 or result.keys?.length == 0
+            @error = "This does not seem to be a valid public key"
+            return
+
+        key = result.keys[0]
+        if not key.isPublic()
+            @error = "This does not seem to be a valid public key"
+            return
+        
+        pub = new PublicKey(key)
+        pub.save()
+
+
+##########################################################
+# ArticleSwitcher
+##########################################################
+#
 class ArticleSwitcher
     constructor: ->
         @path = "templates"
@@ -107,6 +177,7 @@ class ArticleSwitcher
             keyImport: new KeyImport()
             keyView: new KeyView()
             keyRemove: new KeyRemove()
+            publicImport: new PublicImport()
 
         @curent = null
         @binding = null
@@ -140,6 +211,10 @@ class ArticleSwitcher
             article.onBind()
 
 
+##########################################################
+# App
+##########################################################
+#
 class App
     constructor: ->
         @element = (document.getElementsByTagName('body'))[0]
@@ -161,6 +236,10 @@ class App
             callback @key
 
 
+##########################################################
+# Main
+##########################################################
+#
 window.onload = ->
     app = window.app = new App()
     rivets.bind app.element, app
