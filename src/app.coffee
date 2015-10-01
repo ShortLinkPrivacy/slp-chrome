@@ -1,6 +1,5 @@
 app     = null
 config  = new window.Config()
-keyring = new window.Keyring(config)
 storage = new window.Storage(config)
 
 ##########################################################
@@ -26,7 +25,7 @@ class Article
     onBind: ->
 
 
-class KeyPairGenerate extends Article
+class KeyGenerate extends Article
     filename: 'mykeys/generate.html'
 
     submit: (e)=>
@@ -47,7 +46,7 @@ class KeyPairGenerate extends Article
         .then (keypair)=>
             storage.set config.keyName, keypair.publicKeyArmored, =>
                 @spinner = off
-                app.switch.to 'keyPairView'
+                app.switch.to 'keyView'
 
 
         .catch (error)=>
@@ -55,7 +54,7 @@ class KeyPairGenerate extends Article
             @error = "Can not create a new key - #{error}"
 
 
-class KeyPairImport extends Article
+class KeyImport extends Article
     filename: 'mykeys/import.html'
 
     submit: (e)=>
@@ -72,10 +71,10 @@ class KeyPairImport extends Article
             return
 
         storage.set config.keyName, key.armor(), =>
-            app.switch.to 'keyPairView'
+            app.switch.to 'keyView'
 
 
-class KeyPairView extends Article
+class KeyView extends Article
     filename: 'mykeys/view.html'
 
     onBind: =>
@@ -85,29 +84,29 @@ class KeyPairView extends Article
             @public = key?.toPublic()
 
     toGenerate: ->
-        app.switch.to 'keyPairGenerate'
+        app.switch.to 'keyGenerate'
 
     toImport: ->
-        app.switch.to 'keyPairImport'
+        app.switch.to 'keyImport'
 
 
-class KeyPairRemove extends Article
+class KeyRemove extends Article
     filename: 'mykeys/remove.html'
 
     doRemove: ->
         storage.remove config.keyName
         app.key = null
-        app.switch.to 'keyPairView'
+        app.switch.to 'keyView'
 
 
 class ArticleSwitcher
     constructor: ->
         @path = "templates"
         @articles =
-            keyPairGenerate: new KeyPairGenerate()
-            keyPairImport: new KeyPairImport()
-            keyPairView: new KeyPairView()
-            keyPairRemove: new KeyPairRemove()
+            keyGenerate: new KeyGenerate()
+            keyImport: new KeyImport()
+            keyView: new KeyView()
+            keyRemove: new KeyRemove()
 
         @curent = null
         @binding = null
@@ -147,7 +146,7 @@ class App
         @key = null
 
         @switch = new ArticleSwitcher()
-        @switch.to 'keyPairView'
+        @switch.to 'keyView'
 
     template: (e)=>
         e.preventDefault()
