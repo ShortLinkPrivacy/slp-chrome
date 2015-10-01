@@ -162,6 +162,6 @@ class App
             callback @key
 
 
-$ ->
+window.onload = ->
     app = window.app = new App()
     rivets.bind app.element, app
