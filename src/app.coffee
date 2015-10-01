@@ -26,7 +26,7 @@ class Article
 
 
 class KeyGenerate extends Article
-    filename: 'mykeys/generate.html'
+    filename: 'key/generate.html'
 
     submit: (e)=>
         e.preventDefault()
@@ -55,7 +55,7 @@ class KeyGenerate extends Article
 
 
 class KeyImport extends Article
-    filename: 'mykeys/import.html'
+    filename: 'key/import.html'
 
     submit: (e)=>
         e.preventDefault()
@@ -75,7 +75,7 @@ class KeyImport extends Article
 
 
 class KeyView extends Article
-    filename: 'mykeys/view.html'
+    filename: 'key/view.html'
 
     onBind: =>
         if app.key then return @key = app.key
@@ -91,7 +91,7 @@ class KeyView extends Article
 
 
 class KeyRemove extends Article
-    filename: 'mykeys/remove.html'
+    filename: 'key/remove.html'
 
     doRemove: ->
         storage.remove config.keyName
