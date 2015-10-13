@@ -1,6 +1,5 @@
 
-urlRe = /1pg\.pw\/(k|m)\/(.+)$/gi
-
+urlRe = /localhost\/(.+)$/gi
 
 loadModule = ->
     unless openpgp?
