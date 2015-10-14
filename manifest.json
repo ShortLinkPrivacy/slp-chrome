@@ -21,7 +21,7 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": [ "content.js"]
+      "js": [ "bower_components/jquery/dist/jquery.min.js", "content.js"]
     }
   ],
 

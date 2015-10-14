@@ -1,22 +1,35 @@
 
-urlRe = /localhost\/(.+)$/gi
+openpgp = null
+triggerRe = /localhost\/x\/(.+)$/gi
+apiUrl = "http://localhost:5000"
 
-loadModule = ->
+loadModules = (callback)->
     unless openpgp?
-        chrome.runtime.sendMessage { loadModule: yes }, (response)->
-            console.log response
-            console.log openpgp.config
-
+        chrome.runtime.sendMessage { loadModules: yes }, (response)=>
+            console.log 'openpgp loaded'
+            openpgp = window.openpgp
+            callback?()
 
 decryptLinks = (node)->
-    match = urlRe.exec(node.nodeValue)
+    match = triggerRe.exec(node.nodeValue)
     while match?
-        console.log "Found: #{match[0]} - #{match[1]} - #{match[2]}"
-        match = urlRe.exec(node.nodeValue)
+        id = match[1]
+        console.log "Found: #{id}"
+        $.get "#{apiUrl}/x/#{id}", (res)->
+            window.node = node
+            node.nodeValue = res.fingerprint
+        match = triggerRe.exec(node.nodeValue)
 
+pageContainsCode = ->
+    walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT)
+    while node = walk.nextNode()
+        if triggerRe.exec(node.nodeValue)
+            return true
+    false
 
-walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT)
-while node = walk.nextNode()
-    decryptLinks(node)
-
-console.log "Done"
+# Main
+if pageContainsCode()
+    loadModules =>
+        walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT)
+        while node = walk.nextNode()
+            decryptLinks(node)
