@@ -1,0 +1,15 @@
+#content {
+    padding: 10px;
+}
+
+.link {
+    cursor: pointer;
+    font-size: 0.8em;
+    text-decoration: underline;
+}
+
+textarea {
+    width: 500px;
+    height: 200px;
+    clear: both;
+}
