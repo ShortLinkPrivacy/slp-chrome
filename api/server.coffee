@@ -1,15 +1,35 @@
 express = require 'express'
 bodyParser = require 'body-parser'
+MongoClient = require('mongodb').MongoClient
+ObjectId = require('mongodb').ObjectID
 
+# -----------------------------------------
+# Contants
+# -----------------------------------------
 port = 5000
-storage = []
+mongoUrl = 'mongodb://localhost:27017/test'
+
+# -----------------------------------------
+# Global variables
+# -----------------------------------------
+
+# MongoDB database handle
+mongo = null
+storage = null
 
 app = express()
 app.use(bodyParser.json())
 
 app.get '/x/:id', (req, res)->
     id = req.params.id
-    res.json storage[id]
+    objId = new ObjectId id
+    storage.findOne { _id: objId }, (err, result)->
+        if err?
+            res.statusCode = 500
+            res.json { error: err }
+        else
+            res.statusCode = 200
+            res.json result
 
 app.post '/x', (req, res)->
     payload = req.body
@@ -23,9 +43,17 @@ app.post '/x', (req, res)->
     # idiots don't begin using this service as a free anonymous
     # key-value storage.
     
-    storage.push(payload)
-    res.json { id: storage.length }
+    storage.insertOne payload, (err, result)->
+        if err?
+            res.statusCode = 500
+            res.json { error: err }
+        else
+            res.statusCode = 201
+            res.json { id: result.insertedId }
 
 # Bootstrap
 app.listen port, ->
-    console.log "Server listening on port #{port} ..."
+    MongoClient.connect mongoUrl, (err, db)->
+        mongo = db
+        storage = db.collection 'Items'
+        console.log "Server listening on port #{port} ..."

@@ -8,6 +8,6 @@
   "dependencies": {
     "body-parser": "^1.14.1",
     "express": "^4.13.3",
-    "winston": "^1.1.0"
+    "mongodb": "^2.0.45"
   }
 }
