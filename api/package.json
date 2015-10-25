@@ -7,7 +7,13 @@
   },
   "dependencies": {
     "body-parser": "^1.14.1",
+    "config": "^1.16.0",
     "express": "^4.13.3",
-    "mongodb": "^2.0.45"
+    "mongoskin": "^2.0.3"
+  },
+  "devDependencies": {
+    "mocha": "^2.3.3",
+    "superagent": "^1.4.0",
+    "supertest": "^1.1.0"
   }
 }

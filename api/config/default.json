@@ -1,0 +1,9 @@
+{
+  "name": "PGP key-value store",
+  "mongo": {
+    "url": "mongodb://localhost:27017/pgp"
+  },
+  "express": {
+    "port": 5000
+  }
+}

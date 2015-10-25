@@ -27,7 +27,6 @@ build/Release
 node_modules
 bower_components
 .module_cache
-src/*.js
-src/classes/*.js
-jasmine/*.js
+*.js
 private.txt
+public.txt
