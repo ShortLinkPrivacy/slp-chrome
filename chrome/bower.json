@@ -15,10 +15,12 @@
     "tests"
   ],
   "dependencies": {
-    "jquery": "",
-    "rivets": "",
     "openpgp": "~1.2.0",
-    "less": "",
-    "jasmine": ""
+    "rivets": "~0.8.1"
+  },
+  "devDependencies": {
+    "less": "~2.5.3",
+    "mocha": "~2.3.3",
+    "jquery": "~2.1.4"
   }
 }
