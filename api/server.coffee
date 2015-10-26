@@ -2,11 +2,20 @@ express = require 'express'
 bodyParser = require 'body-parser'
 mongo = require 'mongoskin'
 config = require 'config'
+log4js = require 'log4js'
 
 # -----------------------------------------
-# Global variables
+# Setup
 # -----------------------------------------
 
+# Logger
+log4js.configure {
+    appenders: config.get('log4js.appenders')
+}
+logger = log4js.getLogger 'app'
+logger.setLevel(config.get('log4js.level'))
+
+# DB
 db = mongo.db(config.get 'mongo.url')
 db.bind('items')
 ObjectId = mongo.ObjectID
@@ -22,6 +31,9 @@ app.ObjectId = ObjectId
 # Express middleware
 # -----------------------------------------
 app.use(bodyParser.json())
+app.use (req, res, next)->
+    logger.info("#{req.method} #{req.path}")
+    next()
 
 # -----------------------------------------
 # Routes
@@ -48,7 +60,8 @@ app.get '/x/:id', (req, res)->
     # Find the id in items
     db.items.findOne { _id: objId }, (err, result)->
         if err?
-            res.sendStatus 500      # TODO: log error
+            logger.error "findOne(#{id}) returned error: #{err}"
+            res.sendStatus 500
         else if result?
             res.statusCode = 200
             res.json result
@@ -70,8 +83,8 @@ app.post '/x', (req, res)->
     
     db.items.insertOne payload, (err, result)->
         if err?
-            res.statusCode = 500
-            res.json { error: err }
+            logger.error "insertOne (#{payload}) resulted in error: #{err}"
+            res.sendStatus = 500
         else
             res.statusCode = 201
             res.json { id: result.insertedId }
@@ -81,6 +94,6 @@ app.post '/x', (req, res)->
 if require.main == module
     port = config.get('express.port')
     app.listen port, ->
-        console.log "The server is running at port #{port}"
+        logger.info "The server is running at port #{port}"
 
 module.exports = app

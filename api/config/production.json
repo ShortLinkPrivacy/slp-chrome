@@ -1,2 +1,12 @@
 {
+  "log4js": {
+    "appenders": [
+      { 
+        "type": "file",
+        "filename": "log/error.log"
+      },
+      "level": "ERROR"
+    ],
+    "level": "TRACE"
+  },
 }
