@@ -70,6 +70,7 @@ app.get '/x/:id', (req, res)->
 
 
 app.post '/x', (req, res)->
+    #logger.trace "req.headers", req.headers
     payload = req.body
 
     unless payload?.keys? or payload?.messages?
