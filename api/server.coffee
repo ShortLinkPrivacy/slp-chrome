@@ -52,7 +52,7 @@ app.get '/x/:id', (req, res)->
     
     # Not json? Return a text with a link to install the extension
     # TODO: Send a full HTML with links here
-    unless req.get('Accept') == "application/json"
+    unless req.get('Content-Type') == "application/json"
         res.statusCode = 200
         res.send "Please download and install this Chrome plugin to read this message"
         return
@@ -73,10 +73,15 @@ app.post '/x', (req, res)->
     #logger.trace "req.headers", req.headers
     payload = req.body
 
-    unless payload?.keys? or payload?.messages?
+    err400 = (msg)->
         res.statusCode = 400
-        res.json { error: "Payload missing" }
-        return
+        res.json { error: msg }
+
+    if not payload?
+        return err400 "Payload missing"
+        
+    unless payload.keys? or payload.messages?
+        return err400 "Neither keys nor messages defined"
 
     # TODO: find a way to limit POSTs to internal data only, so
     # idiots don't begin using this service as a free anonymous

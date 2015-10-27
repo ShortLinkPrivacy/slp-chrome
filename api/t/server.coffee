@@ -29,7 +29,7 @@ describe 'Add item', ->
     p = null
 
     beforeEach (done)->
-        p = r.post("/x").set('Accept', 'application/json')
+        p = r.post("/x").set('Content-Type', 'application/json')
         done()
 
     describe 'POST /x', ->
@@ -66,7 +66,7 @@ describe 'Retrieve items', ->
 
     beforeEach (done)->
         p = r.post("/x")
-            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
             .send({ keys: [1,2,3] })
             .end (err, res)->
                 result = res.body
@@ -75,24 +75,24 @@ describe 'Retrieve items', ->
     describe "GET /x/:id", ->
         it "returns 404 if id not found", (done)->
             r.get("/x/562075c6850ddb4a24c9b005")
-                .set('Accept', 'application/json')
+                .set('Content-Type', 'application/json')
                 .expect(404, done)
 
         it "returns 200 if id is found", (done)->
             r.get("/x/#{result.id}")
-                .set('Accept', 'application/json')
+                .set('Content-Type', 'application/json')
                 .expect(200, done)
 
         it "returns the json stored", (done)->
             r.get("/x/#{result.id}")
-                .set('Accept', 'application/json')
+                .set('Content-Type', 'application/json')
                 .end (err, res)->
                     assert.deepEqual(res.body.keys, [1,2,3])
                     done()
 
         it "save proper data in the DB", (done)->
             r.get("/x/#{result.id}")
-                .set('Accept', 'application/json')
+                .set('Content-Type', 'application/json')
                 .end (err, res)->
                     app.db.items.findOne { _id: app.ObjectId(result.id) }, (e, r)->
                         assert.deepEqual(r.keys, [1,2,3])

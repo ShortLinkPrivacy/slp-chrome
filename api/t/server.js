@@ -26,7 +26,7 @@
     var p;
     p = null;
     beforeEach(function(done) {
-      p = r.post("/x").set('Accept', 'application/json');
+      p = r.post("/x").set('Content-Type', 'application/json');
       return done();
     });
     return describe('POST /x', function() {
@@ -66,7 +66,7 @@
     p = null;
     result = null;
     beforeEach(function(done) {
-      return p = r.post("/x").set('Accept', 'application/json').send({
+      return p = r.post("/x").set('Content-Type', 'application/json').send({
         keys: [1, 2, 3]
       }).end(function(err, res) {
         result = res.body;
@@ -75,19 +75,19 @@
     });
     return describe("GET /x/:id", function() {
       it("returns 404 if id not found", function(done) {
-        return r.get("/x/562075c6850ddb4a24c9b005").set('Accept', 'application/json').expect(404, done);
+        return r.get("/x/562075c6850ddb4a24c9b005").set('Content-Type', 'application/json').expect(404, done);
       });
       it("returns 200 if id is found", function(done) {
-        return r.get("/x/" + result.id).set('Accept', 'application/json').expect(200, done);
+        return r.get("/x/" + result.id).set('Content-Type', 'application/json').expect(200, done);
       });
       it("returns the json stored", function(done) {
-        return r.get("/x/" + result.id).set('Accept', 'application/json').end(function(err, res) {
+        return r.get("/x/" + result.id).set('Content-Type', 'application/json').end(function(err, res) {
           assert.deepEqual(res.body.keys, [1, 2, 3]);
           return done();
         });
       });
       return it("save proper data in the DB", function(done) {
-        return r.get("/x/" + result.id).set('Accept', 'application/json').end(function(err, res) {
+        return r.get("/x/" + result.id).set('Content-Type', 'application/json').end(function(err, res) {
           return app.db.items.findOne({
             _id: app.ObjectId(result.id)
           }, function(e, r) {

@@ -49,7 +49,7 @@
       e = _error;
       return res.sendStatus(404);
     }
-    if (req.get('Accept') !== "application/json") {
+    if (req.get('Content-Type') !== "application/json") {
       res.statusCode = 200;
       res.send("Please download and install this Chrome plugin to read this message");
       return;
@@ -70,14 +70,19 @@
   });
 
   app.post('/x', function(req, res) {
-    var payload;
+    var err400, payload;
     payload = req.body;
-    if (!(((payload != null ? payload.keys : void 0) != null) || ((payload != null ? payload.messages : void 0) != null))) {
+    err400 = function(msg) {
       res.statusCode = 400;
-      res.json({
-        error: "Payload missing"
+      return res.json({
+        error: msg
       });
-      return;
+    };
+    if (payload == null) {
+      return err400("Payload missing");
+    }
+    if (!((payload.keys != null) || (payload.messages != null))) {
+      return err400("Neither keys nor messages defined");
     }
     return db.items.insertOne(payload, function(err, result) {
       if (err != null) {
