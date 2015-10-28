@@ -3,12 +3,29 @@ openpgp = null
 triggerRe = /localhost\/x\/(.+)$/gi
 apiUrl = "http://localhost:5000"
 
+ajaxPost = (url, payload, success)->
+    xmlhttp = new XMLHttpRequest()
+    xmlhttp.open('POST', url, true)
+    xmlhttp.onreadystatechange = ->
+        if xmlhttp.readyState == 4
+            # TODO: try catch this
+            response = JSON.parse(xmlhttp.responseText)
+            if 200 <= xmlhttp.status <= 299
+                success(response)
+            else
+                console.log response
+
+    xmlhttp.setRequestHeader('Content-Type', 'application/json')
+    xmlhttp.send(JSON.stringify payload)
+
 loadOpenPgp = (callback)->
-    unless openpgp?
+    if not openpgp
         chrome.runtime.sendMessage { loadOpenPgp: yes }, (response)=>
             console.log 'openpgp loaded'
             openpgp = window.openpgp
             callback?()
+    else
+        callback?()
 
 encryptText = ->
     console.log "here"
@@ -33,11 +50,13 @@ pageContainsCode = ->
             return true
     false
 
+serviceCall = (payload, opt)->
+
 # Main
 
 elements = document.getElementsByTagName('textarea')
 for el in elements
-    el.onmousedown = (event)->
+    el.addEventListener 'mousedown', (event)->
         message = el.value
         return unless event.which == 3 and message
         loadOpenPgp ->
@@ -52,23 +71,12 @@ for el in elements
                         .then (encryptedMessage)->
                             fingeredHash = {}
                             fingeredHash[publicKey.primaryKey.fingerprint] = encryptedMessage
-                            $.ajax {
-                                beforeSend: (xhrObj)->
-                                    xhrObj.setRequestHeader("Accept", "application/json")
-                                contentType: "application/json"
-                                type: "POST"
-                                url: "#{apiUrl}/x"
-                                data: JSON.stringify { messages: fingeredHash }
-                                dataType: "json"
-                                success: (result)->
-                                    if result.id?
-                                        el.value = "#{apiUrl}/x/#{result.id}"
-                                    else
-                                        console.log "error" # TODO: handle error
-                                error: (error)->
-                                    console.log(error)
-                                    #TODO: handle error
-                            }
+                            ajaxPost "#{apiUrl}/x", { messages: fingeredHash }, (result)->
+                                if result.id?
+                                    el.value = "#{apiUrl}/x/#{result.id}"
+                                    el.dispatchEvent(new Event 'input')
+                                else
+                                    console.log "error" # TODO: handle error
                         .catch (error)->
                             #TODO process error
 
