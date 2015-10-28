@@ -29,3 +29,5 @@ bower_components
 .module_cache
 private.txt
 public.txt
+chrome/*.js
+api/*.js
