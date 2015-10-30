@@ -1,3 +1,4 @@
+COFFEE=$(shell which coffee)
 NODE=$(shell which node)
 APP=server.js
 MOCHA=$(shell which mocha)
@@ -18,13 +19,17 @@ clean:
 	rm -rf node_modules/
 
 start:
+	$(COFFEE) -c ./
 	$(NODE) $(APP)
 
 deploy:
+	$(COFFEE) -c ./
 	NODE_ENV=production $(NODE) $(APP)
 
 test:
+	$(COFFEE) -c t
 	NODE_ENV=test mocha t
 
 mintest:
+	$(COFFEE) -c t
 	NODE_ENV=test mocha -R min t

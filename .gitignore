@@ -31,3 +31,4 @@ private.txt
 public.txt
 chrome/*.js
 api/*.js
+api/t/*.js
