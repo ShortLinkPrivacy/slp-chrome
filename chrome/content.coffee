@@ -1,7 +1,11 @@
 
-openpgp = null
+modules = {}
 triggerRe = /localhost\/x\/(.+)$/gi
 apiUrl = "http://localhost:5000"
+
+log = ()->
+    date = new Date()
+    console.log(date.toISOString(), arguments)
 
 ajaxPost = (url, payload, success)->
     xmlhttp = new XMLHttpRequest()
@@ -18,12 +22,17 @@ ajaxPost = (url, payload, success)->
     xmlhttp.setRequestHeader('Content-Type', 'application/json')
     xmlhttp.send(JSON.stringify payload)
 
-loadOpenPgp = (callback)->
-    if not openpgp
-        chrome.runtime.sendMessage { loadOpenPgp: yes }, (response)=>
-            console.log 'openpgp loaded'
-            openpgp = window.openpgp
-            callback?()
+loadModule = (name, callback)->
+    if not modules[name]
+        log "Requesting module #{name}"
+        chrome.runtime.sendMessage { loadModule: name }, (res)=>
+            log "Received response", res
+            if (property = res.property)?
+                log "Loaded module #{property}"
+                modules[property] = window[property]
+                callback?()
+            else
+                # TODO: error
     else
         callback?()
 
@@ -59,7 +68,8 @@ for el in elements
     el.addEventListener 'mousedown', (event)->
         message = el.value
         return unless event.which == 3 and message
-        loadOpenPgp ->
+        loadModule 'openpgp', ->
+            openpgp = modules.openpgp
             chrome.storage.local.get 'privateKey', (val)->
                 privateKeyArmored  = val.privateKey
                 if not privateKeyArmored?
@@ -81,7 +91,7 @@ for el in elements
                             #TODO process error
 
 #if pageContainsCode()
-#    loadOpenPgp =>
+#    loadModule, 'openpgp', ->
 #        walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT)
 #        while node = walk.nextNode()
 #            decryptLinks(node)
