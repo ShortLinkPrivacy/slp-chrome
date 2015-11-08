@@ -6,12 +6,15 @@
 
     <link rel="stylesheet" href="css/min.css">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/widget.css">
 
     <!-- Vendors JS -->
     <script src="./bower_components/rivets/dist/rivets.bundled.min.js"></script>
+    <script src="./bower_components/jquery/dist/jquery.min.js"></script>
 
     <!-- Code -->
     <script src="js/code.js"></script>
+    <script src="js/widget.js"></script>
   </head>
   <body>
     <div id="content">
@@ -19,7 +22,7 @@
 
         <div class="col c5">
           <div class="row">
-            <textarea rv-value="message" class="smooth"></textarea>
+            <textarea rv-value="message"></textarea>
           </div>
           <div class="row">
             <button rv-on-click="submit" class="btn btn-b btn-sm smooth"> Enter </button>
@@ -35,5 +38,10 @@
 
       </div>
     </div>
+
+    <div id="pgp">
+      encrypt
+    </div>
+
   </body>
 </html>

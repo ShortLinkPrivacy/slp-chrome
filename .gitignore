@@ -34,3 +34,4 @@ chrome/src/*.js
 chrome/src/classes/*.js
 api/*.js
 api/t/*.js
+play/js/*.js
