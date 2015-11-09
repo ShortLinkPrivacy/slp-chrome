@@ -4,7 +4,7 @@ class Icon
     # Private constants
     # ------------------------------------------------
 
-    imageSize = 32
+    imageSize = 16
     imageSrc = 'icon.png'
     propsToSave = [
         'backgroundPositionX'
@@ -18,6 +18,7 @@ class Icon
     # ------------------------------------------------
 
     onMouseMove = (event)->
+        return unless @canEncrypt()
         @showIcon()
         if @isOverIcon(event)
             @el.style.cursor = 'pointer'
@@ -31,6 +32,7 @@ class Icon
         @hideIcon()
 
     onClick = (event)->
+        return unless @canEncrypt()
         if @isOverIcon(event)
             console.log @el
 
@@ -62,6 +64,13 @@ class Icon
     isOverIcon: (event)->
         return @el.offsetWidth - event.offsetX < imageSize and event.offsetY < imageSize
 
+    # Analyzes the value ot the textarea and decides if we can encrypt it
+    canEncrypt: ()->
+        return no unless @el.value
+        return no if @el.value.test(/localhost/)    # TODO: real url
+        yes
+        
+
     showIcon: ->
         @el.style.backgroundPositionX = 'right'
         @el.style.backgroundPositionY = 'top'
@@ -76,4 +85,4 @@ class Icon
 window.addEventListener 'DOMContentLoaded', ()->
         elements = document.getElementsByTagName 'textarea'
         for el in elements
-            el._icon = new Icon(el)
+            new Icon(el)
