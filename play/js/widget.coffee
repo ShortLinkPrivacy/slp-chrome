@@ -106,15 +106,6 @@ class Icon
         popup.style.left = "#{x}px"
         popup.style.top = "#{y}px"
 
-        # header element
-        header = document.createElement('div')
-        header.style.width = "100%"
-        header.style.height = "#{headerHeight}px"
-        header.style.margin = "0"
-        header.style.padding = "0"
-        header.backgroundColor = "#ccc"
-        popup.appendChild(header)
-
         # iframe element
         iframe = document.createElement('iframe')
         iframe.src = iframeSrc

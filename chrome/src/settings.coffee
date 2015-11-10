@@ -160,7 +160,7 @@ class PublicImport extends Article
         if not key.isPublic()
             @error = "This does not seem to be a valid public key"
             return
-        
+
         pub = new PublicKey(key)
         pub.save()
 

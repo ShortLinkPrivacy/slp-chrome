@@ -6,16 +6,9 @@
   "description": "This extension allows you to use PGP to encrypt and decrypt text in your browser. It will automatically recognize encrypted text and allow you to decrypt it with a click of the mouse. You will be able to send encrypted text anywhere. That means email, social networks, insta-whatevers, you name it",
   "version": "1.0",
 
-  /*
-  "browser_action": {
-    "default_icon": "icon.png",
-    "default_popup": "popup.html"
-  },
-  */
-
   "background": {
     "scripts": ["background.js"],
-    "persistent": true    // TODO
+    "persistent": false
   },
 
   "permissions": [ "storage", "contextMenus", "activeTab", "<all_urls>" ],
@@ -26,6 +19,10 @@
       "js": ["content.js"],
       "run_at": "document_end"
     }
+  ],
+
+  "web_accessible_resources": [
+    "iframe.html"
   ],
 
   "author": "Stefan G."
