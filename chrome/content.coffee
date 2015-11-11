@@ -62,7 +62,7 @@ class UI
     iconSrc = '/icon.png'
 
     # Popup that displays when you click the image
-    popupWidth = 200
+    popupWidth = 300
     popupHeight = 300
 
     # Popup header height in pixels
@@ -102,6 +102,11 @@ class UI
         return unless @canEncrypt()
         if @isOverIcon(event)
             @openPopup(event.x, event.y)
+
+    # Class variable
+    # ------------------------------------------------
+    @popupEl: null
+    @iframeEl: null
 
     # Class methods
     # ------------------------------------------------
@@ -151,6 +156,7 @@ class UI
         @restoreProps()
 
     openPopup: (x, y)->
+        console.log chrome.tabs
 
         # popup element
         popup = document.createElement('div')
@@ -183,8 +189,8 @@ class UI
         # Can't bind right away, because it fires on the icon click
         setTimeout bindCloseClick, 1000
 
-        @popupEl = popup
-        @iframeEl = iframe
+        UI.popupEl = popup
+        UI.iframeEl = iframe
 
 decryptLinks = (node)->
     match = triggerRe.exec(node.nodeValue)
@@ -207,13 +213,33 @@ pageContainsCode = ->
     false
 
 
-pageInit = ->
-    elements = document.getElementsByTagName('textarea')
-    for el in elements
-        el.__pgp = new UI(el)
-
+########################################################################
 # Main
-pageInit()
+########################################################################
+
+# ----------------------------------------------------------------
+# Content page message listener
+# ----------------------------------------------------------------
+# To send a message to content script, one must send that message
+# to the background page enclosed in { content: message }, where
+# message is the message inteded for the content page.  The reason
+# for this is that messages to the content page are sent via
+# chrome.tabs.sendMessage, however chrome.tabs is not defined when
+# a page is loaded inside an iframe.
+# ----------------------------------------------------------------
+chrome.runtime.onMessage.addListener (msg, sender, sendResponse)->
+    console.log "Content script received: ", msg
+    if msg.closePopup
+        UI.popupEl?.remove()
+        sendResponse { success: true }
+
+
+# ----------------------------------------------------------------
+# Textarea elements get UIs attached to them
+# ----------------------------------------------------------------
+#
+for el in document.getElementsByTagName('textarea')
+    popup = new UI(el)
 
 #elements = document.getElementsByTagName('textarea')
 #for el in elements
