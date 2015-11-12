@@ -228,7 +228,6 @@ pageContainsCode = ->
 # a page is loaded inside an iframe.
 # ----------------------------------------------------------------
 chrome.runtime.onMessage.addListener (msg, sender, sendResponse)->
-    console.log "Content script received: ", msg
     if msg.closePopup
         UI.popupEl?.remove()
         sendResponse { success: true }

@@ -1,33 +1,9 @@
 app     = null
 config  = new window.Config()
 storage = new window.Storage(config)
+addressBook = new window.AddressBook(config)
 
-##########################################################
-# PublicKey
-##########################################################
-#
-class PublicKey
-    constructor: (@key)->
-
-    fingerprint: ->
-        @key.primaryKey.fingerprint
-
-    save: ->
-        storage.get 'directory', (dir)=>
-            dir = {} unless dir?
-
-            for userId in @key.getUserIds()
-                dir[userId] = @fingerprint()
-
-            value =
-                userIds: @key.getUserIds()
-                armor: @key.armor()
-
-            storage.set @fingerprint(), value, =>
-                # XXX
-                console.log "Saved #{@fingerprint()}"
-                console.log dir
-
+PublicKey = window.PublicKey
 
 ##########################################################
 # Article
@@ -141,6 +117,7 @@ class KeyRemove extends Article
         app.key = null
         app.switch.to 'keyView'
 
+
 ##########################################################
 # PublicImport
 ##########################################################
@@ -151,18 +128,15 @@ class PublicImport extends Article
     submit: (e)=>
         e.preventDefault()
 
-        result = openpgp.key.readArmored(@key)
-        if result.err?.length > 0 or result.keys?.length == 0
-            @error = "This does not seem to be a valid public key"
+        publicKey = null
+        try
+            publicKey = new PublicKey(@key)
+        catch err
+            @error = err
             return
 
-        key = result.keys[0]
-        if not key.isPublic()
-            @error = "This does not seem to be a valid public key"
-            return
-
-        pub = new PublicKey(key)
-        pub.save()
+        addressBook.add publicKey, ->
+            console.log "Added: ", publicKey
 
 
 ##########################################################
