@@ -135,8 +135,14 @@ class PublicImport extends Article
             @error = err
             return
 
-        addressBook.add publicKey, ->
-            console.log "Added: ", publicKey
+        try
+            addressBook.add publicKey, ->
+                console.log "Added: ", publicKey
+        catch err
+            @error = err
+
+class ListAddresses extends Article
+    filename: 'public/list.html'
 
 
 ##########################################################
