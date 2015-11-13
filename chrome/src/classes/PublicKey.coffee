@@ -15,9 +15,6 @@ class PublicKey
     fingerprint: ->
         @key.primaryKey.fingerprint
 
-    userId: (num)->
-        if num? then @key.getUserIds()[num] else @key.getPrimaryUser()
-
     expirationTime: ->
         @key.getExpirationTime()
 
