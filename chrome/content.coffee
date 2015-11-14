@@ -14,7 +14,7 @@ utils =
 
     ajax: (method, url, payload, success)->
         xmlhttp = new XMLHttpRequest()
-        xmlhttp.open(methos, url, true)
+        xmlhttp.open(method, url, true)
         xmlhttp.onreadystatechange = ->
             if xmlhttp.readyState == 4
                 response = null
@@ -27,7 +27,7 @@ utils =
                 if 200 <= xmlhttp.status <= 299
                     success(response)
                 else
-                    utils.error response
+                    utils.error xmlhttp.responseTet
 
         xmlhttp.setRequestHeader('Content-Type', 'application/json')
         xmlhttp.send(JSON.stringify payload)
@@ -64,9 +64,6 @@ class UI
     # Popup that displays when you click the image
     popupWidth = 300
     popupHeight = 300
-
-    # Popup header height in pixels
-    headerHeight = 20
 
     # Iframe to open inside the popup
     iframeSrc = chrome.runtime.getURL '/iframe.html'
