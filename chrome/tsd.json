@@ -10,6 +10,18 @@
     },
     "es6-promise/es6-promise.d.ts": {
       "commit": "aed176536a202b9a2475ce1989ea6d2d0226a185"
+    },
+    "chrome/chrome.d.ts": {
+      "commit": "aed176536a202b9a2475ce1989ea6d2d0226a185"
+    },
+    "webrtc/MediaStream.d.ts": {
+      "commit": "aed176536a202b9a2475ce1989ea6d2d0226a185"
+    },
+    "filewriter/filewriter.d.ts": {
+      "commit": "aed176536a202b9a2475ce1989ea6d2d0226a185"
+    },
+    "filesystem/filesystem.d.ts": {
+      "commit": "aed176536a202b9a2475ce1989ea6d2d0226a185"
     }
   }
 }
