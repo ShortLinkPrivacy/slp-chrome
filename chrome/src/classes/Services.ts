@@ -1,5 +1,5 @@
-/// <reference path="../../typings/openpgp/openpgp.d.ts" />
 /// <reference path="../../typings/chrome/chrome.d.ts" />
+/// <reference path="../typings/openpgp.d.ts" />
 /// <reference path="Interfaces.ts" />
 /// <reference path="PublicKey.ts" />
 module Services {
@@ -25,21 +25,36 @@ module Services {
         (result: PublicKeyArray): void;
     }
 
+    // Callback interface for the functin that returns the private key
+    interface PrivateKeyCallback {
+        [index: number]: PGP.PrivateKey;
+    }
+
+    // Callback interface for the function that returns a message
+    interface MessageCallback {
+        (result: string): void;
+    }
+
     interface Storage {
-        // Public Key
+        // Public Keys
         storePublicKey(key: PGP.PublicKey, callback: Interfaces.Callback): void;
         loadPublicKey(fingerprint: string, callback: PublicKeyCallback): void;
         searchPublicKey(userId: string, callback: PublicKeySearchCallback): void;
 
+        // Private key
+        storePrivateKey(key: PGP.PrivateKey, callback: Interfaces.Callback): void;
+        loadPrivateKey(callback: PrivateKeyCallback): void;
+
         // Messages
-        //storeMessage(armored: string, callback: Interfaces.Callback): void;
-        //loadMessage(id: string, callback: Interfaces.Callback): void;
+        storeMessage(armored: string, callback: Interfaces.Callback): void;
+        loadMessage(id: string, callback: MessageCallback): void;
     }
 
     class LocalStore implements Storage {
         private config: Interfaces.LocalStoreConfig;
         private directory: PublicKeyDict = {};
         private store: chrome.storage.StorageArea;
+        private messages: Interfaces.Dictionary;
 
         constructor(config: Interfaces.LocalStoreConfig ) {
             this.config = config;
@@ -88,7 +103,7 @@ module Services {
             var re = new RegExp(userId);
             for (var fingerprint in this.directory) {
                 var key = this.directory[fingerprint];
-                var userIds = key.getUserIds();
+                var userIds = key.userIds();
                 userIds.forEach(id => {
                     if (id.match(re)) {
                         result.push(key);
@@ -96,6 +111,30 @@ module Services {
                 });
             }
             callback(result);
+        }
+
+
+        storePrivateKey(key: PGP.PrivateKey, callback: Interfaces.Callback): void {
+            var setter: Interfaces.Dictionary = {};
+            setter[this.config.privateKey] = key.armored();
+            this.store.set(setter, function() {
+                this.checkRuntimeError();
+                callback();
+            })
+        }
+
+        loadPrivateKey(callback: PrivateKeyCallback): void {
+            this.store.get(this.config.keyName, function(result){
+                callback(result[this.config.keyName]);
+            })
+        }
+
+        storeMessage(armored: string, callback: Interfaces.Callback): void {
+
+        }
+
+        loadMessage(id: string, callback: MessageCallback): void {
+
         }
 
     }
