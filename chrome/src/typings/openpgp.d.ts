@@ -3,7 +3,7 @@
 // Definitions by: Guillaume Lacasa <https://blog.lacasa.fr>
 // Definitions: https://github.com/borisyankov/DefinitelyTyped
 
-/// <reference path="../../typings/es6-promise/es6-promise.d.ts" />
+/// <reference path="../es6-promise/es6-promise.d.ts" />
 
 declare module openpgp {
 
@@ -387,7 +387,7 @@ declare module openpgp.key {
         armor(): string,
         decrypt(passphrase: string): boolean;
         getExpirationTime(): Date;
-        getKeyIds(): Array<any>;
+        getKeyIds(): Array<Keyid>;
         getPreferredHashAlgorithm(): string;
         getPrimaryUser(): any;
         getUserIds(): Array<string>;
@@ -395,7 +395,7 @@ declare module openpgp.key {
         isPublic(): boolean;
         primaryKey: packet.PublicKey;
         toPublic(): Key;
-        update(key: Key);
+        update(key: Key): void;
         verifyPrimaryKey(): enums.keyStatus;
     }
 
@@ -491,6 +491,13 @@ declare module openpgp.packet {
         getKeyId(): string;
         read(input: string): any;
         write(): any;
+    }
+
+    interface SecretKey extends PublicKey {
+        read(bytes:string): void;
+        write(): string;
+        clearPrivateMPIs(str_passphrase: string): boolean;
+        encrypt(passphrase:string): void;
     }
 
     /** Allocate a new packet from structured packet clone
