@@ -1,4 +1,4 @@
-/// <reference path="../typings/openpgp.d.ts" />
+/// <reference path="../../typings/openpgp.d.ts" />
 module PGP {
     class Key {
         key: openpgp.key.Key;

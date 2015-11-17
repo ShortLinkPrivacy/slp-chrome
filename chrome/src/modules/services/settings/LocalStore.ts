@@ -1,7 +1,7 @@
-/// <reference path="../../../typings/chrome/chrome.d.ts" />
-/// <reference path="../Interfaces.ts" />
-/// <reference path="../PublicKey.ts" />
-/// <reference path="../Settings.ts" />
+/// <reference path="../../../../typings/chrome/chrome.d.ts" />
+/// <reference path="../definitions.ts" />
+/// <reference path="../../interfaces.ts" />
+/// <reference path="../../pgp/keys.ts" />
 
 module Services {
 

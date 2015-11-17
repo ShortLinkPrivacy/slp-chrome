@@ -1,9 +1,13 @@
-/// <reference path="../../typings/chrome/chrome.d.ts" />
-/// <reference path="../typings/openpgp.d.ts" />
-/// <reference path="Interfaces.ts" />
-/// <reference path="PublicKey.ts" />
+/// <reference path="../../../typings/chrome/chrome.d.ts" />
+/// <reference path="../../typings/openpgp.d.ts" />
+/// <reference path="../interfaces.ts" />
+/// <reference path="../pgp/keys.ts" />
 
 module Services {
+
+    /*************************************************************
+     * STORAGE
+     *************************************************************/
 
     // Callback function that returns a key
     export interface PublicKeyCallback {
@@ -40,6 +44,20 @@ module Services {
         // Messages
         storeMessage(armored: string, callback: Interfaces.Callback): void;
         loadMessage(id: string, callback: MessageCallback): void;
+    }
+    
+    /*************************************************************
+     * SETTINGS
+     *************************************************************/
+
+    // Callback interface for the function that returns the private key
+    export interface PrivateKeyCallback {
+        (result: PGP.PrivateKey): void;
+    }
+
+    export interface Settings {
+        storePrivateKey(key: PGP.PrivateKey, callback: Interfaces.Callback): void;
+        loadPrivateKey(callback: PrivateKeyCallback): void;
     }
 
 }

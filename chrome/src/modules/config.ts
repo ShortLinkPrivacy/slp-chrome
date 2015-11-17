@@ -1,4 +1,4 @@
-/// <reference path="Interfaces.ts" />
+/// <reference path="interfaces.ts" />
 /// <reference path="../../typings/chrome/chrome.d.ts" />
 
 class Config {
