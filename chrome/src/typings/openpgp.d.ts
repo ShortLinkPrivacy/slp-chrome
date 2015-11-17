@@ -3,7 +3,7 @@
 // Definitions by: Guillaume Lacasa <https://blog.lacasa.fr>
 // Definitions: https://github.com/borisyankov/DefinitelyTyped
 
-/// <reference path="../es6-promise/es6-promise.d.ts" />
+/// <reference path="../../typings/es6-promise/es6-promise.d.ts" />
 
 declare module openpgp {
 
