@@ -1,9 +1,9 @@
-/// <reference path="../../../../typings/chrome/chrome.d.ts" />
-/// <reference path="../../interfaces.ts" />
-/// <reference path="../../pgp/keys.ts" />
-/// <reference path="../../services/definitions.ts" />
+/// <reference path="../../../typings/chrome/chrome.d.ts" />
+/// <reference path="../interfaces.ts" />
+/// <reference path="../keys.ts" />
+/// <reference path="../store.ts" />
 
-module Services {
+module Store {
 
     interface LocalStoreConfig {
         // chrome storage (local or sync)
@@ -16,7 +16,7 @@ module Services {
         messages: string;
     }
 
-    class LocalStore implements Services.Storage {
+    class LocalStore implements Store.Interface {
         private directory: PublicKeyDict = {};
         private messages: Interfaces.Dictionary = {};
         private config: LocalStoreConfig;
@@ -65,7 +65,7 @@ module Services {
             });
         }
 
-        storePublicKey(key: PGP.PublicKey, callback: Interfaces.Callback): void {
+        storePublicKey(key: Keys.PublicKey, callback: Interfaces.Callback): void {
             if ( this.directory[key.fingerprint()] ) return;
             this.directory[key.fingerprint()] = key;
             this.saveDirectory(callback);

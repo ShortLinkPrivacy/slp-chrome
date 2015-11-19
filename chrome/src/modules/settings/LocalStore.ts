@@ -1,23 +1,23 @@
-/// <reference path="../../../../typings/chrome/chrome.d.ts" />
-/// <reference path="../definitions.ts" />
-/// <reference path="../../interfaces.ts" />
-/// <reference path="../../pgp/keys.ts" />
+/// <reference path="../../../typings/chrome/chrome.d.ts" />
+/// <reference path="../settings.ts" />
+/// <reference path="../interfaces.ts" />
+/// <reference path="../keys.ts" />
 
-module Services {
+module Settings {
 
     export interface SettingsConfig {
         privateKey: string;
         store: chrome.storage.StorageArea;
     }
 
-    export class LocalStore implements Settings {
+    export class LocalStore implements Settings.Interface {
         private config: SettingsConfig;
 
         constructor(config: any) {
             this.config = config.settings.localStore;
         }
 
-        storePrivateKey(key: PGP.PrivateKey, callback: Interfaces.Callback): void {
+        storePrivateKey(key: Keys.PrivateKey, callback: Interfaces.Callback): void {
             var setter: Interfaces.Dictionary = {};
             setter[this.config.privateKey] = key.armored();
             this.config.store.set(setter, function() {

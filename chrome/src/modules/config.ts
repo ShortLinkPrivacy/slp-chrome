@@ -28,5 +28,7 @@ class Config {
                 result[prop] = opts[prop];
             }
         }
+
+        return result;
     }
 }

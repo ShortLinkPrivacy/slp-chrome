@@ -1,9 +1,10 @@
 app     = null
 config  = new window.Config()
-storage = new window.Storage(config)
-addressBook = new window.AddressBook(config)
 
-PublicKey = window.PublicKey
+Services = window.Services
+Keys = window.Keys
+
+storage = new Services.LocalStore(config)
 
 ##########################################################
 # Article
@@ -50,8 +51,9 @@ class KeyGenerate extends Article
             passphrase: @passphrase
 
         openpgp.generateKeyPair(options)
-        .then (keypair)=>
-            storage.set config.keyName, keypair.publicKeyArmored, =>
+        .then (result)=>
+            console.log result
+            storage.storePublicKey result, =>
                 @spinner = off
                 app.switch.to 'keyView'
 

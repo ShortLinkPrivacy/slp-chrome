@@ -1,5 +1,5 @@
-/// <reference path="../../typings/openpgp.d.ts" />
-module PGP {
+/// <reference path="../typings/openpgp.d.ts" />
+module Keys {
     class Key {
         key: openpgp.key.Key;
 
@@ -18,7 +18,7 @@ module PGP {
             this.key = result.keys[0];
 
         }
-    
+
         fingerprint(): string {
             return this.key.primaryKey.getFingerprint();
         }
