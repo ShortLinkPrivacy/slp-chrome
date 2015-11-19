@@ -8,10 +8,11 @@ build:
 	tsc --out src/modules.js \
 		src/modules/config.ts \
 		src/modules/interfaces.ts \
-		src/modules/pgp/keys.ts \
-		src/modules/services/definitions.ts \
-		src/modules/services/settings/LocalStore.ts \
-		src/modules/services/storage/LocalStore.ts
+		src/modules/keys.ts \
+		src/modules/settings.ts \
+		src/modules/settings/LocalStore.ts \
+		src/modules/store.ts \
+		src/modules/store/LocalStore.ts
 
 install:
 	bower install
