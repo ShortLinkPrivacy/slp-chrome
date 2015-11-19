@@ -34,7 +34,9 @@ private.txt
 public.txt
 chrome/*.js
 chrome/src/*.js
-chrome/src/classes/*.js
+chrome/src/modules/*.js
+chrome/src/modules/settings/*.js
+chrome/src/modules/store/*.js
 api/*.js
 api/t/*.js
 play/js/*.js
