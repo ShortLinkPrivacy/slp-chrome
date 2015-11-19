@@ -16,7 +16,7 @@ module Store {
         messages: string;
     }
 
-    class LocalStore implements Store.Interface {
+    export class LocalStore implements Store.Interface {
         private directory: PublicKeyDict = {};
         private messages: Interfaces.Dictionary = {};
         private config: LocalStoreConfig;
