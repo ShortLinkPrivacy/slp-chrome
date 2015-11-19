@@ -15,13 +15,19 @@ var Services;
                 throw chrome.runtime.lastError;
             }
         };
-        LocalStore.prototype.saveDirectory = function (callback) {
+        LocalStore.prototype.save = function (key, value, callback) {
             var setter = {};
-            setter[this.config.directory] = this.directory;
+            setter[key] = value;
             this.config.store.set(setter, function () {
                 this.checkRuntimeError();
                 callback();
             });
+        };
+        LocalStore.prototype.saveDirectory = function (callback) {
+            this.save(this.config.directory, this.directory, callback);
+        };
+        LocalStore.prototype.saveMessages = function (callback) {
+            this.save(this.config.messages, this.messages, callback);
         };
         LocalStore.prototype.initialize = function (callback) {
             var store = this.config.store;
@@ -62,9 +68,18 @@ var Services;
             }
             callback(result);
         };
+        LocalStore.prototype.deleteAllPublicKeys = function (callback) {
+            this.directory = {};
+            this.saveDirectory(callback);
+        };
         LocalStore.prototype.storeMessage = function (armored, callback) {
+            var algo = openpgp.enums.hash.md5;
+            var md5 = openpgp.crypto.hash.digest(algo, armored);
+            this.messages[md5] = armored;
+            this.saveMessages(callback);
         };
         LocalStore.prototype.loadMessage = function (id, callback) {
+            callback(this.messages[id]);
         };
         return LocalStore;
     })();

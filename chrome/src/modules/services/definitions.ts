@@ -40,12 +40,13 @@ module Services {
         storePublicKey(key: PGP.PublicKey, callback: Interfaces.Callback): void;
         loadPublicKey(fingerprint: string, callback: PublicKeyCallback): void;
         searchPublicKey(userId: string, callback: PublicKeySearchCallback): void;
+        deleteAllPublicKeys(callback: Interfaces.Callback): void;
 
         // Messages
         storeMessage(armored: string, callback: Interfaces.Callback): void;
         loadMessage(id: string, callback: MessageCallback): void;
     }
-    
+
     /*************************************************************
      * SETTINGS
      *************************************************************/

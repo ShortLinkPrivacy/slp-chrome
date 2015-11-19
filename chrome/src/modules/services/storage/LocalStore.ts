@@ -12,7 +12,7 @@ module Services {
         // public keys
         directory: string;
 
-        // messages 
+        // messages
         messages: string;
     }
 
@@ -31,13 +31,21 @@ module Services {
             }
         }
 
-        private saveDirectory(callback: Interfaces.Callback): void {
+        private save(key: string, value: any, callback: Interfaces.Callback): void {
             var setter: Interfaces.Dictionary = {};
-            setter[this.config.directory] = this.directory;
+            setter[key] = value;
             this.config.store.set(setter, function() {
                 this.checkRuntimeError();
                 callback();
-            })
+            });
+        }
+
+        private saveDirectory(callback: Interfaces.Callback): void {
+            this.save(this.config.directory, this.directory, callback);
+        }
+
+        private saveMessages(callback: Interfaces.Callback): void {
+            this.save(this.config.messages, this.messages, callback);
         }
 
         initialize(callback: Interfaces.Callback): void {
@@ -83,12 +91,20 @@ module Services {
             callback(result);
         }
 
+        deleteAllPublicKeys(callback: Interfaces.Callback): void {
+            this.directory = {};
+            this.saveDirectory(callback);
+        }
+
         storeMessage(armored: string, callback: Interfaces.Callback): void {
-            
+            var algo = openpgp.enums.hash.md5;
+            var md5 = openpgp.crypto.hash.digest(algo, armored);
+            this.messages[md5] = armored;
+            this.saveMessages(callback);
         }
 
         loadMessage(id: string, callback: MessageCallback): void {
-
+            callback(this.messages[id]);
         }
 
     }
