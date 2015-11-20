@@ -1,4 +1,5 @@
 /// <reference path="../typings/openpgp.d.ts" />
+
 module Keys {
     class Key {
         key: openpgp.key.Key;
@@ -53,6 +54,10 @@ module Keys {
             if (!this.key.isPrivate()) {
                 throw "key.not_private";
             }
+        }
+
+        toPublic(): Key {
+            return new PublicKey(this.key.toPublic().armor());
         }
     }
 }
