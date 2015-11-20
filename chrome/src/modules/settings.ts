@@ -14,6 +14,7 @@ module Settings {
     export interface Interface {
         storePrivateKey(key: Keys.PrivateKey, callback: Interfaces.Callback): void;
         loadPrivateKey(callback: PrivateKeyCallback): void;
+        removePrivateKey(callback: Interfaces.Callback): void;
     }
 
 }

@@ -25,7 +25,7 @@ module Store {
             this.config = config.storage.localStore;
         }
 
-        private checkRuntimeError(error: string): void {
+        private checkRuntimeError(): void {
             if ( typeof chrome.runtime != "undefined" && chrome.runtime.lastError ) {
                 throw chrome.runtime.lastError;
             }
@@ -34,7 +34,7 @@ module Store {
         private save(key: string, value: any, callback: Interfaces.Callback): void {
             var setter: Interfaces.Dictionary = {};
             setter[key] = value;
-            this.config.store.set(setter, function() {
+            this.config.store.set(setter, () => {
                 this.checkRuntimeError();
                 callback();
             });
@@ -54,7 +54,7 @@ module Store {
             var dk = this.config.directory;
 
             // Load the directory with publick keys and messages
-            store.get([mk, dk], function(result){
+            store.get([mk, dk], (result) => {
                 if ( typeof result[dk] != "undefined" ) {
                     this.directory = result[dk];
                 }
