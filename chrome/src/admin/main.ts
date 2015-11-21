@@ -1,9 +1,9 @@
-/// <reference path="modules/config.ts" />
-/// <reference path="modules/keys.ts" />
-/// <reference path="modules/store/LocalStore.ts" />
-/// <reference path="modules/settings/LocalStore.ts" />
-/// <reference path="typings/openpgp.d.ts" />
-/// <reference path="typings/rivets.d.ts" />
+/// <reference path="../modules/config.ts" />
+/// <reference path="../modules/keys.ts" />
+/// <reference path="../modules/store/LocalStore.ts" />
+/// <reference path="../modules/settings/LocalStore.ts" />
+/// <reference path="../typings/openpgp.d.ts" />
+/// <reference path="../typings/rivets.d.ts" />
 
 var config = new Config();
 var storage = new Store.LocalStore(config);
