@@ -56,7 +56,7 @@ class KeyGenerate implements Article {
                 var key = new Keys.PrivateKey(generated.privateKeyArmored);
                 settings.storePrivateKey(key, ()=>{
                     this.spinner = false;
-                    app.switcher.to('keyView');
+                    app.loadArticle('keyView');
                 })
            }).catch((error)=>{
                this.spinner = false;
@@ -90,7 +90,7 @@ class KeyImport implements Article {
         }
 
         settings.storePrivateKey(key, ()=>{
-            app.switcher.to('keyView');
+            app.loadArticle('keyView');
         });
 
     }
@@ -130,7 +130,7 @@ class KeyRemove implements Article {
     doRemove(): void {
         settings.removePrivateKey(() => {
             app.key = null;
-            app.switcher.to('keyView');
+            app.loadArticle('keyView');
         });
     }
 }
@@ -167,11 +167,8 @@ class PublicImport implements Article {
 }
 
 class App {
-    element: JQuery;
-    key: Keys.PrivateKey;
 
     private path: string = "templates";
-
     private articles: { [name: string]: Article } = {
         keyGenerate:  new KeyGenerate(),
         keyImport:    new KeyImport(),
@@ -180,13 +177,15 @@ class App {
         publicImport: new PublicImport()
     };
 
-    private current: string;
     private binding: Rivets.View = null;
     private element: JQuery = $('article');
 
+    key: Keys.PrivateKey;
+    currentArticle: Article;
+
     constructor() {
         this.element = $('body');
-        this.switcher.to('keyView');
+        this.loadArticle('keyView');
     }
 
     readKey(callback: Settings.PrivateKeyCallback) {
@@ -208,8 +207,8 @@ class App {
         if ( this.binding != null ) {
             this.binding.unbind();
         }
-        this.current = name;
-        article = this.articles[name];
+
+        this.currentArticle = article = this.articles[name];
 
         if (article == null) {
             this.error("Article " + name + " is not initialized");
