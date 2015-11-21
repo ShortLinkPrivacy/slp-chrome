@@ -56,7 +56,7 @@ class KeyGenerate implements Article {
                 var key = new Keys.PrivateKey(generated.privateKeyArmored);
                 settings.storePrivateKey(key, ()=>{
                     this.spinner = false;
-                    //app.switch.to('keyView');
+                    app.switcher.to('keyView');
                 })
            }).catch((error)=>{
                this.spinner = false;
@@ -90,7 +90,7 @@ class KeyImport implements Article {
         }
 
         settings.storePrivateKey(key, ()=>{
-            //app.switch.to('keyView');
+            app.switcher.to('keyView');
         });
 
     }
@@ -166,18 +166,17 @@ class PublicImport implements Article {
     }
 }
 
-/***************************************************************
- * @ArticleSwitcher
- *
- ***************************************************************/
-class ArticleSwitcher {
+class App {
+    element: JQuery;
+    key: Keys.PrivateKey;
+
     private path: string = "templates";
 
     private articles: { [name: string]: Article } = {
-        keyGenerate: new KeyGenerate(),
-        keyImport: new KeyImport(),
-        keyView: new KeyView(),
-        keyRemove: new KeyRemove(),
+        keyGenerate:  new KeyGenerate(),
+        keyImport:    new KeyImport(),
+        keyView:      new KeyView(),
+        keyRemove:    new KeyRemove(),
         publicImport: new PublicImport()
     };
 
@@ -185,11 +184,24 @@ class ArticleSwitcher {
     private binding: Rivets.View = null;
     private element: JQuery = $('article');
 
+    constructor() {
+        this.element = $('body');
+        this.switcher.to('keyView');
+    }
+
+    readKey(callback: Settings.PrivateKeyCallback) {
+        settings.loadPrivateKey((key) => {
+            if (!key) return callback(null);
+            this.key = key;
+            callback(key);
+        });
+    }
+
     error(message: string): void {
         this.element.html(message).addClass('warning');
     }
 
-    to(name: string): void {
+    loadArticle(name: string): void {
         var article: Article;
         var fullpath: string;
 
@@ -220,24 +232,5 @@ class ArticleSwitcher {
             article.onBind();
         })
 
-    }
-}
-
-class App {
-    element: JQuery;
-    key: Keys.PrivateKey;
-    switcher = new ArticleSwitcher();
-
-    constructor() {
-        this.element = $('body');
-        this.switcher.to('keyView');
-    }
-
-    readKey(callback: Settings.PrivateKeyCallback) {
-        settings.loadPrivateKey((key) => {
-            if (!key) return callback(null);
-            this.key = key;
-            callback(key);
-        });
     }
 }
