@@ -108,7 +108,10 @@ class KeyView implements Article {
     private publicKey: Keys.PublicKey;
 
     onBind(): void {
-        if (app.key) return this.key = app.key;
+        if (app.key) {
+            this.key = app.key;
+            return;
+        }
         app.readKey((key) => {
             this.key = key;
             this.publicKey = key.toPublic();
