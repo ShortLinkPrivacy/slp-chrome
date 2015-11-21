@@ -5,231 +5,122 @@
 /// <reference path="../typings/openpgp.d.ts" />
 /// <reference path="../typings/rivets.d.ts" />
 
-var config = new Config();
-var storage = new Store.LocalStore(config);
-var settings = new Settings.LocalStore(config);
+module Admin {
 
-var app: App = null;
-
-interface Article {
-    // The name of the template
-    filename: string;
-
-    onBind?(): void;
-}
-
-/***************************************************************
- * @KeyGenerate
- * Allows the user to generate a pair of keys using a simple web
- * form.
- ***************************************************************/
-class KeyGenerate implements Article {
-
-    filename = "key/generate.html";
-    error: string = null;
-    spinner: boolean = false;
-
-    name: string;
-    email: string;
-    passphrase: string;
-    confirm: string;
-    numBits: number = config.defaultBits;
-
-    submit(e: Event): void {
-        e.preventDefault();
-
-        if (this.passphrase != this.confirm) {
-            this.error = "The passphrase and the passphrase confirmation do not match";
-            return;
-        }
-
-        this.spinner = true;
-
-        var options = {
-            numBits: config.defaultBits,
-            userId: this.name + " " + this.email,
-            passphrase: this.passphrase
-        };
-
-        openpgp.generateKeyPair(options)
-           .then((generated)=>{
-                var key = new Keys.PrivateKey(generated.privateKeyArmored);
-                settings.storePrivateKey(key, ()=>{
-                    this.spinner = false;
-                    app.loadArticle('keyView');
-                })
-           }).catch((error)=>{
-               this.spinner = false;
-               this.error = "Can not create a new key - " + error;
-           })
+    interface ArticleConstructor {
+        app: App,
+        name: string;
+        filename: string;
     }
 
-}
+    interface AppConstructor {
+        config: Config;
+        storage: Store.Interface;
+        settings: Settings.Interface;
+    }
 
+    class Article {
+        
+        // Reference to the main application
+        private app: App;
 
-/***************************************************************
- * @KeyImport
- * Allows the user to import an already created private key
- ***************************************************************/
+        filename: string;
+        name: string;
 
-class KeyImport implements Article {
+        // Run this after the article has been bound to the element
+        onBind(): void {};
 
-    filename = "key/import.html";
-    error: string;
-    key: string;
+        constructor( args: ArticleConstructor ) {
+            this.filename = args.filename;
+            this.name = args.name;
+            this.app = args.app;
 
-    submit(e: Event): void {
-        e.preventDefault();
-        var key: Keys.PrivateKey;
-
-        try {
-            key = new Keys.PrivateKey(this.key);
-        } catch (err) {
-            this.error = err;
-            return;
+            this.register();
         }
 
-        settings.storePrivateKey(key, ()=>{
-            app.loadArticle('keyView');
-        });
-
-    }
-}
-
-
-/***************************************************************
- * @KeyView
- * Display the private key armored text and other info
- ***************************************************************/
-
-class KeyView implements Article {
-    filename = "key/view.html";
-    key: Keys.PrivateKey;
-    private publicKey: Keys.PublicKey;
-
-    onBind(): void {
-        if (app.key) {
-            this.key = app.key;
-            return;
+        register() {
+            this.app.articles[this.name] = this;
         }
-        app.readKey((key) => {
-            this.key = key;
-            this.publicKey = key.toPublic();
-        })
     }
-}
 
-/***************************************************************
- * @KeyRemove
- * Remove the private key
- ***************************************************************/
+    class App {
 
-class KeyRemove implements Article {
-    filename = "key/remove.html";
+        path: string = "templates";
+        articles: { [intex: string ]: Article } = {};
+        binding: Rivets.View = null;
+        element: JQuery = $('article');
+        key: Keys.PrivateKey;
+        currentArticle: Article;
+        config: Config;
+        settings: Settings.Interface;
+        storage: Store.Interface;
 
-    doRemove(): void {
-        settings.removePrivateKey(() => {
-            app.key = null;
-            app.loadArticle('keyView');
-        });
-    }
-}
-
-/***************************************************************
- * @PublicImport
- * Import a public key
- ***************************************************************/
-
-class PublicImport implements Article {
-    filename = "public/import.html";
-    error: string;
-    key: string;
-
-    submit(e: Event): void {
-        e.preventDefault();
-
-        var publicKey: Keys.PublicKey = null;
-        try {
-            publicKey = new Keys.PublicKey(this.key);
-        } catch (err) {
-            this.error = err;
-            return;
+        constructor(args: AppConstructor) {
+            this.config = args.config;
+            this.storage = args.storage;
+            this.settings = args.settings;
+            this.element = $('body');
+            this.loadArticle('keyView');
         }
 
-        try {
-            storage.storePublicKey(publicKey, () => {
-                console.log("Added: ", publicKey);
+        readKey(callback: Settings.PrivateKeyCallback) {
+            this.settings.loadPrivateKey((key) => {
+                if (!key) return callback(null);
+                this.key = key;
+                callback(key);
             });
-        } catch ( err ) {
-            this.error = err;
-        }
-    }
-}
-
-class App {
-
-    private path: string = "templates";
-    private articles: { [name: string]: Article } = {
-        keyGenerate:  new KeyGenerate(),
-        keyImport:    new KeyImport(),
-        keyView:      new KeyView(),
-        keyRemove:    new KeyRemove(),
-        publicImport: new PublicImport()
-    };
-
-    private binding: Rivets.View = null;
-    private element: JQuery = $('article');
-
-    key: Keys.PrivateKey;
-    currentArticle: Article;
-
-    constructor() {
-        this.element = $('body');
-        this.loadArticle('keyView');
-    }
-
-    readKey(callback: Settings.PrivateKeyCallback) {
-        settings.loadPrivateKey((key) => {
-            if (!key) return callback(null);
-            this.key = key;
-            callback(key);
-        });
-    }
-
-    error(message: string): void {
-        this.element.html(message).addClass('warning');
-    }
-
-    loadArticle(name: string): void {
-        var article: Article;
-        var fullpath: string;
-
-        if ( this.binding != null ) {
-            this.binding.unbind();
         }
 
-        this.currentArticle = article = this.articles[name];
-
-        if (article == null) {
-            this.error("Article " + name + " is not initialized");
-            return;
+        error(message: string): void {
+            this.element.html(message).addClass('warning');
         }
 
-        // Get the fullpath of the article
-        fullpath = this.path + "/" + article.filename;
+        loadArticle(name: string): void {
+            var article: Article;
+            var fullpath: string;
 
-        // Load the article into the element
-        this.element.load(fullpath, (res, status, xhr)=>{
+            if ( this.binding != null ) {
+                this.binding.unbind();
+            }
 
-            // Error
-            if ( status == "error" ) {
-                this.error("Can not load " + fullpath);
+            this.currentArticle = article = this.articles[name];
+
+            if (article == null) {
+                this.error("Article " + name + " is not initialized");
                 return;
             }
 
-            this.binding = rivets.bind(this.element, article);
-            article.onBind();
-        })
+            // Get the fullpath of the article
+            fullpath = this.path + "/" + article.filename;
 
+            // Load the article into the element
+            this.element.load(fullpath, (res, status, xhr)=>{
+
+                // Error
+                if ( status == "error" ) {
+                    this.error("Can not load " + fullpath);
+                    return;
+                }
+
+                this.binding = rivets.bind(this.element, article);
+                article.onBind();
+            })
+
+        }
     }
+
+    // Bootstrap
+    $(() => {
+        var app: App;
+        var config = new Config();
+
+        app = window["app"] = new App({
+            config: config,
+            storage: new Store.LocalStore(config),
+            settings: new Settings.LocalStore(config)
+        });
+
+        rivets.bind(app.element, app);
+    })
 }
+
