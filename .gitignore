@@ -37,6 +37,8 @@ chrome/src/*.js
 chrome/src/modules/*.js
 chrome/src/modules/settings/*.js
 chrome/src/modules/store/*.js
+chrome/src/admin/*.js
+chrome/src/admin/articles/*.js
 api/*.js
 api/t/*.js
 play/js/*.js
