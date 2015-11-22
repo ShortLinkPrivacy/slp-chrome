@@ -7,46 +7,23 @@
 
 module Admin {
 
-    interface ArticleConstructor {
-        app: App,
-        name: string;
+    export interface Article {
+        articleId: string;
         filename: string;
+        app: App;
+        onBind?(): void;
     }
-
-    interface AppConstructor {
+    
+    interface AppInitialize {
         config: Config;
         storage: Store.Interface;
         settings: Settings.Interface;
     }
 
-    class Article {
-        
-        // Reference to the main application
-        private app: App;
-
-        filename: string;
-        name: string;
-
-        // Run this after the article has been bound to the element
-        onBind(): void {};
-
-        constructor( args: ArticleConstructor ) {
-            this.filename = args.filename;
-            this.name = args.name;
-            this.app = args.app;
-
-            this.register();
-        }
-
-        register() {
-            this.app.articles[this.name] = this;
-        }
-    }
-
-    class App {
+    export class App {
 
         path: string = "templates";
-        articles: { [intex: string ]: Article } = {};
+        articles: { [index: string]: Article } = {};
         binding: Rivets.View = null;
         element: JQuery = $('article');
         key: Keys.PrivateKey;
@@ -55,12 +32,11 @@ module Admin {
         settings: Settings.Interface;
         storage: Store.Interface;
 
-        constructor(args: AppConstructor) {
+        constructor(args: AppInitialize) {
             this.config = args.config;
             this.storage = args.storage;
             this.settings = args.settings;
             this.element = $('body');
-            this.loadArticle('keyView');
         }
 
         readKey(callback: Settings.PrivateKeyCallback) {
@@ -75,7 +51,21 @@ module Admin {
             this.element.html(message).addClass('warning');
         }
 
-        loadArticle(name: string): void {
+        registerArticle(article: Article) {
+            if ( !article.articleId )
+                throw "Article articleId is missing";
+
+            if ( !article.filename )
+                throw "Article filename is missing";
+
+            if ( this.articles[article.articleId] )
+                throw "Article ID " + article.articleId + " is already taken"; 
+
+            article.app = this;
+            this.articles[article.articleId] = article;
+        }
+
+        loadArticle(articleId: string): void {
             var article: Article;
             var fullpath: string;
 
@@ -83,10 +73,10 @@ module Admin {
                 this.binding.unbind();
             }
 
-            this.currentArticle = article = this.articles[name];
+            this.currentArticle = article = this.articles[articleId];
 
             if (article == null) {
-                this.error("Article " + name + " is not initialized");
+                this.error("Article " + articleId + " is not initialized");
                 return;
             }
 
@@ -103,24 +93,21 @@ module Admin {
                 }
 
                 this.binding = rivets.bind(this.element, article);
-                article.onBind();
+                if ( article.onBind ) article.onBind();
             })
 
         }
     }
 
     // Bootstrap
-    $(() => {
-        var app: App;
-        var config = new Config();
+    export var app: App;
+    var config = new Config();
 
-        app = window["app"] = new App({
-            config: config,
-            storage: new Store.LocalStore(config),
-            settings: new Settings.LocalStore(config)
-        });
+    app = window["app"] = new App({
+        config: config,
+        storage: new Store.LocalStore(config),
+        settings: new Settings.LocalStore(config)
+    });
 
-        rivets.bind(app.element, app);
-    })
 }
 
