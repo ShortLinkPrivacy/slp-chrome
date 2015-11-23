@@ -10,7 +10,6 @@ module Admin {
     export interface Article {
         articleId: string;
         filename: string;
-        app: App;
         onBind?(): void;
     }
     
@@ -22,7 +21,7 @@ module Admin {
 
     export class App {
 
-        path: string = "templates";
+        path: string = "src/templates";
         articles: { [index: string]: Article } = {};
         binding: Rivets.View = null;
         element: JQuery = $('article');
@@ -36,7 +35,6 @@ module Admin {
             this.config = args.config;
             this.storage = args.storage;
             this.settings = args.settings;
-            this.element = $('body');
         }
 
         readKey(callback: Settings.PrivateKeyCallback) {
@@ -61,7 +59,6 @@ module Admin {
             if ( this.articles[article.articleId] )
                 throw "Article ID " + article.articleId + " is already taken"; 
 
-            article.app = this;
             this.articles[article.articleId] = article;
         }
 

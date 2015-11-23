@@ -3,7 +3,7 @@
 module Admin {
     class PrivateKeyImport implements Article {
 
-        app: App;
+        app: App = app;
         filename = "key/import.html";
         articleId = "privateKeyImport";
 
@@ -21,8 +21,8 @@ module Admin {
                 return;
             }
 
-            this.app.settings.storePrivateKey(key, () => {
-                this.app.loadArticle('keyView');
+            app.settings.storePrivateKey(key, () => {
+                app.loadArticle('keyView');
             });
 
         }

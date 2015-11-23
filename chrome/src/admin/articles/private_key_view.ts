@@ -3,7 +3,6 @@
 module Admin {
     class PrivateKeyView implements Article {
 
-        app: App;
         filename = "key/view.html";
         articleId = "privateKeyView";
 
@@ -11,15 +10,26 @@ module Admin {
         publicKey: Keys.PublicKey;
 
         onBind(): void {
-            if (this.app.key) {
-                this.key = this.app.key;
+            if (app.key) {
+                this.key = app.key;
                 return;
             }
-            this.app.readKey((key) => {
+            app.readKey((key) => {
                 this.key = key;
-                this.publicKey = key.toPublic();
+                if ( key ) {
+                    this.publicKey = key.toPublic();
+                }
             });
         }
+
+        toGenerate() {
+            app.loadArticle('privateKeyGenerate');
+        }
+
+        toImport() {
+            app.loadArticle('privateKeyImport');
+        }
+
     }
     app.registerArticle( new PrivateKeyView() );
 }

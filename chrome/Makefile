@@ -1,18 +1,17 @@
 help:
 	@echo "Available targets:"
 	@echo "install                 install all dependencies"
-	@echo "build                   compile all CoffeeScript and TypeScript files"
+	@echo "admin                   compile all admin files"
 
-build:
-	coffee -c ./
-	tsc --out src/modules.js \
-		src/modules/config.ts \
-		src/modules/interfaces.ts \
-		src/modules/keys.ts \
-		src/modules/settings.ts \
-		src/modules/settings/LocalStore.ts \
-		src/modules/store.ts \
-		src/modules/store/LocalStore.ts
+admin:
+	tsc --out src/admin.js \
+		src/admin/main.ts \
+		src/admin/articles/private_key_generate.ts \
+		src/admin/articles/private_key_import.ts \
+		src/admin/articles/private_key_remove.ts \
+		src/admin/articles/private_key_view.ts \
+		src/admin/articles/public_key_import.ts \
+		src/admin/run.ts
 
 install:
 	bower install

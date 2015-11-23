@@ -3,7 +3,6 @@
 module Admin {
     class PrivateKeyGenerate implements Article {
 
-        app: App;
         filename = "key/generate.html";
         articleId = "privateKeyGenerate";
 
@@ -13,7 +12,11 @@ module Admin {
         email: string;
         passphrase: string;
         confirm: string;
-        numBits: number = this.app.config.defaultBits;
+        numBits: number;
+
+        constructor() {
+            this.numBits = app.config.defaultBits;
+        }
 
         submit(e: Event): void {
             e.preventDefault();
@@ -26,7 +29,7 @@ module Admin {
             this.spinner = true;
 
             var options = {
-                numBits: this.app.config.defaultBits,
+                numBits: app.config.defaultBits,
                 userId: this.name + " " + this.email,
                 passphrase: this.passphrase
             };
@@ -34,9 +37,9 @@ module Admin {
             openpgp.generateKeyPair(options)
                .then((generated)=>{
                     var key = new Keys.PrivateKey(generated.privateKeyArmored);
-                    this.app.settings.storePrivateKey(key, () => {
+                    app.settings.storePrivateKey(key, () => {
                         this.spinner = false;
-                        this.app.loadArticle('keyView');
+                        app.loadArticle('keyView');
                     })
                }).catch((error)=>{
                    this.spinner = false;

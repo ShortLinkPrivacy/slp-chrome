@@ -3,15 +3,16 @@
 module Admin {
     class PrivateKeyRemove implements Article {
 
-        app: App;
+        app: App = app;
         filename = "key/remove.html";
         articleId = "privateKeyRemove";
 
         doRemove(): void {
-            this.app.settings.removePrivateKey(() => {
-                this.app.key = null;
-                this.app.loadArticle('privateKeyView');
+            app.settings.removePrivateKey(() => {
+                app.key = null;
+                app.loadArticle('privateKeyView');
             });
         }
     }
+    app.registerArticle( new PrivateKeyRemove() );
 }

@@ -3,7 +3,7 @@
 module Admin {
     class PublicKeyImport implements Article {
 
-        app: App;
+        app: App = app;
         filename = "public/import.html";
         articleId = "publicKeyImport";
 
@@ -22,7 +22,7 @@ module Admin {
             }
 
             try {
-                this.app.storage.storePublicKey(publicKey, () => {
+                app.storage.storePublicKey(publicKey, () => {
                     console.log("Added: ", publicKey);
                 });
             } catch ( err ) {
@@ -30,4 +30,5 @@ module Admin {
             }
         }
     }
+    app.registerArticle( new PublicKeyImport() );
 }

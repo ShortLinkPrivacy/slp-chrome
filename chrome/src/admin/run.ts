@@ -1,6 +1,7 @@
 module Admin {
     $(() => {
-        rivets.bind(app.element, app);
-        app.loadArticle('keyView');
+        var el = app.element = $('article');
+        rivets.bind(el, app);
+        app.loadArticle('privateKeyView');
     })
 }
