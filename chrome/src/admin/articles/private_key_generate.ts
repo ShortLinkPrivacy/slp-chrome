@@ -39,7 +39,7 @@ module Admin {
                     var key = new Keys.PrivateKey(generated.privateKeyArmored);
                     app.settings.storePrivateKey(key, () => {
                         this.spinner = false;
-                        app.loadArticle('keyView');
+                        app.loadArticle('privateKeyView');
                     })
                }).catch((error)=>{
                    this.spinner = false;

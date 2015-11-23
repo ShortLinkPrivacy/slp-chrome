@@ -34,7 +34,14 @@ module Settings {
 
         loadPrivateKey(callback: PrivateKeyCallback): void {
             this.config.store.get(this.config.privateKey, (result) => {
-                callback(result[this.config.privateKey]);
+                var armoredText: string = result[this.config.privateKey];
+                var privateKey: Keys.PrivateKey;
+                try {
+                    privateKey = new Keys.PrivateKey(armoredText);
+                } catch (err) {
+                    throw "key.bad_key";
+                }
+                callback(privateKey);
             });
         }
 
