@@ -7,6 +7,8 @@
 
 module Admin {
 
+    export var app: App;
+
     export interface Article {
         articleId: string;
         filename: string;
@@ -24,7 +26,7 @@ module Admin {
         path: string = "src/templates";
         articles: { [index: string]: Article } = {};
         binding: Rivets.View = null;
-        element: JQuery = $('article');
+        element: JQuery;
         key: Keys.PrivateKey;
         currentArticle: Article;
         config: Config;
@@ -37,12 +39,9 @@ module Admin {
             this.settings = args.settings;
         }
 
-        readKey(callback: Settings.PrivateKeyCallback) {
-            this.settings.loadPrivateKey((key) => {
-                if (!key) return callback(null);
-                this.key = key;
-                callback(key);
-            });
+        template(e: Event): void {
+            e.preventDefault();
+            this.loadArticle($(e.target).prop('rel'));
         }
 
         error(message: string): void {
@@ -94,12 +93,24 @@ module Admin {
             })
 
         }
+
+        // This goes to window.onload or jquery
+        run(): void {
+            rivets.configure({
+                handler: function(target, event, binding) {
+                    this.call(app, event, binding.view.models)
+                }
+            });
+            rivets.bind($('body'), this);
+            this.element = $('article');
+            this.settings.loadPrivateKey((key) => { 
+                this.key = key 
+                this.loadArticle('privateKeyView');
+            });
+        }
     }
 
-    // Bootstrap
-    export var app: App;
     var config = new Config();
-
     app = window["app"] = new App({
         config: config,
         storage: new Store.LocalStore(config),
