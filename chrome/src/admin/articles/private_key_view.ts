@@ -10,16 +10,7 @@ module Admin {
         publicKey: Keys.PublicKey;
 
         onBind(): void {
-            if (app.key) {
-                this.key = app.key;
-                return;
-            }
-            app.readKey((key) => {
-                this.key = key;
-                if ( key ) {
-                    this.publicKey = key.toPublic();
-                }
-            });
+            this.key = app.key;
         }
 
         toGenerate() {
