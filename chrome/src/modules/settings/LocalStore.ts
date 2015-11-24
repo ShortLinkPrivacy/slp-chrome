@@ -36,11 +36,16 @@ module Settings {
             this.config.store.get(this.config.privateKey, (result) => {
                 var armoredText: string = result[this.config.privateKey];
                 var privateKey: Keys.PrivateKey;
-                try {
-                    privateKey = new Keys.PrivateKey(armoredText);
-                } catch (err) {
-                    throw "key.bad_key";
+
+                // Check for corrupted private key, and remove it if it is
+                if ( armoredText ) {
+                    try {
+                        privateKey = new Keys.PrivateKey(armoredText);
+                    } catch (err) {
+                        throw "key.corrupted";
+                    }
                 }
+
                 callback(privateKey);
             });
         }
