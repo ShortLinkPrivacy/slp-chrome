@@ -98,7 +98,7 @@ module Admin {
         run(): void {
             rivets.configure({
                 handler: function(target, event, binding) {
-                    this.call(app, event, binding.view.models)
+                    this.call(app.currentArticle, event, binding.view.models)
                 }
             });
             rivets.bind($('body'), this);
