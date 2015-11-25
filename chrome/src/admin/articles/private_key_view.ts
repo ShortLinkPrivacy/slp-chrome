@@ -9,8 +9,11 @@ module Admin {
         key: Keys.PrivateKey;
         publicKey: Keys.PublicKey;
 
-        onBind(): void {
+        onBind() {
             this.key = app.key;
+            if (this.key) {
+                this.publicKey = this.key.toPublic();
+            }
         }
 
         toGenerate() {
