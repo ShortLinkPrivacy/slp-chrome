@@ -26,6 +26,10 @@ module Admin {
         error: string;
         info: string;
 
+        constructor() {
+            this.clear = this.clear.bind(this);
+        }
+
         clear(): void {
             this.error = this.info = null;
         }
@@ -77,9 +81,6 @@ module Admin {
             });
         }
 
-        error(message: string): void {
-        }
-
         registerArticle(article: Article) {
             if ( !article.articleId )
                 throw "Article articleId is missing";
@@ -97,11 +98,14 @@ module Admin {
         loadPage(filename: string, callback?: Interfaces.Callback): void {
             var fullpath: string = this.path + "/" + filename;
 
+            // Clear error and info when pages change
+            this.notify.clear();
+
             this.element.load(fullpath, (res, status, xhr) => {
 
                 // Error
                 if ( status == "error" ) {
-                    this.error("Can not load " + fullpath);
+                    this.notify.error = "Can not load " + fullpath;
                     return;
                 }
 
@@ -114,7 +118,7 @@ module Admin {
             var article: Article = this.articles[articleId];
 
             if (article == null) {
-                this.error("Article " + articleId + " is not initialized");
+                this.notify.error = "Article " + articleId + " is not initialized";
                 return;
             }
 
