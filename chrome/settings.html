@@ -12,6 +12,7 @@
     <link rel="stylesheet/less" type="text/css" href="css/style.less">
 
     <!-- Vendors JS -->
+    <script src="./bower_components/pathjs/path.min.js"></script>
     <script src="./bower_components/jquery/dist/jquery.min.js"></script>
     <script src="./bower_components/rivets/dist/rivets.bundled.min.js"></script>
     <script src="./bower_components/openpgp/dist/openpgp.min.js"></script>
@@ -24,11 +25,11 @@
     <div id="container" >
       <nav class="pure-menu pure-menu-horizontal">
           <ul class="pure-menu-list">
-            <li class="pure-menu-item"><a rv-on-click="template" href="#" rel="privateKeyGenerate" class="pure-menu-link"> Generate</a></li>
-            <li class="pure-menu-item"><a rv-on-click="template" href="#" rel="privateKeyImport" class="pure-menu-link"> Import</a></li>
-            <li class="pure-menu-item"><a rv-on-click="template" href="#" rel="privateKeyView" class="pure-menu-link"> View</a></li>
-            <li class="pure-menu-item"><a rv-on-click="template" href="#" rel="privateKeyRemove" class="pure-menu-link"> Remove</a></li>
-            <li class="pure-menu-item"><a rv-on-click="template" href="#" rel="publicKeyImport" class="pure-menu-link"> PubImport</a></li>
+            <li class="pure-menu-item"><a href="#/key/generate" class="pure-menu-link"> Generate</a></li>
+            <li class="pure-menu-item"><a href="#/key/import" class="pure-menu-link"> Import</a></li>
+            <li class="pure-menu-item"><a href="#/key/view" class="pure-menu-link"> View</a></li>
+            <li class="pure-menu-item"><a href="#/key/remove" class="pure-menu-link"> Remove</a></li>
+            <li class="pure-menu-item"><a href="#/pub/import" class="pure-menu-link"> PubImport</a></li>
           </ul>
       </nav>
       <article>

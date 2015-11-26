@@ -30,16 +30,16 @@ module Admin {
 
             var options = {
                 numBits: app.config.defaultBits,
-                userId: this.name + " " + this.email,
+                userId: '"' + this.name + '" <' + this.email + '>',
                 passphrase: this.passphrase
             };
 
             openpgp.generateKeyPair(options)
                .then((generated)=>{
-                    var key = new Keys.PrivateKey(generated.privateKeyArmored);
+                    var key = app.key = new Keys.PrivateKey(generated.privateKeyArmored);
                     app.settings.storePrivateKey(key, () => {
                         this.spinner = false;
-                        app.loadArticle('privateKeyView');
+                        window.location.hash = "#/key/view";
                     })
                }).catch((error)=>{
                    this.spinner = false;

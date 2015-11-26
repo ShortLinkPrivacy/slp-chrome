@@ -4,6 +4,7 @@
 /// <reference path="../modules/settings/LocalStore.ts" />
 /// <reference path="../typings/openpgp.d.ts" />
 /// <reference path="../typings/rivets.d.ts" />
+/// <reference path="../../typings/pathjs/pathjs.d.ts" />
 
 module Admin {
 
@@ -12,9 +13,9 @@ module Admin {
     export interface Article {
         articleId: string;
         filename: string;
-        onBind?(): void;
+        onBind?(args?: Object): void;
     }
-    
+
     interface AppInitialize {
         config: Config;
         storage: Store.Interface;
@@ -37,11 +38,33 @@ module Admin {
             this.config = args.config;
             this.storage = args.storage;
             this.settings = args.settings;
+            this.initRouter();
         }
 
-        template(e: Event): void {
-            e.preventDefault();
-            this.loadArticle($(e.target).prop('rel'));
+        private initRouter() {
+            Path.map("#/key/generate").to(() => {
+                this.loadArticle('privateKeyGenerate');
+            });
+
+            Path.map("#/key/import").to(() => {
+                this.loadArticle('privateKeyImport');
+            });
+
+            Path.map("#/key/view").to(() => {
+                if ( this.key ) {
+                    this.loadArticle('privateKeyView');
+                } else {
+                    this.loadPage('key/missing.html');
+                }
+            });
+
+            Path.map("#/key/remove").to(() => {
+                this.loadArticle('privateKeyRemove');
+            });
+
+            Path.map("#/pub/import").to(() => {
+                this.loadArticle('publicKeyImport');
+            });
         }
 
         error(message: string): void {
@@ -56,31 +79,16 @@ module Admin {
                 throw "Article filename is missing";
 
             if ( this.articles[article.articleId] )
-                throw "Article ID " + article.articleId + " is already taken"; 
+                throw "Article ID " + article.articleId + " is already taken";
 
             this.articles[article.articleId] = article;
         }
 
-        loadArticle(articleId: string): void {
-            var article: Article;
-            var fullpath: string;
+        // Loads a page from the template folder
+        loadPage(filename: string, callback?: Interfaces.Callback): void {
+            var fullpath: string = this.path + "/" + filename;
 
-            if ( this.binding != null ) {
-                this.binding.unbind();
-            }
-
-            this.currentArticle = article = this.articles[articleId];
-
-            if (article == null) {
-                this.error("Article " + articleId + " is not initialized");
-                return;
-            }
-
-            // Get the fullpath of the article
-            fullpath = this.path + "/" + article.filename;
-
-            // Load the article into the element
-            this.element.load(fullpath, (res, status, xhr)=>{
+            this.element.load(fullpath, (res, status, xhr) => {
 
                 // Error
                 if ( status == "error" ) {
@@ -88,24 +96,49 @@ module Admin {
                     return;
                 }
 
-                this.binding = rivets.bind(this.element, article);
-                if ( article.onBind ) article.onBind();
-            })
+                if (callback) callback();
+            });
+        }
 
+        // Loads a page and binds it to a controller
+        loadArticle(articleId: string, onBindArgs?: Object): void {
+            var article: Article = this.articles[articleId];
+
+            if (article == null) {
+                this.error("Article " + articleId + " is not initialized");
+                return;
+            }
+
+            this.currentArticle = article;
+
+            // Remove previous binding
+            if ( this.binding != null ) {
+                this.binding.unbind();
+            }
+
+            this.loadPage(article.filename, () => {
+                this.binding = rivets.bind(this.element, article);
+                if ( article.onBind ) article.onBind(onBindArgs);
+            });
         }
 
         // This goes to window.onload or jquery
         run(): void {
+
+            // Rivets
             rivets.configure({
                 handler: function(target, event, binding) {
                     this.call(app.currentArticle, event, binding.view.models)
                 }
             });
             rivets.bind($('body'), this);
+
+            // App
             this.element = $('article');
-            this.settings.loadPrivateKey((key) => { 
-                this.key = key 
-                this.loadArticle('privateKeyView');
+            this.settings.loadPrivateKey((key) => {
+                this.key = key
+                Path.listen();
+                window.location.hash = "#/key/view";
             });
         }
     }

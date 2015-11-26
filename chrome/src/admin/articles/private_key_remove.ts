@@ -10,7 +10,7 @@ module Admin {
         doRemove(): void {
             app.settings.removePrivateKey(() => {
                 app.key = null;
-                app.loadArticle('privateKeyView');
+                window.location.hash = '#/key/view';
             });
         }
     }

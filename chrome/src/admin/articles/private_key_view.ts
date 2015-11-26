@@ -16,14 +16,6 @@ module Admin {
             }
         }
 
-        toGenerate() {
-            app.loadArticle('privateKeyGenerate');
-        }
-
-        toImport() {
-            app.loadArticle('privateKeyImport');
-        }
-
     }
     app.registerArticle( new PrivateKeyView() );
 }
