@@ -5,8 +5,6 @@ module Admin {
 
         filename = "public/import.html";
         articleId = "publicKeyImport";
-
-        error: string;
         key: string;
 
         submit(e: Event): void {
@@ -16,7 +14,7 @@ module Admin {
             try {
                 publicKey = new Keys.PublicKey(this.key);
             } catch (err) {
-                this.error = err;
+                app.notify.error = err;
                 return;
             }
 
@@ -25,7 +23,7 @@ module Admin {
                     app.log("Added: ", publicKey);
                 });
             } catch ( err ) {
-                this.error = err;
+                app.notify.error = err;
             }
         }
     }

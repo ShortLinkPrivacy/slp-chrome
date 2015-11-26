@@ -6,8 +6,6 @@ module Admin {
         app: App = app;
         filename = "key/import.html";
         articleId = "privateKeyImport";
-
-        error: string;
         key: string;
 
         submit(e: Event): void {
@@ -17,7 +15,7 @@ module Admin {
             try {
                 key = new Keys.PrivateKey(this.key);
             } catch (err) {
-                this.error = err;
+                app.notify.error = err;
                 return;
             }
 

@@ -11,7 +11,7 @@ module Admin {
 
         onBind() {
             this.key = app.key;
-            if (this.key) {
+            if (this.key != null) {
                 this.publicKey = this.key.toPublic();
             }
         }

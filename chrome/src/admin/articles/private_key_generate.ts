@@ -6,7 +6,6 @@ module Admin {
         filename = "key/generate.html";
         articleId = "privateKeyGenerate";
 
-        error: string = null;
         spinner: boolean = false;
         name: string;
         email: string;
@@ -22,7 +21,7 @@ module Admin {
             e.preventDefault();
 
             if (this.passphrase != this.confirm) {
-                this.error = "The passphrase and the passphrase confirmation do not match";
+                app.notify.error = "The passphrase and the passphrase confirmation do not match";
                 return;
             }
 
@@ -43,7 +42,7 @@ module Admin {
                     })
                }).catch((error)=>{
                    this.spinner = false;
-                   this.error = "Can not create a new key - " + error;
+                   app.notify.error = "Can not create a new key - " + error;
                })
         }
     }
