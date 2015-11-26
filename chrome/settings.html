@@ -32,6 +32,10 @@
             <li class="pure-menu-item"><a href="#/pub/import" class="pure-menu-link"> PubImport</a></li>
           </ul>
       </nav>
+      <div id="notify" rv-on-click="notify.clear">
+        <div class="warning" rv-if="notify.error">{ notify.error }</div>
+        <div class="info" rv-if="notify.info">{ notify.info }</div>
+      </div>
       <article>
       </article>
     </div><!-- #container -->

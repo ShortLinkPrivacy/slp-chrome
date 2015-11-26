@@ -22,6 +22,15 @@ module Admin {
         settings: Settings.Interface;
     }
 
+    class Notify {
+        error: string;
+        info: string;
+
+        clear(): void {
+            this.error = this.info = null;
+        }
+    }
+
     export class App {
 
         path: string = "src/templates";
@@ -33,6 +42,7 @@ module Admin {
         config: Config;
         settings: Settings.Interface;
         storage: Store.Interface;
+        notify: Notify = new Notify();
 
         constructor(args: AppInitialize) {
             this.config = args.config;
@@ -68,7 +78,6 @@ module Admin {
         }
 
         error(message: string): void {
-            this.element.html(message).addClass('warning');
         }
 
         registerArticle(article: Article) {
@@ -120,6 +129,10 @@ module Admin {
                 this.binding = rivets.bind(this.element, article);
                 if ( article.onBind ) article.onBind(onBindArgs);
             });
+        }
+
+        log(...args): void {
+            console.log.apply(args);
         }
 
         // This goes to window.onload or jquery
