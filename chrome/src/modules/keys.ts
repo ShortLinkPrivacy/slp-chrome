@@ -1,5 +1,7 @@
 /// <reference path="../typings/openpgp.d.ts" />
 
+declare var exports: { [index: string]: any };
+
 module Keys {
     class Key {
         key: openpgp.key.Key;
@@ -59,5 +61,9 @@ module Keys {
         toPublic(): Key {
             return new PublicKey(this.key.toPublic().armor());
         }
+    }
+
+    if ( typeof window == "undefined" ) {
+        exports["Keys"] = Keys;
     }
 }

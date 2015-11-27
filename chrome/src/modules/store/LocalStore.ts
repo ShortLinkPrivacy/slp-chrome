@@ -41,7 +41,11 @@ module Store {
         }
 
         private saveDirectory(callback: Interfaces.Callback): void {
-            this.save(this.config.directory, this.directory, callback);
+            var armoredDir = {};
+            for ( var fingerprint in this.directory ) {
+                armoredDir[fingerprint] = this.directory[fingerprint].armored();
+            }
+            this.save(this.config.directory, armoredDir, callback);
         }
 
         private saveMessages(callback: Interfaces.Callback): void {
@@ -52,15 +56,26 @@ module Store {
             var store = this.config.store;
             var mk = this.config.messages;
             var dk = this.config.directory;
+            var dir: Interfaces.Dictionary;
 
-            // Load the directory with publick keys and messages
+            // Load the directory with public keys and messages
             store.get([mk, dk], (result) => {
+
+                // Load all public keys from localStore.
+                // All keys are stored in armored text, so when we load them
+                // back, we have to convert them to Key.PublicKey
                 if ( typeof result[dk] != "undefined" ) {
-                    this.directory = result[dk];
+                    dir = result[dk];
+                    for (var k in dir) {
+                        this.directory[k] = new Keys.PublicKey(dir[k]);
+                    }
                 }
+
+                // Load all messages from LocalStore
                 if ( typeof result[mk] != "undefined" ) {
                     this.messages = result[mk];
                 }
+
                 callback();
             });
         }

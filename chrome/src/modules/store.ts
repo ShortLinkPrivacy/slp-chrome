@@ -3,6 +3,8 @@
 /// <reference path="interfaces.ts" />
 /// <reference path="keys.ts" />
 
+declare var exports: { [index: string]: any };
+
 module Store {
 
     // Callback function that returns a key
@@ -46,4 +48,7 @@ module Store {
         loadMessage(id: string, callback: MessageCallback): void;
     }
 
+    if ( typeof window == "undefined" ) {
+        exports["Store"] = Store;
+    }
 }
