@@ -79,6 +79,10 @@ module Admin {
             Path.map("#/pub/import").to(() => {
                 this.loadArticle('publicKeyImport');
             });
+
+            Path.map("#/pub/list").to(() => {
+                this.loadArticle('publicKeyList');
+            });
         }
 
         registerArticle(article: Article) {
@@ -136,7 +140,7 @@ module Admin {
         }
 
         log(...args): void {
-            console.log.apply(args);
+            console.log(args);
         }
 
         // This goes to window.onload or jquery
@@ -152,10 +156,12 @@ module Admin {
 
             // App
             this.element = $('article');
-            this.settings.loadPrivateKey((key) => {
-                this.key = key
-                Path.listen();
-                window.location.hash = "#/key/view";
+            this.storage.initialize(() => {
+                this.settings.loadPrivateKey((key) => {
+                    this.key = key
+                    Path.listen();
+                    window.location.hash = "#/key/view";
+                });
             });
         }
     }

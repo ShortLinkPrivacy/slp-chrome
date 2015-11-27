@@ -32,6 +32,9 @@ module Store {
     }
 
     export interface Interface {
+        // Initialization
+        initialize(callback: Interfaces.Callback): void;
+
         // Public Keys
         storePublicKey(key: Keys.PublicKey, callback: Interfaces.Callback): void;
         loadPublicKey(fingerprint: string, callback: PublicKeyCallback): void;

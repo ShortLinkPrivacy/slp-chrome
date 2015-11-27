@@ -38,7 +38,7 @@ chrome/src/modules/settings/*.js
 chrome/src/modules/store/*.js
 chrome/src/admin/*.js
 chrome/src/admin/articles/*.js
-chrome/test_keys
+chrome/_keys
 api/*.js
 api/t/*.js
 play/js/*.js
