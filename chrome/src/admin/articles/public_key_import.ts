@@ -21,6 +21,8 @@ module Admin {
             try {
                 app.storage.storePublicKey(publicKey, () => {
                     app.log("Added: ", publicKey);
+                    app.notify.info = "Key for " + publicKey.getPrimaryUser() + " added successfully";
+                    this.key = "";
                 });
             } catch ( err ) {
                 app.notify.error = err;

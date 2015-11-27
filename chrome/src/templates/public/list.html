@@ -1,0 +1,21 @@
+<div>
+  <form class="pure-form">
+    <input rv-value="filter" rv-on-keyup="doFilter" placeholder="filer">
+  </form>
+  <table class="pure-table">
+    <thead>
+      <tr>
+        <th>User ID</th>
+        <th>Fingerprint</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr rv-each-key="foundKeys">
+        <td>{ key.getPrimaryUser }</td>
+        <td>{ key.fingerprint }</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
