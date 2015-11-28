@@ -1,6 +1,6 @@
 /// <reference path="../modules/config.ts" />
 /// <reference path="../modules/keys.ts" />
-/// <reference path="../modules/store/LocalStore.ts" />
+/// <reference path="../modules/keystore/LocalStore.ts" />
 /// <reference path="../modules/settings/LocalStore.ts" />
 /// <reference path="../typings/openpgp.d.ts" />
 /// <reference path="../typings/rivets.d.ts" />
@@ -18,7 +18,7 @@ module Admin {
 
     interface AppInitialize {
         config: Config;
-        storage: Store.Interface;
+        storage: KeyStore.Interface;
         settings: Settings.Interface;
     }
 
@@ -45,7 +45,7 @@ module Admin {
         currentArticle: Article;
         config: Config;
         settings: Settings.Interface;
-        storage: Store.Interface;
+        storage: KeyStore.Interface;
         notify: Notify = new Notify();
 
         constructor(args: AppInitialize) {
@@ -169,7 +169,7 @@ module Admin {
     var config = new Config();
     app = window["app"] = new App({
         config: config,
-        storage: new Store.LocalStore(config),
+        storage: new KeyStore.LocalStore(config),
         settings: new Settings.LocalStore(config)
     });
 

@@ -5,7 +5,7 @@
 
 declare var exports: { [index: string]: any };
 
-module Store {
+module KeyStore {
 
     // Callback function that returns a key
     export interface PublicKeyCallback {
@@ -29,21 +29,14 @@ module Store {
     }
 
     export interface Interface {
-        // Initialization
         initialize(callback: Interfaces.Callback): void;
-
-        // Public Keys
         storePublicKey(key: Keys.PublicKey, callback: Interfaces.Callback): void;
         loadPublicKey(fingerprint: string, callback: PublicKeyCallback): void;
         searchPublicKey(userId: string, callback: PublicKeySearchCallback): void;
         deleteAllPublicKeys(callback: Interfaces.Callback): void;
-
-        // Messages
-        storeMessage(armored: string, callback: Interfaces.Callback): void;
-        loadMessage(id: string, callback: MessageCallback): void;
     }
 
     if ( typeof window == "undefined" ) {
-        exports["Store"] = Store;
+        exports["KeyStore"] = KeyStore;
     }
 }

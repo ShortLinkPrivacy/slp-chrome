@@ -1,9 +1,9 @@
 /// <reference path="../../../typings/chrome/chrome.d.ts" />
 /// <reference path="../interfaces.ts" />
 /// <reference path="../keys.ts" />
-/// <reference path="../store.ts" />
+/// <reference path="../keystore.ts" />
 
-module Store {
+module KeyStore {
 
     interface LocalStoreConfig {
         // chrome storage (local or sync)
@@ -20,7 +20,7 @@ module Store {
         [fingerprint: string]: Array<string>;
     }
 
-    export class LocalStore implements Store.Interface {
+    export class LocalStore implements KeyStore.Interface {
         private directory: KeyDirectory = {};
         private messages: Interfaces.Dictionary = {};
         private config: LocalStoreConfig;
@@ -105,16 +105,6 @@ module Store {
                 this.directory = {};
                 callback();
             });
-        }
-
-        storeMessage(armored: string, callback: Interfaces.Callback): void {
-            var algo = openpgp.enums.hash.md5;
-            var md5 = openpgp.crypto.hash.digest(algo, armored);
-            this.messages[md5] = armored;
-        }
-
-        loadMessage(id: string, callback: MessageCallback): void {
-            callback(this.messages[id]);
         }
 
     }

@@ -6,7 +6,7 @@ module Admin {
         filename = "public/list.html";
         articleId = "publicKeyList";
         filter: string;
-        foundKeys: Store.PublicKeyArray = [];
+        foundKeys: KeyStore.PublicKeyArray = [];
 
         doFilter(): void {
             if ( this.filter == "" || this.filter == null ) {
