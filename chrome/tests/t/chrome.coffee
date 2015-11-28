@@ -1,4 +1,4 @@
-Chrome = require("../local/chrome.js").Chrome
+Chrome = require("../lib/chrome.js").Chrome
 storage = new Chrome()
 assert = require "assert"
 

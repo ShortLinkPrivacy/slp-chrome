@@ -1,23 +1,35 @@
-Store = require("../lib/store.js").Store
-Keys = require("../lib/store.js").Keys
-Chrome = require('../local/chrome.js').Chrome
-localStorage = new Chrome()
-assert  = require 'assert'
-fs = require "fs"
+Store  = require("../compiled/store.js").Store
+Keys   = require("../compiled/store.js").Keys
+Chrome = require('../lib/chrome.js').Chrome
 
-aliceArmor = fs.readFileSync("keys/alice.pub", "utf8")
-bobArmor = fs.readFileSync("keys/bob.pub", "utf8")
+assert  = require 'assert'
+fs      = require "fs"
+
+localStorage = new Chrome()
+
+# Create a store to test on
+store = new Store.LocalStore
+    storage:
+        localStore:
+            store: localStorage
+            directory: 'directory'
+            message: 'message'
+
+# Read three armored texts of public keys
+aliceArmor   = fs.readFileSync("keys/alice.pub", "utf8")
+bobArmor     = fs.readFileSync("keys/bob.pub", "utf8")
 charlieArmor = fs.readFileSync("keys/charlie.pub", "utf8")
 
-describe "Key files", ->
-    it "loaded", ->
-        assert aliceArmor
-        assert bobArmor
-        assert charlieArmor
+# Create three public keys
+alice   = new Keys.PublicKey(aliceArmor)
+bob     = new Keys.PublicKey(bobArmor)
+charlie = new Keys.PublicKey(charlieArmor)
 
 
-describe "Store module", ->
-    it "loaded", ->
-        assert Store
-        assert Keys
+describe 'Prerequisits', ->
+    it 'has a store object', ->
+        assert( store )
+
+    it 'has a key for Alice', ->
+        assert( alice instanceof Key.PublicKey )
 
