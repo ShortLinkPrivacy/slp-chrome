@@ -26,7 +26,7 @@ module KeyStore {
         private config: LocalStoreConfig;
 
         constructor(config: any) {
-            this.config = config.storage.localStore;
+            this.config = config.keyStore.localStore;
         }
 
         private checkRuntimeError(): void {

@@ -13,15 +13,21 @@ class Config {
         }
     };
 
-    // Storage types
-    storage = {
+    // Key storage types
+    keyStore = {
         localStore: {
             store: chrome.storage.local,
             directory: 'directory',
             messages: 'messages'
         }
     };
-
+    
+    // Message storage types
+    messageStore = {
+        localStore: {
+            store: chrome.storage.local,
+        }
+    };
 
     // The constructor will take an optional object, whch can be
     // used to feed different values to all of the default
