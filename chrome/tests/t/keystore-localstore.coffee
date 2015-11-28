@@ -2,6 +2,7 @@
 
 GLOBAL.openpgp = require("openpgp")
 
+Config    = require("../lib/testconfig.js").TestConfig
 KeyStore  = require("../compiled/keystore.js").KeyStore
 Keys      = require("../compiled/keystore.js").Keys
 Chrome    = require('../lib/chrome.js').Chrome
@@ -11,15 +12,11 @@ fs      = require "fs"
 
 #############################################################
 
-localStorage = new Chrome()
+config = new Config()
+localStorage = config.keyStore.store
 
 # Create a store to test on
-keyStore = new KeyStore.LocalStore
-    keyStore:
-        localStore:
-            store: localStorage
-            directory: 'directory'
-            message: 'message'
+keyStore = new KeyStore.LocalStore(config)
 
 # Read three armored texts of public keys
 aliceArmor   = fs.readFileSync("keys/alice.pub", "utf8")
