@@ -1,15 +1,21 @@
-Store  = require("../compiled/store.js").Store
-Keys   = require("../compiled/store.js").Keys
-Chrome = require('../lib/chrome.js').Chrome
+#############################################################
+
+GLOBAL.openpgp = require("openpgp")
+
+KeyStore  = require("../compiled/keystore.js").KeyStore
+Keys      = require("../compiled/keystore.js").Keys
+Chrome    = require('../lib/chrome.js').Chrome
 
 assert  = require 'assert'
 fs      = require "fs"
 
+#############################################################
+
 localStorage = new Chrome()
 
 # Create a store to test on
-store = new Store.LocalStore
-    storage:
+keyStore = new KeyStore.LocalStore
+    keyStore:
         localStore:
             store: localStorage
             directory: 'directory'
@@ -25,11 +31,19 @@ alice   = new Keys.PublicKey(aliceArmor)
 bob     = new Keys.PublicKey(bobArmor)
 charlie = new Keys.PublicKey(charlieArmor)
 
+#############################################################
 
-describe 'Prerequisits', ->
-    it 'has a store object', ->
-        assert( store )
+describe "Key Storage", ->
+    describe 'Prerequisits', ->
+        it 'has a store object', ->
+            assert keyStore
 
-    it 'has a key for Alice', ->
-        assert( alice instanceof Key.PublicKey )
+        it 'has a key for Alice', ->
+            assert alice.armored()
+
+        it 'has a key for Bob', ->
+            assert bob.armored()
+
+        it 'has a key for Charlie', ->
+            assert charlie.armored()
 
