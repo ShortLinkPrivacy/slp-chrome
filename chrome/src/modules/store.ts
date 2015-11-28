@@ -18,11 +18,6 @@ module Store {
         push(key: Keys.PublicKey);
     }
 
-    // A dictionary of fingerprints and public keys
-    export interface PublicKeyDict {
-        [fingerprint: string]: Keys.PublicKey;
-    }
-
     // Callback function that returns an array of keys
     export interface PublicKeySearchCallback {
         (result: PublicKeyArray): void;
