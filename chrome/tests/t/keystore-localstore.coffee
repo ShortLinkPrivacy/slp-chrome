@@ -2,18 +2,20 @@
 
 GLOBAL.openpgp = require("openpgp")
 
-Config    = require("../lib/testconfig.js").TestConfig
-KeyStore  = require("../compiled/keystore.js").KeyStore
-Keys      = require("../compiled/keystore.js").Keys
-Chrome    = require('../lib/chrome.js').Chrome
+TestConfig = require("../lib/testconfig.js").TestConfig
+KeyStore   = require("../compiled/keystore.js").KeyStore
+Keys       = require("../compiled/keystore.js").Keys
+Chrome     = require('../lib/chrome.js').Chrome
 
 assert  = require 'assert'
 fs      = require "fs"
 
 #############################################################
 
-config = new Config()
-localStorage = config.keyStore.store
+config = new TestConfig()
+store  = config.keyStore.localStore.store
+
+console.log config
 
 # Create a store to test on
 keyStore = new KeyStore.LocalStore(config)
@@ -44,3 +46,11 @@ describe "Key Storage", ->
         it 'has a key for Charlie', ->
             assert charlie.armored()
 
+
+    describe 'storePublicKey', ->
+        beforeEach ->
+            store.clear()
+
+        it 'saves the public key', ->
+            keyStore.storePublicKey alice, ()->
+                assert store[alice.fingerprint()]
