@@ -38,6 +38,9 @@ class Chrome
         callback()
         return
 
+    clear: ->
+        data = {}
+
     data: ->
         data
 

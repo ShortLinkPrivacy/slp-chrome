@@ -1,5 +1,5 @@
-TS_PATH=../src/modules
-LIB_PATH=lib
+SOURCE=../src/modules
+TARGET=compiled
 
 help:
 	@echo "Available targets:"
@@ -11,8 +11,8 @@ install:
 	npm install
 
 build:
-	tsc --out $(LIB_PATH)/store.js \
-		$(TS_PATH)/store/LocalStore.ts
+	tsc --out $(TARGET)/store.js \
+		$(SOURCE)/store/LocalStore.ts
 
 test:
 	NODE_ENV=test mocha t
