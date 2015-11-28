@@ -3,7 +3,6 @@
 module Admin {
     class PrivateKeyRemove implements Article {
 
-        app: App = app;
         filename = "key/remove.html";
         articleId = "privateKeyRemove";
 

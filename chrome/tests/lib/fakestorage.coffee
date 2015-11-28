@@ -1,4 +1,4 @@
-class Chrome
+class FakeStorage
     data = {}
 
     itemsToArr = (items)->
@@ -44,4 +44,16 @@ class Chrome
     data: ->
         data
 
-exports.Chrome = Chrome
+
+locl = new FakeStorage()
+sync = new FakeStorage()
+for method in ['get', 'set', 'remove', 'clear']
+    chrome.storage.local[method] = locl[method].bind(locl)
+    chrome.storage.sync[method]  = sync[method].bind(sync)
+
+chrome.storage.local._data = locl.data.bind(locl)
+chrome.storage.sync._data = sync.data.bind(sync)
+
+window.FakeStorage = FakeStorage
+window.fakeLocal = locl
+window.fakeSync = sync

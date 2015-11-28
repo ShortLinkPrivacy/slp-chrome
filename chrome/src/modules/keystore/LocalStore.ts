@@ -11,9 +11,6 @@ module KeyStore {
 
         // public keys
         directory: string;
-
-        // messages
-        messages: string;
     }
 
     interface KeyDirectory {
@@ -36,13 +33,11 @@ module KeyStore {
         }
 
         initialize(callback: Interfaces.Callback): void {
-            var mk = this.config.messages;
-            var dk = this.config.directory;
+            var d = this.config.directory;
 
             // Load the directory with public keys and messages
-            this.config.store.get([mk, dk], (result) => {
-                this.directory = result[dk] || {};
-                this.messages = result[mk] || {}
+            this.config.store.get(d, (result) => {
+                this.directory = result[d] || {};
                 callback();
             });
         }

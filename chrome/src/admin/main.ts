@@ -8,6 +8,9 @@
 
 module Admin {
 
+    // Are we running the code in unit tests
+    var in_testing = typeof window["mocha"] != "undefined";
+
     export var app: App;
 
     export interface Article {
@@ -145,6 +148,9 @@ module Admin {
 
         // This goes to window.onload or jquery
         run(): void {
+
+            // Do not run the app if in unit tests
+            if ( in_testing ) return;
 
             // Rivets
             rivets.configure({

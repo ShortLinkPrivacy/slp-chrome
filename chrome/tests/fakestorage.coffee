@@ -1,6 +1,4 @@
-Chrome = require("../lib/chrome.js").Chrome
-storage = new Chrome()
-assert = require "assert"
+storage = new FakeStorage()
 
 describe "Chrome fake localStorage", ->
     describe "Set", ->

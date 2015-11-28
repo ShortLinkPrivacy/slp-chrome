@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Pretty Good Plugin (Unit Tests)</title>
+    <link href="./bower_components/mocha/mocha.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="mocha"></div>
+
+    <!-- Vendors JS -->
+    <script src="./bower_components/pathjs/path.min.js"></script>
+    <script src="./bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="./bower_components/rivets/dist/rivets.bundled.min.js"></script>
+    <script src="./bower_components/openpgp/dist/openpgp.min.js"></script>
+    <script src="./bower_components/mocha/mocha.js"></script>
+
+    <!-- Code -->
+    <script src="src/admin.js"></script>
+
+    <!-- Tests -->
+    <script src="tests/lib/init.js"></script>
+    <script src="tests/lib/testkeys.js"></script>
+
+    <script src="tests/keystore-localstore.js"></script>
+
+    <script src="tests/lib/run.js"></script>
+  </body>
+</html>
