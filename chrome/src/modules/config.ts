@@ -18,7 +18,6 @@ class Config {
         localStore: {
             store: chrome.storage.local,
             directory: 'directory',
-            messages: 'messages'
         }
     };
     
@@ -26,19 +25,7 @@ class Config {
     messageStore = {
         localStore: {
             store: chrome.storage.local,
+            directory: 'messages',
         }
     };
-
-    // The constructor will take an optional object, whch can be
-    // used to feed different values to all of the default
-    // properties. This can be useful when writing tests.
-    constructor(opts?: Interfaces.Dictionary) {
-        if (typeof opts != "undefined") {
-            for (var prop in opts) {
-                if (opts.hasOwnPropety(prop)) {
-                    this[prop] = opts[prop];
-                }
-            }
-        }
-    }
 }
