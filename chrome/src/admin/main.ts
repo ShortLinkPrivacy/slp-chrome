@@ -21,7 +21,7 @@ module Admin {
 
     interface AppInitialize {
         config: Config;
-        storage: KeyStore.Interface;
+        keyStore: KeyStore.Interface;
         settings: Settings.Interface;
     }
 
@@ -48,12 +48,12 @@ module Admin {
         currentArticle: Article;
         config: Config;
         settings: Settings.Interface;
-        storage: KeyStore.Interface;
+        keyStore: KeyStore.Interface;
         notify: Notify = new Notify();
 
         constructor(args: AppInitialize) {
             this.config = args.config;
-            this.storage = args.storage;
+            this.keyStore = args.keyStore;
             this.settings = args.settings;
             this.initRouter();
         }
@@ -162,7 +162,7 @@ module Admin {
 
             // App
             this.element = $('article');
-            this.storage.initialize(() => {
+            this.keyStore.initialize(() => {
                 this.settings.loadPrivateKey((key) => {
                     this.key = key
                     Path.listen();
@@ -175,7 +175,7 @@ module Admin {
     var config = new Config();
     app = window["app"] = new App({
         config: config,
-        storage: new KeyStore.LocalStore(config),
+        keyStore: new KeyStore.LocalStore(config),
         settings: new Settings.LocalStore(config)
     });
 

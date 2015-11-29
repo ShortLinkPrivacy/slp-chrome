@@ -14,7 +14,7 @@ module Admin {
                 return;
             }
 
-            app.storage.searchPublicKey(this.filter, (keys) => {
+            app.keyStore.searchPublicKey(this.filter, (keys) => {
                 this.foundKeys = keys;
             });
         }
