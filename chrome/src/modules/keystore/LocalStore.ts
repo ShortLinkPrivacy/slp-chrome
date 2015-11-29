@@ -47,7 +47,11 @@ module KeyStore {
                 k = this.config.directory,
                 setter = {};
 
-            if ( this.directory[p] ) return;
+            if ( this.directory[p] ) {
+                if (callback) callback();
+                return;
+            }
+
             this.directory[p] = key.userIds();
 
             setter[p] = key.armored();
@@ -55,14 +59,15 @@ module KeyStore {
 
             this.config.store.set( setter, () => {
                 this.checkRuntimeError();
-                callback();
+                if (callback) callback();
             });
         }
 
         loadPublicKey(fingerprint: string, callback: PublicKeyCallback): void {
             this.config.store.get( fingerprint, (items) => {
                 this.checkRuntimeError();
-                callback(items[fingerprint]);
+                var key = new Keys.PublicKey(items[fingerprint]);
+                if (callback) callback(key);
             });
         }
 
@@ -88,7 +93,7 @@ module KeyStore {
                     result.push( key );
                 });
 
-                callback(result);
+                if (callback) callback(result);
             });
         }
 
