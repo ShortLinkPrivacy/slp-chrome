@@ -37,6 +37,7 @@ module KeyStore {
 
             // Load the directory with public keys and messages
             this.config.store.get(d, (result) => {
+                this.checkRuntimeError();
                 this.directory = result[d] || {};
                 callback();
             });

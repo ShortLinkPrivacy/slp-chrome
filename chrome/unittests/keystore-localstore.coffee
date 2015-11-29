@@ -12,8 +12,9 @@ charlie = TestKeys.charlie
 #############################################################
 
 describe "Key Storage", ->
-    beforeEach ->
+    before (done)->
         store.clear()
+        done()
 
     #--------------------------------------------------------
     describe 'Prerequisits', ->
@@ -49,20 +50,39 @@ describe "Key Storage", ->
     #--------------------------------------------------------
     describe 'searchPublicKey', ->
         before (done)->
-            keyStore.storePublicKey alice
-            keyStore.storePublicKey bob
-            keyStore.storePublicKey charlie
-            done()
+            keyStore.storePublicKey alice, ->
+                keyStore.storePublicKey bob, ->
+                    keyStore.storePublicKey charlie, ->
+                        done()
 
-        it 'finds all by domain', ->
+        it 'finds all by domain', (done)->
             keyStore.searchPublicKey 'ifnx', (result)->
                 expect(result).to.have.length 3
+                done()
 
-        it 'filters by name', ->
+        it 'filters by name', (done)->
             keyStore.searchPublicKey 'alice', (result)->
                 expect(result).to.have.length 1
+                done()
 
-        it 'returns an array of strings', ->
+        it 'returns an array of PublicKeys', (done)->
             keyStore.searchPublicKey 'bob', (result)->
-                expect(result[0]).to.have.length 1
+                expect(result[0]).to.be.a Keys.PublicKey
+                done()
+
+    #--------------------------------------------------------
+    describe 'initialize', ->
+        before (done)->
+            keyStore.storePublicKey alice, ->
+                keyStore.storePublicKey bob, ->
+                    keyStore.storePublicKey charlie, ->
+                        done()
+
+        it 'loads the directory', (done)->
+            ks = new KeyStore.LocalStore(app.config)
+            ks.initialize ->
+                ks.searchPublicKey 'ifnx', (result)->
+                    expect(result).to.have.length 3
+                    done()
+
 
