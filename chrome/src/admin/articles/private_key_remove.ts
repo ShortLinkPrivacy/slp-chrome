@@ -7,7 +7,7 @@ module Admin {
         articleId = "privateKeyRemove";
 
         doRemove(): void {
-            app.settings.removePrivateKey(() => {
+            app.privateKeyStore.remove(() => {
                 app.key = null;
                 window.location.hash = '#/key/view';
             });

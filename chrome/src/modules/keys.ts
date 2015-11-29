@@ -3,6 +3,18 @@
 declare var exports: { [index: string]: any };
 
 module Keys {
+
+    export class KeyError extends Error {
+        code: string;
+        data: any;
+
+        constructor(code: string, data?: any) {
+            super();
+            this.code = 'key.' + code;
+            this.data = data;
+        }
+    }
+
     class Key {
         key: openpgp.key.Key;
 
@@ -10,12 +22,16 @@ module Keys {
             var result = openpgp.key.readArmored(armoredText);
             var key: openpgp.key.Key;
 
+            if (!armoredText) {
+                throw new KeyError('missing', {a: 3});
+            }
+
             if (result.err && result.err.length) {
-                throw "key.missing";
+                throw new KeyError('error', result.err);
             }
 
             if (result.keys && !result.keys.length) {
-                throw "key.missing";
+                throw new KeyError('error', 'unknown');
             }
 
             this.key = result.keys[0];

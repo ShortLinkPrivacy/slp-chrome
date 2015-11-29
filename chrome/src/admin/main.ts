@@ -1,7 +1,7 @@
 /// <reference path="../modules/config.ts" />
 /// <reference path="../modules/keys.ts" />
 /// <reference path="../modules/keystore/LocalStore.ts" />
-/// <reference path="../modules/settings/LocalStore.ts" />
+/// <reference path="../modules/privatekey-store/LocalStore.ts" />
 /// <reference path="../typings/openpgp.d.ts" />
 /// <reference path="../typings/rivets.d.ts" />
 /// <reference path="../../typings/pathjs/pathjs.d.ts" />
@@ -22,7 +22,7 @@ module Admin {
     interface AppInitialize {
         config: Config;
         keyStore: KeyStore.Interface;
-        settings: Settings.Interface;
+        privateKeyStore: PrivateKeyStore.Interface;
     }
 
     class Notify {
@@ -47,14 +47,14 @@ module Admin {
         key: Keys.PrivateKey;
         currentArticle: Article;
         config: Config;
-        settings: Settings.Interface;
+        privateKeyStore: PrivateKeyStore.Interface;
         keyStore: KeyStore.Interface;
         notify: Notify = new Notify();
 
         constructor(args: AppInitialize) {
             this.config = args.config;
             this.keyStore = args.keyStore;
-            this.settings = args.settings;
+            this.privateKeyStore = args.privateKeyStore;
             this.initRouter();
         }
 
@@ -163,7 +163,7 @@ module Admin {
             // App
             this.element = $('article');
             this.keyStore.initialize(() => {
-                this.settings.loadPrivateKey((key) => {
+                this.privateKeyStore.get((key) => {
                     this.key = key
                     Path.listen();
                     window.location.hash = "#/key/view";
@@ -176,7 +176,7 @@ module Admin {
     app = window["app"] = new App({
         config: config,
         keyStore: new KeyStore.LocalStore(config),
-        settings: new Settings.LocalStore(config)
+        privateKeyStore: new PrivateKeyStore.LocalStore(config)
     });
 
 }

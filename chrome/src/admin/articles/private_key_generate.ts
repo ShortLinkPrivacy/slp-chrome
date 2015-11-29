@@ -36,7 +36,7 @@ module Admin {
             openpgp.generateKeyPair(options)
                .then((generated)=>{
                     var key = app.key = new Keys.PrivateKey(generated.privateKeyArmored);
-                    app.settings.storePrivateKey(key, () => {
+                    app.privateKeyStore.set(key, () => {
                         this.spinner = false;
                         window.location.hash = "#/key/view";
                     })

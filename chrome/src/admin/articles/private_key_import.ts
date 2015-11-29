@@ -12,15 +12,12 @@ module Admin {
             var key: Keys.PrivateKey;
 
             try {
-                key = new Keys.PrivateKey(this.key);
+                app.privateKeyStore.set(key, () => {
+                    window.location.hash = "#/key/view"
+                });
             } catch (err) {
                 app.notify.error = err;
-                return;
             }
-
-            app.settings.storePrivateKey(key, () => {
-                app.loadArticle('keyView');
-            });
 
         }
     }
