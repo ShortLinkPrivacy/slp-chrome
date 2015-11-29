@@ -1,6 +1,6 @@
 /// <reference path="../modules/config.ts" />
 /// <reference path="../modules/keys.ts" />
-/// <reference path="../modules/keystore/LocalStore.ts" />
+/// <reference path="../modules/key-store/LocalStore.ts" />
 /// <reference path="../modules/privatekey-store/LocalStore.ts" />
 /// <reference path="../modules/message-store/LocalStore.ts" />
 /// <reference path="../typings/openpgp.d.ts" />
