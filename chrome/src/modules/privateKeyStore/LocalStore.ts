@@ -3,15 +3,15 @@
 /// <reference path="../interfaces.ts" />
 /// <reference path="../keys.ts" />
 
-module Settings {
+module PrivateKeyStore {
 
-    export interface SettingsConfig {
-        privateKey: string;
+    export interface PrivateKeyStoreConfig {
+        privateKeyLabel: string;
         store: chrome.storage.StorageArea;
     }
 
-    export class LocalStore implements Settings.Interface {
-        private config: SettingsConfig;
+    export class LocalStore implements PrivateKeyStore.Interface {
+        private config: PrivateKeyStoreConfig;
 
         constructor(config: any) {
             this.config = config.settings.localStore;
@@ -23,18 +23,18 @@ module Settings {
             }
         }
 
-        storePrivateKey(key: Keys.PrivateKey, callback: Interfaces.Callback): void {
+        set(key: Keys.PrivateKey, callback: Interfaces.Callback): void {
             var setter: Interfaces.Dictionary = {};
-            setter[this.config.privateKey] = key.armored();
+            setter[this.config.privateKeyLabel] = key.armored();
             this.config.store.set(setter, () => {
                 this.checkRuntimeError();
                 callback();
             });
         }
 
-        loadPrivateKey(callback: PrivateKeyCallback): void {
-            this.config.store.get(this.config.privateKey, (result) => {
-                var armoredText: string = result[this.config.privateKey];
+        get(callback: PrivateKeyCallback): void {
+            this.config.store.get(this.config.privateKeyLabel, (result) => {
+                var armoredText: string = result[this.config.privateKeyLabel];
                 var privateKey: Keys.PrivateKey;
 
                 // Check for corrupted private key, and remove it if it is
@@ -50,8 +50,8 @@ module Settings {
             });
         }
 
-        removePrivateKey(callback: Interfaces.Callback): void {
-            this.config.store.remove(this.config.privateKey, () => {
+        remove(callback: Interfaces.Callback): void {
+            this.config.store.remove(this.config.privateKeyLabel, () => {
                 callback();
             });
         }

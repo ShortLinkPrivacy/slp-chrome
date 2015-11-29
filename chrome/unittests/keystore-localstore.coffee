@@ -3,7 +3,6 @@
 
 # Create a store to test on
 keyStore = new KeyStore.LocalStore(app.config)
-store = chrome.storage.local
 
 alice = TestKeys.alice
 bob = TestKeys.bob
@@ -11,15 +10,15 @@ charlie = TestKeys.charlie
 
 #############################################################
 
-describe "Key Storage", ->
+describe "Key Storage :: LocalStore", ->
     before (done)->
-        store.clear()
+        keyStore.config.store.clear()
         done()
 
     #--------------------------------------------------------
     describe 'Prerequisits', ->
         it 'has a store object', ->
-            expect(keyStore).to.be.ok()
+            expect(keyStore).to.be.a KeyStore.LocalStore
 
         it 'has a key for Alice', ->
             expect(alice).to.be.a Keys.PublicKey
@@ -85,4 +84,12 @@ describe "Key Storage", ->
                     expect(result).to.have.length 3
                     done()
 
+
+    #--------------------------------------------------------
+    describe 'deleteAllPublicKeys', ->
+        it 'deletes all', (done)->
+            keyStore.deleteAllPublicKeys ->
+                keyStore.searchPublicKey 'ifnx', (result)->
+                    expect(result).to.have.length 0
+                    done()
 

@@ -6,10 +6,10 @@ class Config {
     defaultBits = 2048;
 
     // Settings types
-    settings = {
+    privateKeyStore = {
         localStore: {
             store: chrome.storage.sync,
-            privateKey: 'privateKey'
+            privateKeyLabel: 'privateKey'
         }
     };
 

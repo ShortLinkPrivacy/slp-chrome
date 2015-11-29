@@ -3,7 +3,7 @@
 /// <reference path="interfaces.ts" />
 /// <reference path="keys.ts" />
 
-module Settings {
+module PrivateKeyStore {
 
     // Callback interface for the function that returns the private key
     export interface PrivateKeyCallback {
@@ -12,9 +12,9 @@ module Settings {
 
     // Anyone implementing settings should implements this
     export interface Interface {
-        storePrivateKey(key: Keys.PrivateKey, callback: Interfaces.Callback): void;
-        loadPrivateKey(callback: PrivateKeyCallback): void;
-        removePrivateKey(callback: Interfaces.Callback): void;
+        set(key: Keys.PrivateKey, callback: Interfaces.Callback): void;
+        get(callback: PrivateKeyCallback): void;
+        remove(callback: Interfaces.Callback): void;
     }
 
 }
