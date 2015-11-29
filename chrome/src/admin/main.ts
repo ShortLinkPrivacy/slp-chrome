@@ -2,6 +2,7 @@
 /// <reference path="../modules/keys.ts" />
 /// <reference path="../modules/keystore/LocalStore.ts" />
 /// <reference path="../modules/privatekey-store/LocalStore.ts" />
+/// <reference path="../modules/message-store/LocalStore.ts" />
 /// <reference path="../typings/openpgp.d.ts" />
 /// <reference path="../typings/rivets.d.ts" />
 /// <reference path="../../typings/pathjs/pathjs.d.ts" />
@@ -23,6 +24,7 @@ module Admin {
         config: Config;
         keyStore: KeyStore.Interface;
         privateKeyStore: PrivateKeyStore.Interface;
+        messageStore: MessageStore.Interface;
     }
 
     class Notify {
@@ -44,17 +46,21 @@ module Admin {
         articles: { [index: string]: Article } = {};
         binding: Rivets.View = null;
         element: JQuery;
-        key: Keys.PrivateKey;
         currentArticle: Article;
         config: Config;
-        privateKeyStore: PrivateKeyStore.Interface;
+
+        key: Keys.PrivateKey;
         keyStore: KeyStore.Interface;
+        privateKeyStore: PrivateKeyStore.Interface;
+        messageStore: MessageStore.Interface;
+
         notify: Notify = new Notify();
 
         constructor(args: AppInitialize) {
             this.config = args.config;
             this.keyStore = args.keyStore;
             this.privateKeyStore = args.privateKeyStore;
+            this.messageStore = args.messageStore;
             this.initRouter();
         }
 
@@ -176,7 +182,8 @@ module Admin {
     app = window["app"] = new App({
         config: config,
         keyStore: new KeyStore.LocalStore(config),
-        privateKeyStore: new PrivateKeyStore.LocalStore(config)
+        privateKeyStore: new PrivateKeyStore.LocalStore(config),
+        messageStore: new MessageStore.LocalStore(config)
     });
 
 }
