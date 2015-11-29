@@ -3,7 +3,6 @@
 module Admin {
     class PrivateKeyImport implements Article {
 
-        app: App = app;
         filename = "key/import.html";
         articleId = "privateKeyImport";
         key: string;

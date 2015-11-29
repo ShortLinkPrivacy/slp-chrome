@@ -1,17 +1,13 @@
 
 #############################################################
 
-store  = window.fakeLocal
-
 # Create a store to test on
 keyStore = new KeyStore.LocalStore(app.config)
+store = chrome.storage.local
 
 alice = TestKeys.alice
 bob = TestKeys.bob
 charlie = TestKeys.charlie
-
-console.log store
-console.log app.storage
 
 #############################################################
 
@@ -30,4 +26,5 @@ describe "Key Storage", ->
 
         it 'saves the public key', ->
             keyStore.storePublicKey alice, ()->
+                assert true
                 # assert store[alice.fingerprint()]
