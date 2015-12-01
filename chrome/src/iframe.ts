@@ -35,3 +35,11 @@ class App {
     }
 
 }
+
+window.onload = function() {
+    var config = new Config();
+    var app = window["app"] = new App({
+        keyStore: new KeyStore.LocalStore(config),
+        privateKeyStore: new PrivateKeyStore.LocalStore(config)
+    });
+};
