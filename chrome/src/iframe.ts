@@ -8,16 +8,20 @@
 /// <reference path="../typings/chrome/chrome.d.ts" />
 
 interface AppConfig {
-
+    keyStore: KeyStore.Interface;
+    privateKeyStore: PrivateKeyStore.Interface;
 }
 
 class App {
     element: HTMLElement;
     config: AppConfig;
     keyStore: KeyStore.Interface;
+    privateKeyStore: PrivateKeyStore.Interface;
 
-    constructor() {
+    constructor( config: AppConfig ) {
         this.element = document.getElementById('iframe');
+        this.keyStore = config.keyStore;
+        this.privateKeyStore = config.privateKeyStore;
     }
 
     sendMessage(msg: any, callback: Interfaces.ResultCallback): void {
