@@ -1,11 +1,7 @@
-/// <reference path="modules/config.ts" />
-/// <reference path="modules/keys.ts" />
-/// <reference path="modules/key-store/LocalStore.ts" />
-/// <reference path="modules/privatekey-store/LocalStore.ts" />
-/// <reference path="modules/message-store/LocalStore.ts" />
 /// <reference path="../typings/openpgp/openpgp.d.ts" />
 /// <reference path="../typings/rivets/rivets.d.ts" />
 /// <reference path="../typings/chrome/chrome.d.ts" />
+/// <reference path="modules.d.ts" />
 
 interface AppConfig {
     keyStore: KeyStore.Interface;

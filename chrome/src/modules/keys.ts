@@ -15,7 +15,7 @@ module Keys {
         }
     }
 
-    class Key {
+    export class Key {
         key: openpgp.key.Key;
 
         constructor(armoredText: string) {

@@ -1,9 +1,35 @@
 help:
 	@echo "Available targets:"
+	@echo "-----------------------------------------------------"
 	@echo "install                 install all dependencies"
+	@echo "clean                   delete all generated Js files"
+	@echo "modules                 compile all module files"
+	@echo "coffee                  compile all coffee files"
 	@echo "admin                   compile all admin files"
-	@echo "compile                 compile all coffee files"
-	@echo "build                   compile all files"
+	@echo "iframe                  compile all iframe files"
+	@echo "build                   build all"
+
+#------------------------------------------------------------------
+
+install:
+	bower install
+	tsd install
+
+#------------------------------------------------------------------
+
+clean:
+	find src -name "*.js" | xargs rm -v
+	rm -v src/modules.d.ts
+
+#------------------------------------------------------------------
+
+modules:
+	find src/modules -name "*.ts" | xargs tsc --out src/modules.js --declaration
+
+#------------------------------------------------------------------
+
+coffee:
+	coffee -c ./ unittests/
 
 admin:
 	tsc --out src/admin.js \
@@ -16,11 +42,9 @@ admin:
 		src/admin/articles/public_key_list.ts \
 		src/admin/run.ts
 
-compile:
-	coffee -c ./ unittests/
+iframe:
+	tsc --out src/iframe.js \
+		src/iframe.ts
 
-build: admin compile
+build: modules coffee admin iframe
 
-install:
-	bower install
-	tsd install
