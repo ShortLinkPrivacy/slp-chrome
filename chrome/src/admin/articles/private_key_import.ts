@@ -9,10 +9,9 @@ module Admin {
 
         submit(e: Event): void {
             e.preventDefault();
-            var key: Keys.PrivateKey;
 
             try {
-                app.privateKeyStore.set(key, () => {
+                app.privateKeyStore.set(this.key, () => {
                     window.location.hash = "#/key/view"
                 });
             } catch (err) {

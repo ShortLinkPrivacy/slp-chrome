@@ -19,12 +19,13 @@ module Keys {
         key: openpgp.key.Key;
 
         constructor(armoredText: string) {
-            var result = openpgp.key.readArmored(armoredText);
-            var key: openpgp.key.Key;
+            var result: openpgp.key.KeyResult;
 
             if (!armoredText) {
-                throw new KeyError('missing', {a: 3});
+                throw new KeyError('missing');
             }
+
+            result = openpgp.key.readArmored(armoredText);
 
             if (result.err && result.err.length) {
                 throw new KeyError('error', result.err);
