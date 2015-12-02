@@ -1,4 +1,4 @@
-/// <reference path="../typings/openpgp.d.ts" />
+/// <reference path="../../typings/openpgp/openpgp.d.ts" />
 
 declare var exports: { [index: string]: any };
 

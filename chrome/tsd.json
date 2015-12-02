@@ -5,32 +5,32 @@
   "path": "typings",
   "bundle": "typings/tsd.d.ts",
   "installed": {
-    "openpgp/openpgp.d.ts": {
-      "commit": "aed176536a202b9a2475ce1989ea6d2d0226a185"
-    },
-    "es6-promise/es6-promise.d.ts": {
-      "commit": "aed176536a202b9a2475ce1989ea6d2d0226a185"
-    },
     "chrome/chrome.d.ts": {
-      "commit": "aed176536a202b9a2475ce1989ea6d2d0226a185"
+      "commit": "4910a7c52a1cf335877ea3b0917eb65117a66637"
     },
     "webrtc/MediaStream.d.ts": {
-      "commit": "aed176536a202b9a2475ce1989ea6d2d0226a185"
-    },
-    "filewriter/filewriter.d.ts": {
-      "commit": "aed176536a202b9a2475ce1989ea6d2d0226a185"
+      "commit": "4910a7c52a1cf335877ea3b0917eb65117a66637"
     },
     "filesystem/filesystem.d.ts": {
-      "commit": "aed176536a202b9a2475ce1989ea6d2d0226a185"
+      "commit": "4910a7c52a1cf335877ea3b0917eb65117a66637"
     },
-    "rivets/rivets.d.ts": {
-      "commit": "fc341765ebbb04b7109981a25dced01f488f4d94"
+    "es6-promise/es6-promise.d.ts": {
+      "commit": "4910a7c52a1cf335877ea3b0917eb65117a66637"
     },
     "jquery/jquery.d.ts": {
-      "commit": "16134c168d021351acb1673ee9659644fc58c424"
+      "commit": "4910a7c52a1cf335877ea3b0917eb65117a66637"
     },
     "pathjs/pathjs.d.ts": {
-      "commit": "36c6ce86fb64bafb28ec95dc78c6b98228b45c8d"
+      "commit": "4910a7c52a1cf335877ea3b0917eb65117a66637"
+    },
+    "filewriter/filewriter.d.ts": {
+      "commit": "4910a7c52a1cf335877ea3b0917eb65117a66637"
+    },
+    "rivets/rivets.d.ts": {
+      "commit": "4910a7c52a1cf335877ea3b0917eb65117a66637"
+    },
+    "openpgp/openpgp.d.ts": {
+      "commit": "4910a7c52a1cf335877ea3b0917eb65117a66637"
     }
   }
 }

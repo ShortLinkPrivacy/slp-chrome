@@ -3,8 +3,8 @@
 /// <reference path="../modules/key-store/LocalStore.ts" />
 /// <reference path="../modules/privatekey-store/LocalStore.ts" />
 /// <reference path="../modules/message-store/LocalStore.ts" />
-/// <reference path="../typings/openpgp.d.ts" />
-/// <reference path="../typings/rivets.d.ts" />
+/// <reference path="../../typings/openpgp/openpgp.d.ts" />
+/// <reference path="../../typings/rivets/rivets.d.ts" />
 /// <reference path="../../typings/pathjs/pathjs.d.ts" />
 
 module Admin {
