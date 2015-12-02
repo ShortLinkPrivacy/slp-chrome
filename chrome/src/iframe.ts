@@ -38,4 +38,14 @@ window.onload = function() {
         keyStore: new KeyStore.LocalStore(config),
         privateKeyStore: new PrivateKeyStore.LocalStore(config)
     });
+
+    var element = document.getElementById('iframe');
+
+    // Rivets
+    rivets.configure({
+        handler: function(target, event, binding) {
+            this.call(app, event, binding.view.models)
+        }
+    });
+    rivets.bind(element, app);
 };

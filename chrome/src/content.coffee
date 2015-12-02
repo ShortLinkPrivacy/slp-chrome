@@ -59,7 +59,7 @@ class UI
 
     # Icon to show in the corner of each textarea
     iconSize = 16
-    iconSrc = '/icon.png'
+    iconSrc = chrome.runtime.getURL("/icon.png")
 
     # Popup that displays when you click the image
     popupWidth = 300

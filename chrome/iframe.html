@@ -13,6 +13,7 @@
     <script src="./bower_components/less/dist/less.js"></script>
 
     <!-- Code -->
+    <script src="src/modules.js"></script>
     <script src="src/iframe.js"></script>
   </head>
   <body>
@@ -21,6 +22,9 @@
         Encrypt this!
         <span rv-on-click="close" class="close">x</span>
       </div>
+      <ul rv-each-user="users">
+        <li></li>
+      </ul>
     </div>
   </body>
 </html>
