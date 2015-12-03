@@ -3,6 +3,8 @@
 /// <reference path="../typings/chrome/chrome.d.ts" />
 /// <reference path="modules.d.ts" />
 
+var app: App;
+
 interface AppConfig {
     keyStore: KeyStore.Interface;
     privateKeyStore: PrivateKeyStore.Interface;
@@ -13,6 +15,9 @@ class App {
     config: AppConfig;
     keyStore: KeyStore.Interface;
     privateKeyStore: PrivateKeyStore.Interface;
+    filter: string;
+    foundKeys: KeyStore.PublicKeyArray = [];
+    key: Keys.PrivateKey;
 
     constructor( config: AppConfig ) {
         this.element = document.getElementById('iframe');
@@ -32,22 +37,40 @@ class App {
         this.sendMessageToContent( { closePopup: true } );
     }
 
+    doFilter(): void {
+        if ( this.filter == "" || this.filter == null ) {
+            this.foundKeys = [];
+            return
+        }
+
+        this.keyStore.searchPublicKey(this.filter, (keys) => {
+            this.foundKeys = keys;
+        });
+    }
+
+    run(): void {
+        // Rivets
+        this.element = document.getElementById('iframe');
+        rivets.configure({
+            handler: function(target, event, binding) {
+                this.call(app, event, binding.view.models)
+            }
+        });
+        rivets.bind(this.element, this);
+
+        this.keyStore.initialize(() => {
+            this.privateKeyStore.get((key) => {
+                this.key = key;
+            })
+        })
+    }
+
 }
 
-window.onload = function() {
-    var config = new Config();
-    var app = window["app"] = new App({
-        keyStore: new KeyStore.LocalStore(config),
-        privateKeyStore: new PrivateKeyStore.LocalStore(config)
-    });
+var config = new Config();
+app = window["app"] = new App({
+    keyStore: new KeyStore.LocalStore(config),
+    privateKeyStore: new PrivateKeyStore.LocalStore(config)
+});
 
-    var element = document.getElementById('iframe');
-
-    // Rivets
-    rivets.configure({
-        handler: function(target, event, binding) {
-            this.call(app, event, binding.view.models)
-        }
-    });
-    rivets.bind(element, app);
-};
+window.onload = app.run.bind(app);

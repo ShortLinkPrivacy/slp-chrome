@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html class='full'>
   <head>
     <meta charset="UTF-8">
     <title>Pretty Good Plugin (Menu)</title>
@@ -16,14 +16,15 @@
     <script src="src/modules.js"></script>
     <script src="src/iframe.js"></script>
   </head>
-  <body>
+  <body class='full'>
     <div id="iframe">
       <div id="header">
         Encrypt this!
         <span rv-on-click="close" class="close">x</span>
       </div>
-      <ul rv-each-user="users">
-        <li></li>
+      <input rv-value="filter" rv-on-keyup="doFilter" placeholder="filer">
+      <ul rv-each-key="foundKeys">
+        <li>{ key.getPrimaryUser }</li>
       </ul>
     </div>
   </body>
