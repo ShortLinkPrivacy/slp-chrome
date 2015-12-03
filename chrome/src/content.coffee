@@ -153,7 +153,6 @@ class UI
         @restoreProps()
 
     openPopup: (x, y)->
-        console.log chrome.tabs
 
         # popup element
         popup = document.createElement('div')
@@ -215,20 +214,15 @@ pageContainsCode = ->
 ########################################################################
 
 # ----------------------------------------------------------------
-# Content page message listener
+# Content page message listener. The iframe posts here.
 # ----------------------------------------------------------------
-# To send a message to content script, one must send that message
-# to the background page enclosed in { content: message }, where
-# message is the message inteded for the content page.  The reason
-# for this is that messages to the content page are sent via
-# chrome.tabs.sendMessage, however chrome.tabs is not defined when
-# a page is loaded inside an iframe.
-# ----------------------------------------------------------------
-chrome.runtime.onMessage.addListener (msg, sender, sendResponse)->
-    if msg.closePopup
-        UI.popupEl?.remove()
-        sendResponse { success: true }
 
+window.addEventListener 'message', (event)->
+    if event.data.iframe and (msg = event.data.message)
+        if msg.closePopup
+            UI.popupEl?.remove()
+
+    return
 
 # ----------------------------------------------------------------
 # Textarea elements get UIs attached to them

@@ -24,10 +24,12 @@ class App {
         chrome.runtime.sendMessage({ iframe: true, message: msg }, callback);
     }
 
+    sendMessageToContent(msg: any): void {
+        window.parent.postMessage({ iframe: true, message: msg }, '*' );
+    }
+
     close(e: Event): void {
-        this.sendMessageToBackground( { closePopup: true }, (res) => {
-            console.log(res);
-        });
+        this.sendMessageToContent( { closePopup: true } );
     }
 
 }
