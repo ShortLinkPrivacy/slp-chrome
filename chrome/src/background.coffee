@@ -12,19 +12,15 @@ modules =
 chrome.runtime.onMessage.addListener (msg, sender, sendResponse)->
     console.log "Received runtime message:", msg
 
-    # First check to see if this is a message intended for the
-    # content script and if so, pass it down
-    if (content = msg.content)?
-        chrome.tabs.query {active: true, currentWindow: true}, (tabs)->
-            chrome.tabs.sendMessage tabs[0].id, content, sendResponse
+    # If the message came from the iframe, then it's for the content page.
+    if msg.iframe
+        chrome.tabs.sendMessage sender.tab.id, msg.message, sendResponse
 
-    # Handle other messages here
-    # --------------------------
+    # If the message came from the content, it's for the background page
     else if (name = msg.loadModule)?
         filename = modules[name].filename
         property = modules[name].property
         chrome.tabs.executeScript null, { file: filename }, ->
             sendResponse { property: property }
-
 
     return true

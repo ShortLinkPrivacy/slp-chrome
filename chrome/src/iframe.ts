@@ -20,12 +20,12 @@ class App {
         this.privateKeyStore = config.privateKeyStore;
     }
 
-    sendMessage(msg: any, callback: Interfaces.ResultCallback): void {
-        chrome.runtime.sendMessage({ content: msg }, callback);
+    sendMessageToBackground(msg: any, callback: Interfaces.ResultCallback): void {
+        chrome.runtime.sendMessage({ iframe: true, message: msg }, callback);
     }
 
     close(e: Event): void {
-        this.sendMessage( { closePopup: true }, (res) => {
+        this.sendMessageToBackground( { closePopup: true }, (res) => {
             console.log(res);
         });
     }
