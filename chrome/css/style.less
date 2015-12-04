@@ -102,13 +102,15 @@ form[name=importKeysForm] {
   margin: 0;
 }
 
+@iframeWidth: 300;
+
 #iframe {
   font-size: 12px;
   font-family: sans-serif;
   width: 98%;
   height: 98%;
   background-color: #fff;
-  border: 1px solid #999;
+  border: 2px solid #999;
   display: block;
 
   #header {
@@ -118,5 +120,29 @@ form[name=importKeysForm] {
     font-weight: bold;
     text-align: left;
     .close { float: right; cursor: pointer; }
+  }
+
+  #content {
+    padding: 3px;
+  }
+
+  #filter {
+    margin-bottom: 3px;
+    width: 98%;
+    color: #00a;
+    font-weight: bold;
+  }
+
+  ul {
+    margin: 0;
+    padding: 0;
+    li {
+      list-style-type: none;
+      cursor: pointer;
+      &:hover {
+        background-color: #3b8bba;
+      }
+    }
+
   }
 }

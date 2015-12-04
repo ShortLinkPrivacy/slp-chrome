@@ -23,6 +23,8 @@ class App {
         this.element = document.getElementById('iframe');
         this.keyStore = config.keyStore;
         this.privateKeyStore = config.privateKeyStore;
+
+        this.filter = "ifn"; // TODO - most used
     }
 
     sendMessageToBackground(msg: any, callback: Interfaces.ResultCallback): void {
@@ -48,6 +50,10 @@ class App {
         });
     }
 
+    select(e: Event, a: any, self: { index: number }) {
+
+    }
+
     run(): void {
         // Rivets
         this.element = document.getElementById('iframe');
@@ -62,6 +68,7 @@ class App {
             this.privateKeyStore.get((key) => {
                 this.key = key;
             })
+            this.doFilter();
         })
     }
 
