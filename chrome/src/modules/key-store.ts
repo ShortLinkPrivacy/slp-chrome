@@ -13,9 +13,7 @@ module KeyStore {
     }
 
     // An array of public keys
-    export interface PublicKeyArray {
-        [index: number]: Keys.PublicKey;
-        push(key: Keys.PublicKey);
+    export interface PublicKeyArray extends Array<Keys.PublicKey> {
     }
 
     // Callback function that returns an array of keys

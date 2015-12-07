@@ -1,7 +1,6 @@
 module Interfaces {
-    export interface Dictionary {
+    export interface Dictionary extends Object {
         [index: string]: any;
-        hasOwnPropety?(value: string): boolean;
     }
 
     export interface Callback {
