@@ -1,0 +1,58 @@
+@iframeWidth: 300;
+
+html,body {
+  height: 100%;
+  margin: 0;
+}
+
+#iframe {
+  font-size: 12px;
+  font-family: sans-serif;
+  width: 98%;
+  height: 98%;
+  background-color: #fff;
+  border: 2px solid #999;
+  display: block;
+
+  #header {
+    padding: 2px 4px;
+    background-color: #ccc;
+    color: #111;
+    font-weight: bold;
+    text-align: left;
+    .close { float: right; cursor: pointer; }
+  }
+
+  #content {
+    padding: 3px;
+  }
+
+  #filter {
+    margin-bottom: 3px;
+    width: 98%;
+    color: #00a;
+    font-weight: bold;
+  }
+
+  ul {
+    margin: 5px 0;
+    padding: 0;
+    input[type="checkbox"] {
+      cursor: pointer;
+    }
+    li {
+      padding: 2px 0;
+      list-style-type: none;
+      cursor: pointer;
+      &:hover {
+        background-color: #3b8bba;
+        color: #fff;
+      }
+    }
+
+  }
+
+  button {
+    font-weight: bold;
+  }
+}

@@ -10,21 +10,36 @@ interface AppConfig {
     privateKeyStore: PrivateKeyStore.Interface;
 }
 
+class KeyItem {
+    publicKey: Keys.PublicKey;
+    selected: boolean;
+
+    constructor(key: Keys.PublicKey) {
+        this.publicKey = key;
+        this.selected = false;
+    }
+
+    name(): string {
+        return this.publicKey.getPrimaryUser();
+    }
+}
+
 class App {
     element: HTMLElement;
     config: AppConfig;
     keyStore: KeyStore.Interface;
     privateKeyStore: PrivateKeyStore.Interface;
     filter: string;
-    foundKeys: KeyStore.PublicKeyArray = [];
+    foundKeys: Array<KeyItem>;
     key: Keys.PrivateKey;
 
     constructor( config: AppConfig ) {
         this.element = document.getElementById('iframe');
         this.keyStore = config.keyStore;
         this.privateKeyStore = config.privateKeyStore;
+        this.foundKeys = [];
 
-        this.filter = "ifn"; // TODO - most used
+        this.filter = ""; // TODO - most used
     }
 
     sendMessageToBackground(msg: any, callback: Interfaces.ResultCallback): void {
@@ -35,31 +50,46 @@ class App {
         window.parent.postMessage({ iframe: true, message: msg }, '*' );
     }
 
-    close(e: Event): void {
-        this.sendMessageToContent( { closePopup: true } );
+    close(e: Event, keys?: Array<Keys.PublicKey>): void {
+        var response = { closePopup: true };
+        if (keys) response["keys"] = keys;
+        this.sendMessageToContent(response);
     }
 
     doFilter(): void {
         if ( this.filter == "" || this.filter == null ) {
             this.foundKeys = [];
-            return
+            return;
         }
 
         this.keyStore.searchPublicKey(this.filter, (keys) => {
-            this.foundKeys = keys;
+            this.foundKeys = keys.map((k) => {
+                return new KeyItem(k);
+            })
         });
     }
 
-    select(e: Event, a: any, self: { index: number }) {
+    select(e: Event, model: {index: number}) {
+        var keyItem = this.foundKeys[model.index];
+        keyItem.selected = !keyItem.selected;
+    }
 
+    submit(e: Event) {
+        var keys = this.foundKeys.filter((k) => { 
+            return k.selected 
+        }).map((k) => { 
+            return k.publicKey 
+        });
+        this.sendMessageToContent( { keys: keys } );
+        this.close(e);
     }
 
     run(): void {
         // Rivets
         this.element = document.getElementById('iframe');
         rivets.configure({
-            handler: function(target, event, binding) {
-                this.call(app, event, binding.view.models)
+            handler: function(target, ev, binding) {
+                this.call(app, ev, binding.model)
             }
         });
         rivets.bind(this.element, this);

@@ -1,14 +1,15 @@
 <!doctype html>
-<html class='full'>
+<html>
   <head>
     <meta charset="UTF-8">
     <title>Pretty Good Plugin (Menu)</title>
 
     <!-- Local CSS -->
-    <link rel="stylesheet/less" type="text/css" href="css/style.less">
+    <link rel="stylesheet/less" type="text/css" href="css/iframe.less">
 
     <!-- Vendors JS -->
-    <script src="./bower_components/rivets/dist/rivets.bundled.min.js"></script>
+    <script src="./bower_components/sightglass/index.js"></script>
+    <script src="./bower_components/rivets/dist/rivets.js"></script>
     <script src="./bower_components/openpgp/dist/openpgp.min.js"></script>
     <script src="./bower_components/less/dist/less.js"></script>
 
@@ -16,16 +17,16 @@
     <script src="src/modules.js"></script>
     <script src="src/iframe.js"></script>
   </head>
-  <body class='full'>
+  <body>
     <div id="iframe">
       <div id="header">
-        Encrypt this!
+        Select recipients
         <span rv-on-click="close" class="close">x</span>
       </div>
       <div id="content">
         <input id="filter" rv-value="filter" rv-on-keyup="doFilter" placeholder="filter">
         <ul>
-          <li rv-each-key="foundKeys"><input type="checkbox" name="{ key.fingerprint }" /><span rv-on-click="select">{ key.getPrimaryUser }</span></li>
+          <li rv-on-click="select" rv-each-key="foundKeys"><input type="checkbox" rv-checked="key.selected" /><span rv-text="key.name"></span></li>
         </ul>
         <button rv-on-click="submit">encrypt</button>
       </div>
