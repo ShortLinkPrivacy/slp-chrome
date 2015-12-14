@@ -181,12 +181,18 @@ class UI
             document.addEventListener 'click', ->
                 popup.remove()
                 document.removeEventListener 'click', this
+                UI.self = null
 
         # Can't bind right away, because it fires on the icon click
         setTimeout bindCloseClick, 1000
 
-        UI.popupEl = popup
-        UI.iframeEl = iframe
+        @popup = popup
+        @iframe = iframe
+        UI.self = this
+
+    closePopup: ->
+        @popup.remove()
+
 
 decryptLinks = (node)->
     match = triggerRe.exec(node.nodeValue)

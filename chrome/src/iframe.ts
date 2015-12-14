@@ -80,8 +80,7 @@ class App {
         }).map((k) => { 
             return k.publicKey 
         });
-        this.sendMessageToContent( { keys: keys } );
-        this.close(e);
+        this.close(e, keys);
     }
 
     run(): void {
