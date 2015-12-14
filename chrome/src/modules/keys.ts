@@ -55,6 +55,9 @@ module Keys {
             return this.key.armor();
         }
 
+        openpgpKey(): openpgp.key.Key {
+            return this.key;
+        }
 
     }
 

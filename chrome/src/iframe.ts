@@ -50,10 +50,9 @@ class App {
         window.parent.postMessage({ iframe: true, message: msg }, '*' );
     }
 
-    close(e: Event, keys?: Array<Keys.PublicKey>): void {
-        var response = { closePopup: true };
-        if (keys) response["keys"] = keys;
-        this.sendMessageToContent(response);
+    close(e: MouseEvent): void {
+        e.preventDefault();
+        this.sendMessageToContent({ closePopup: true });
     }
 
     doFilter(): void {
@@ -75,12 +74,14 @@ class App {
     }
 
     submit(e: Event) {
-        var keys = this.foundKeys.filter((k) => { 
+        var keys: Array<string> = this.foundKeys.filter((k) => { 
             return k.selected 
         }).map((k) => { 
-            return k.publicKey 
+            return k.publicKey.armored()
         });
-        this.close(e, keys);
+
+        // Close and send keys
+        this.sendMessageToContent({ closePopup: true, keys: keys });
     }
 
     run(): void {

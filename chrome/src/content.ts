@@ -3,6 +3,26 @@
 /// <reference path="../typings/chrome/chrome.d.ts" />
 /// <reference path="modules.d.ts" />
 
+// Contains all loaded modules
+var loadedModules: Interfaces.Dictionary = {};
+
+//---------------------------------------------------------
+// Loads a module on demand
+//---------------------------------------------------------
+function loadModule(name: string, callback: Interfaces.Callback): void {
+    if (!loadedModules[name]) {
+        chrome.runtime.sendMessage({ loadModule: name }, (res) => {
+            var property: string;
+            if ( property = res.property ) {
+                loadedModules[property] = window[property]
+                callback()
+            }
+        })
+    } else {
+        callback()
+    }
+}
+
 class Popup {
 
     /*------------------------------------------------------------
@@ -140,6 +160,10 @@ class Popup {
         this.restoreProps()
     }
 
+    /*------------------------------------------------------------
+     *  Open and close popup
+     *-----------------------------------------------------------*/
+    
     openPopup(x: number, y: number): void {
 
         var popup: HTMLElement, 
@@ -181,10 +205,26 @@ class Popup {
         Popup.current = this
     }
 
-    closePopup(): void {
+    // Close the popup and optionally set the new text of the input
+    closePopup(encryptedText?: string): void {
         this.popup.remove();
         Popup.current = null;
         document.removeEventListener('click', this.closeBound);
+        if ( encryptedText ) this.el.value = encryptedText;
+    }
+
+    encrypt(armoredPublicKeys: Array<string>, callback: Interfaces.ResultCallback): void {
+        var keys: Array<openpgp.key.Key>;
+
+        loadModule("openpgp", () => {
+            keys = armoredPublicKeys.map((armoredText: string) => {
+                return openpgp.key.readArmored(armoredText).keys[0];
+            })
+
+            openpgp.encryptMessage( keys, this.el.value ).then(callback).catch((err) => {
+                console.log(err);
+            })
+        });
     }
 }
 
@@ -194,12 +234,18 @@ class Popup {
 // ----------------------------------------------------------------
 
 window.addEventListener('message', (e) => {
-    var msg: any,
+    var msg = e.data.message,
         current: Popup = Popup.current;
 
-    if (e.data.iframe && (msg = e.data.message)) {
+    if (e.data.iframe && msg) {
         if (msg.closePopup && current) {
-            current.closePopup()
+            if ( msg.keys && msg.keys.length ) {
+                current.encrypt(msg.keys, (encryptedText) => {
+                    current.closePopup(encryptedText)
+                })
+            } else {
+                current.closePopup()
+            }
         }
     }
 });
