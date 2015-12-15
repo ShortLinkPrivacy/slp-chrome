@@ -257,10 +257,51 @@ window.addEventListener('message', (e) => {
 // Textarea elements get UIs attached to them
 // ----------------------------------------------------------------
 
-//var el: HTMLTextAreaElement;
 var textAreas = document.getElementsByTagName('textarea'),
     i: number;
 
 for (i = 0; i < textAreas.length; ++i) {
     new Popup(textAreas[i]);
 }
+
+// ----------------------------------------------------------------
+// Traverse all text nodes for PGP keys and messages
+// ----------------------------------------------------------------
+
+var urlRe = /localhost\/x\/(.+)$/gi,
+    pgpRe = /----BEGIN PGP MESSAGE----/gi;
+
+function pageContainsCode(): boolean {
+    var walk: TreeWalker,
+        node: Node;
+
+    walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    while (node = walk.nextNode()) {
+        if ( node.nodeValue.match(pgpRe) ) return true;
+    }
+
+    return false;
+}
+
+function processPageNodes(): void {
+    var walk: TreeWalker,
+        node: Node;
+
+    walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT)
+    while (node = walk.nextNode()) {
+        var text = node.nodeValue;
+        if (text.match(pgpRe)) {
+            var message = window["m"] = openpgp.message.readArmored(text);
+            console.log(message);
+        }
+    }
+}
+
+window.onload = function() {
+    if ( pageContainsCode() ) {
+        loadModule("openpgp", () => {
+            setTimeout( processPageNodes, 1000 );
+        })
+    }
+}
+

@@ -22,7 +22,7 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["src/content.js"],
+      "js": [ "src/modules.js", "src/content.js" ],
       "run_at": "document_end",
       "all_frames": true
     }
