@@ -15,6 +15,7 @@
   ],
   "dependencies": {
     "jquery": "",
-    "rivets": ""
+    "rivets": "",
+    "openpgp": "~1.4.0"
   }
 }
