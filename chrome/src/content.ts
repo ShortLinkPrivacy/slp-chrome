@@ -54,7 +54,7 @@ class Popup {
     private savedProps: Object;
 
     /*------------------------------------------------------------
-     *  Public variables and constructor 
+     *  Public variables and constructor
      *-----------------------------------------------------------*/
 
     // Holder of the currently opened UI object
@@ -119,7 +119,7 @@ class Popup {
     /*------------------------------------------------------------
      *  Save and restore element props
      *-----------------------------------------------------------*/
-    
+
     // Save the element's style properties
     saveProps(): void {
         this.propsToSave.forEach((p) => {
@@ -137,7 +137,7 @@ class Popup {
     /*------------------------------------------------------------
      *  Icon
      *-----------------------------------------------------------*/
-    
+
     isOverIcon(e: MouseEvent): boolean {
         return this.el.offsetWidth - e.offsetX < this.iconSize && e.offsetY < this.iconSize
     }
@@ -163,10 +163,10 @@ class Popup {
     /*------------------------------------------------------------
      *  Open and close popup
      *-----------------------------------------------------------*/
-    
+
     openPopup(x: number, y: number): void {
 
-        var popup: HTMLElement, 
+        var popup: HTMLElement,
             iframe: HTMLIFrameElement;
 
         // popup element
@@ -206,11 +206,14 @@ class Popup {
     }
 
     // Close the popup and optionally set the new text of the input
-    closePopup(encryptedText?: string): void {
+    closePopup(newText?: string): void {
         this.popup.remove();
         Popup.current = null;
         document.removeEventListener('click', this.closeBound);
-        if ( encryptedText ) this.el.value = encryptedText;
+        if ( newText ) {
+            this.el.value = newText;
+            this.el.dispatchEvent(new Event('input'));
+        }
     }
 
     encrypt(armoredPublicKeys: Array<string>, callback: Interfaces.ResultCallback): void {
