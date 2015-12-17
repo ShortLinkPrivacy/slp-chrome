@@ -3,13 +3,22 @@
 /// <reference path="../typings/chrome/chrome.d.ts" />
 /// <reference path="modules.d.ts" />
 
+
+var config = new Config();
+
+// How we load the private key
+var privateKeyStore = new PrivateKeyStore.LocalStore(config);
+
+var privateKey: Keys.PrivateKey;
+
 // Contains all loaded modules
 var loadedModules: Interfaces.Dictionary = {};
 
 // Regexp for a PGP message
 var pgpRe = /----BEGIN PGP MESSAGE----/gi;
 
-var publicKey: Keys.PublicKey;
+// Nodes to decrypt
+var nodes: Array<Node>;
 
 /**************************************************
  * Loads a module on demand
@@ -65,9 +74,14 @@ function processNodes(nodes: Array<Node>): void {
         text = node.nodeValue;
         if (text.match(pgpRe)) {
             var message = openpgp.message.readArmored(text);
-            console.log(message);
+            openpgp.decryptMessage( privateKey.key, message )
+               .then((plainText) => {
+                   node.nodeValue = plainText;
+               })
+               .catch((error) => {
+                   console.log(error);
+               });
         }
-
     }
 }
 
@@ -105,28 +119,35 @@ function prepareTextAreas(): void {
 
 
 function run(): void {
-    var config: Config,
-        privateKeyStore: PrivateKeyStore.Interface,
-        nodes: Array<Node>;
+    privateKeyStore = new PrivateKeyStore.LocalStore(config);
 
-    config = new Config();
-    privateKeyStore: new PrivateKeyStore.LocalStore(config);
-
-    // Prepare all textareas
-    prepareTextAreas();
-
-    // Check to see if there is anything to decode
+    // Get all nodes that must be decrypted
     nodes = nodesToDecrypt();
-    if ( nodes.length ) {
-        privateKeyStore.get((privateKey) => {
-            publicKey = privateKey.toPublic();
-            loadModule("openpgp", () => {
-                setTimeout(() => {
-                    processNodes(nodes)
-                }, config.decryptDelay);
-            });
-        });
-    }
+
+    // All of this only matters if the guy has a private key set up
+    privateKeyStore.has((value) => {
+        if ( value ) {
+
+            // Prepare all textareas
+            prepareTextAreas();
+
+            // Decrypt nodes
+            if ( nodes.length ) {
+                loadModule("openpgp", () => {
+                    privateKeyStore.get((pk) => {
+                        privateKey = pk;
+                        privateKey.key.decrypt('Password-123'); // TODO
+                        processNodes(nodes);
+                    });
+                });
+            }
+        } else {
+            if ( nodes.length ) {
+                // TODO: nag about adding public key
+                // (perhaps only when there are nodes to decrypt)
+            }
+        }
+    });
 }
 
 class Popup {
@@ -337,4 +358,6 @@ class Popup {
     }
 }
 
-run();
+window.onload = function() {
+    setTimeout(run, config.decryptDelay);
+}

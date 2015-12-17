@@ -74,14 +74,25 @@ class App {
     }
 
     submit(e: Event) {
-        var keys: Array<string> = this.foundKeys.filter((k) => { 
-            return k.selected 
-        }).map((k) => { 
-            return k.publicKey.armored()
-        });
+        var armoredTexts: Array<string> = [],
+            i: number,
+            key: KeyItem;
+
+        // We can't send objects with methods in a message, so we'll collect
+        // only the armored text of all keys
+        for (i = 0; i < this.foundKeys.length; i++) {
+            key = this.foundKeys[i];
+            if ( key.selected ) {
+                armoredTexts.push(key.publicKey.armored())
+            }
+        }
+
+        // Last, but not least we push the guys own public key, so he can read
+        // his own messages
+        armoredTexts.push(this.key.toPublic().armored());
 
         // Close and send keys
-        this.sendMessageToContent({ closePopup: true, keys: keys });
+        this.sendMessageToContent({ closePopup: true, keys: armoredTexts });
     }
 
     run(): void {

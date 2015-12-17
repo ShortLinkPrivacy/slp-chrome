@@ -26,6 +26,10 @@ module PrivateKeyStore {
             }
         }
 
+        has(callback: Interfaces.ResultCallback): void {
+            this.store.get(this.privateKeyLabel, callback);
+        }
+
         set(key: Keys.PrivateKey|string, callback: Interfaces.Callback): void {
             var setter: Interfaces.Dictionary = {},
                 _key: Keys.PrivateKey;
