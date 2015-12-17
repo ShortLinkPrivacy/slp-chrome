@@ -5,6 +5,10 @@ class Config {
     // Default private key bits
     defaultBits = 2048;
 
+    // Milliseconds to wait before decrypting the page nodes.
+    // This is to give the page code enough time to render.
+    decryptDelay = 1000;
+
     // Settings types
     privateKeyStore = {
         localStore: {
@@ -20,7 +24,7 @@ class Config {
             directory: 'directory',
         }
     };
-    
+
     // Message storage types
     messageStore = {
         localStore: {
