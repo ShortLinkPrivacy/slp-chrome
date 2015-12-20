@@ -47,10 +47,7 @@ iframe:
 	tsc --out src/iframe.js src/iframe.ts
 
 content:
-	tsc --out src/content.js \
-		src/content/func.ts \
-		src/content/popup.ts \
-		src/content/main.ts
+	tsc --out src/content.js src/content.ts
 
 build: modules coffee admin iframe content
 
