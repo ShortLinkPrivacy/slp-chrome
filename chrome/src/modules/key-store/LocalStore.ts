@@ -17,7 +17,7 @@ module KeyStore {
         [fingerprint: string]: Array<string>;
     }
 
-    export class LocalStore implements KeyStore.Interface {
+    export class LocalStore implements Interface {
         private directory: KeyDirectory = {};
         private messages: Interfaces.Dictionary = {};
         private config: LocalStoreConfig;

@@ -10,7 +10,7 @@ module PrivateKeyStore {
         privateKeyLabel: string;
     }
 
-    export class LocalStore implements PrivateKeyStore.Interface {
+    export class LocalStore implements Interface {
         private store: chrome.storage.StorageArea;
         private privateKeyLabel: string;
 
