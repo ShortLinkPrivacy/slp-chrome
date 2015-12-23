@@ -33,34 +33,33 @@ function loadModule(name: string, callback: Interfaces.Callback): void {
 
 /**************************************************
  * Collects a list of nodes that need to be decrypted
+ * and initializes the global nodes array
  **************************************************/
-function nodesToDecrypt(): Array<Node> {
+function initializeNodes(): void {
     var walk: TreeWalker,
         node: Node,
-        result: Array<Node>,
         armorType: number;
 
-    result = [];
+    nodes = [];
     walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
 
     while (node = walk.nextNode()) {
         armorType = getArmorType(node.nodeValue);
         if ( armorType == 3 || armorType == 4 ) {   // TODO: messages only
-            result.push(node);
+            nodes.push(node);
         }
     }
 
-    return result;
 }
 
 /*********************************************************
  * Takes a list of nodes and decrypts them one by one.
  *--------------------------------------------------------
- * This can not be done in one step in nodesToDecrypt because
+ * This can not be done in one step in initializeNodes because
  * loading the openpgp module on the fly, flushes all
  * variables, for some reason.
  *********************************************************/
-function processNodes(nodes: Array<Node>): void {
+function processNodes(): void {
     var node: Node,
         i: number;
 
@@ -110,11 +109,14 @@ function prepareTextAreas(): void {
 }
 
 
+/************************************************************
+ * Bootstrap and run at window.onload
+ ************************************************************/
 function run(): void {
     privateKeyStore = new PrivateKeyStore.LocalStore(config);
 
     // Get all nodes that must be decrypted
-    nodes = nodesToDecrypt();
+    initializeNodes();
 
     // All of this only matters if the guy has a private key set up
     privateKeyStore.has((value) => {
@@ -129,7 +131,7 @@ function run(): void {
                     privateKeyStore.get((pk) => {
                         privateKey = pk;
                         privateKey.key.decrypt('Password-123'); // TODO
-                        processNodes(nodes);
+                        processNodes();
                     });
                 });
             }
