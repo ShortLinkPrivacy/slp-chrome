@@ -80,8 +80,8 @@ app.post '/x', (req, res)->
     if not payload?
         return err400 "Payload missing"
         
-    unless payload.keys? or payload.messages?
-        return err400 "Neither keys nor messages defined"
+    unless payload.armor?
+        return err400 "armor not defined"
 
     # TODO: find a way to limit POSTs to internal data only, so
     # idiots don't begin using this service as a free anonymous

@@ -39,20 +39,12 @@ describe 'Add item', ->
             p.expect(400, done)
 
         #----------------------------------------------
-        it 'returns 400 if there are no keys or messages', (done)->
+        it 'returns 400 if there is no armor', (done)->
             p.send({ blah: 1 }).expect(400, done)
 
         #----------------------------------------------
-        it 'returns 201 if there are keys', (done)->
-            p.send({ keys: [1, 2, 3] })
-                .end (err, res)->
-                    assert.equal(res.status, 201, "201 OK")
-                    assert.ok(res.body.id, "id present")
-                    done()
-
-        #----------------------------------------------
-        it 'returns 201 if there are messages', (done)->
-            p.send({ messages: { fingerprint: 123 } })
+        it 'returns 201 if there is armor', (done)->
+            p.send({ armor: "something" })
                 .end (err, res)->
                     assert.equal(res.status, 201, "201 OK")
                     assert.ok(res.body.id, "id present")
@@ -67,7 +59,7 @@ describe 'Retrieve items', ->
     beforeEach (done)->
         p = r.post("/x")
             .set('Content-Type', 'application/json')
-            .send({ keys: [1,2,3] })
+            .send({ armor: "something" })
             .end (err, res)->
                 result = res.body
                 done()
@@ -87,7 +79,7 @@ describe 'Retrieve items', ->
             r.get("/x/#{result.id}")
                 .set('Content-Type', 'application/json')
                 .end (err, res)->
-                    assert.deepEqual(res.body.keys, [1,2,3])
+                    assert.equal(res.body.armor, "something")
                     done()
 
         it "save proper data in the DB", (done)->
@@ -95,5 +87,5 @@ describe 'Retrieve items', ->
                 .set('Content-Type', 'application/json')
                 .end (err, res)->
                     app.db.items.findOne { _id: app.ObjectId(result.id) }, (e, r)->
-                        assert.deepEqual(r.keys, [1,2,3])
+                        assert.equal(r.armor, "something")
                         done()
