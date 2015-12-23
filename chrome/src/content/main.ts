@@ -60,12 +60,7 @@ function initializeNodes(): void {
  * variables, for some reason.
  *********************************************************/
 function processNodes(): void {
-    var node: Node,
-        i: number;
-
-    for (i = 0; i < nodes.length; i++) {
-        node = nodes[i];
-        var message = openpgp.message.readArmored(node.nodeValue);
+    var decode = function(message: openpgp.message.Message, node: Node): void {
         openpgp.decryptMessage( privateKey.key, message )
            .then((plainText) => {
                node.nodeValue = plainText;
@@ -73,6 +68,12 @@ function processNodes(): void {
            .catch((error) => {
                node.nodeValue = "&lt;PGP MESSAGE&gt;"; // TODO: icon
            });
+    };
+
+    for (var i = 0; i < nodes.length; i++) {
+        var node = nodes[i];
+        var message = openpgp.message.readArmored(node.nodeValue);
+        decode(message, node);
     }
 }
 
