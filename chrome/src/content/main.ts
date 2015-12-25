@@ -11,8 +11,7 @@ var privateKey: Keys.PrivateKey;
 // Contains all loaded modules
 var loadedModules: Interfaces.Dictionary = {};
 
-// Nodes to decrypt
-var nodes: Array<Node>;
+var observer: MutationObserver;
 
 /**************************************************
  * Loads a module on demand
@@ -31,36 +30,15 @@ function loadModule(name: string, callback: Interfaces.Callback): void {
     }
 }
 
-/**************************************************
- * Collects a list of nodes that need to be decrypted
- * and initializes the global nodes array
- **************************************************/
-function initializeNodes(): void {
-    var walk: TreeWalker,
-        node: Node,
-        armorType: number;
-
-    nodes = [];
-    walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-
-    while (node = walk.nextNode()) {
-        armorType = getArmorType(node.nodeValue);
-        if ( armorType == 3 || armorType == 4 ) {   // TODO: messages only
-            nodes.push(node);
-        }
-    }
-
+function textContainsCode(text: string): boolean {
+    var armorType = getArmorType(text);
+    return ( armorType == 3 || armorType == 4 ); // TODO, these are messages only
 }
 
-/*********************************************************
- * Takes a list of nodes and decrypts them one by one.
- *--------------------------------------------------------
- * This can not be done in one step in initializeNodes because
- * loading the openpgp module on the fly, flushes all
- * variables, for some reason.
- *********************************************************/
-function processNodes(): void {
-    var decode = function(message: openpgp.message.Message, node: Node): void {
+
+function decodeNode(node: Node): void {
+    var _decode = function() {
+        var message = openpgp.message.readArmored(node.nodeValue);
         openpgp.decryptMessage( privateKey.key, message )
            .then((plainText) => {
                node.nodeValue = plainText;
@@ -70,10 +48,31 @@ function processNodes(): void {
            });
     };
 
-    for (var i = 0; i < nodes.length; i++) {
-        var node = nodes[i];
-        var message = openpgp.message.readArmored(node.nodeValue);
-        decode(message, node);
+    loadModule("openpgp", () => {
+        if ( !privateKey ) {
+            privateKeyStore.get((pk) => {
+                privateKey = pk;
+                privateKey.key.decrypt('Password-123'); // TODO
+                _decode();
+            });
+        } else {
+            _decode()
+        }
+    });
+};
+
+function traverseNodes(root: HTMLElement): void {
+    var walk: TreeWalker,
+        node: Node,
+        armorType: number;
+
+    // Create a walker from the root element, searching only for text nodes
+    walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+
+    while (node = walk.nextNode()) {
+        if ( textContainsCode(node.nodeValue) ) {
+            decodeNode(node);
+        }
     }
 }
 
@@ -116,9 +115,6 @@ function prepareTextAreas(): void {
 function run(): void {
     privateKeyStore = new PrivateKeyStore.LocalStore(config);
 
-    // Get all nodes that must be decrypted
-    initializeNodes();
-
     // All of this only matters if the guy has a private key set up
     privateKeyStore.has((value) => {
         if ( value ) {
@@ -127,22 +123,25 @@ function run(): void {
             prepareTextAreas();
 
             // Decrypt nodes
-            if ( nodes.length ) {
-                loadModule("openpgp", () => {
-                    privateKeyStore.get((pk) => {
-                        privateKey = pk;
-                        privateKey.key.decrypt('Password-123'); // TODO
-                        processNodes();
-                    });
+            traverseNodes(document.body);
+
+            observer = new MutationObserver((mutationArray) => {
+                mutationArray.forEach((mutation) => {
+                    for (var i = 0; i < mutation.addedNodes.length; i++) {
+                        var node = mutation.addedNodes[i];
+                        traverseNodes(<HTMLElement>node);
+                    }
                 });
-            }
+            });
+            observer.observe(document, { childList: true, subtree: true });
+
         } else {
-            if ( nodes.length ) {
-                // TODO: nag about adding public key
-                // (perhaps only when there are nodes to decrypt)
-            }
+            // TODO: nag about adding public key
+            // (perhaps only when there are nodes to decrypt)
         }
     });
+
+
 }
 
 window.onload = function() {
