@@ -6,6 +6,7 @@ var config = new Config();
 // How we load the private key
 var privateKeyStore = new PrivateKeyStore.LocalStore(config);
 
+var privateKeyArmored: string;
 var privateKey: Keys.PrivateKey;
 
 // Contains all loaded modules
@@ -49,15 +50,11 @@ function decodeNode(node: Node): void {
     };
 
     loadModule("openpgp", () => {
-        if ( !privateKey ) {
-            privateKeyStore.get((pk) => {
-                privateKey = pk;
-                privateKey.key.decrypt('Password-123'); // TODO
-                _decode();
-            });
-        } else {
-            _decode()
+        if (!privateKey) {
+            privateKey = new Keys.PrivateKey(privateKeyArmored);
+            privateKey.key.decrypt('Password-123'); // TODO
         }
+        _decode();
     });
 };
 
@@ -116,8 +113,9 @@ function run(): void {
     privateKeyStore = new PrivateKeyStore.LocalStore(config);
 
     // All of this only matters if the guy has a private key set up
-    privateKeyStore.has((value) => {
+    privateKeyStore.getArmored((value) => {
         if ( value ) {
+            privateKeyArmored = value;
 
             // Prepare all textareas
             prepareTextAreas();

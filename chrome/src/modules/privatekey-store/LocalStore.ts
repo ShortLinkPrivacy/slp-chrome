@@ -26,10 +26,6 @@ module PrivateKeyStore {
             }
         }
 
-        has(callback: Interfaces.ResultCallback): void {
-            this.store.get(this.privateKeyLabel, callback);
-        }
-
         set(key: Keys.PrivateKey|string, callback: Interfaces.Callback): void {
             var setter: Interfaces.Dictionary = {},
                 _key: Keys.PrivateKey;
@@ -43,27 +39,33 @@ module PrivateKeyStore {
             setter[this.privateKeyLabel] = _key.armored();
             this.store.set(setter, () => {
                 this.checkRuntimeError();
-                if (callback) callback();
+                callback();
+            });
+        }
+
+        getArmored(callback: {(armored: string): void}) {
+            this.store.get(this.privateKeyLabel, (result) => {
+                var armoredText: string = result[this.privateKeyLabel];
+                callback(armoredText);
             });
         }
 
         get(callback: PrivateKeyCallback): void {
-            this.store.get(this.privateKeyLabel, (result) => {
-                var armoredText: string = result[this.privateKeyLabel],
-                    privateKey: Keys.PrivateKey;
+            this.getArmored((armoredText) => {
+                var privateKey: Keys.PrivateKey;
 
-                // Check for corrupted private key, and remove it if it is
+                // TODO: Check for corrupted private key, and remove it if it is
                 if ( armoredText ) {
                     privateKey = new Keys.PrivateKey(armoredText);
                 }
 
-                if (callback) callback(privateKey);
+                callback(privateKey);
             });
         }
 
         remove(callback: Interfaces.Callback): void {
             this.store.remove(this.privateKeyLabel, () => {
-                if (callback) callback();
+                callback();
             });
         }
     }
