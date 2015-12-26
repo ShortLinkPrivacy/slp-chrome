@@ -22,7 +22,7 @@ function loadModule(name: string, callback: Interfaces.Callback): void {
         chrome.runtime.sendMessage({ loadModule: name }, (res) => {
             var property: string;
             if ( property = res.property ) {
-                loadedModules[property] = window[property]
+                loadedModules[name] = window[property]
                 callback()
             }
         })
@@ -38,8 +38,14 @@ function textContainsCode(text: string): boolean {
 
 
 function decodeNode(node: Node): void {
-    var _decode = function() {
-        var message = openpgp.message.readArmored(node.nodeValue);
+    loadModule("openpgp", () => {
+        if (!privateKey) {
+            privateKey = new Keys.PrivateKey(privateKeyArmored);
+            privateKey.key.decrypt('Password-123'); // TODO
+        }
+
+        var message = openpgp.message.readArmored(node.nodeValue); // TODO: there might be more
+
         openpgp.decryptMessage( privateKey.key, message )
            .then((plainText) => {
                node.nodeValue = plainText;
@@ -47,14 +53,6 @@ function decodeNode(node: Node): void {
            .catch((error) => {
                node.nodeValue = "&lt;PGP MESSAGE&gt;"; // TODO: icon
            });
-    };
-
-    loadModule("openpgp", () => {
-        if (!privateKey) {
-            privateKey = new Keys.PrivateKey(privateKeyArmored);
-            privateKey.key.decrypt('Password-123'); // TODO
-        }
-        _decode();
     });
 };
 
@@ -120,9 +118,10 @@ function run(): void {
             // Prepare all textareas
             prepareTextAreas();
 
-            // Decrypt nodes
+            // Decrypt existing nodes
             traverseNodes(document.body);
 
+            // Observe for new nodes
             observer = new MutationObserver((mutationArray) => {
                 mutationArray.forEach((mutation) => {
                     for (var i = 0; i < mutation.addedNodes.length; i++) {
@@ -142,6 +141,4 @@ function run(): void {
 
 }
 
-window.onload = function() {
-    setTimeout(run, config.decryptDelay);
-}
+run();
