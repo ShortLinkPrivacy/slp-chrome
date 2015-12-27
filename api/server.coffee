@@ -100,6 +100,6 @@ app.post '/x', (req, res)->
 if require.main == module
     port = config.get('express.port')
     app.listen port, ->
-        logger.info "The server is running at port #{port}"
+        logger.info "The server is running on port #{port}"
 
 module.exports = app
