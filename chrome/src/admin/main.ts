@@ -20,7 +20,6 @@ module Admin {
         config: Config;
         keyStore: KeyStore.Interface;
         privateKeyStore: PrivateKeyStore.Interface;
-        messageStore: MessageStore.Interface;
     }
 
     class Notify {
@@ -48,7 +47,6 @@ module Admin {
         key: Keys.PrivateKey;
         keyStore: KeyStore.Interface;
         privateKeyStore: PrivateKeyStore.Interface;
-        messageStore: MessageStore.Interface;
 
         notify: Notify = new Notify();
 
@@ -56,7 +54,6 @@ module Admin {
             this.config = args.config;
             this.keyStore = args.keyStore;
             this.privateKeyStore = args.privateKeyStore;
-            this.messageStore = args.messageStore;
             this.initRouter();
         }
 
@@ -178,8 +175,7 @@ module Admin {
     app = window["app"] = new App({
         config: config,
         keyStore: new KeyStore.LocalStore(config),
-        privateKeyStore: new PrivateKeyStore.LocalStore(config),
-        messageStore: new MessageStore.LocalStore(config)
+        privateKeyStore: new PrivateKeyStore.LocalStore(config)
     });
 
 }

@@ -70,7 +70,8 @@ app.get '/x/:id', (req, res)->
 
 
 app.post '/x', (req, res)->
-    #logger.trace "req.headers", req.headers
+    logger.trace "req.headers", req.headers
+    logger.trace "req.body", req.body
     payload = req.body
 
     err400 = (msg)->

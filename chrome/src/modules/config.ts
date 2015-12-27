@@ -27,9 +27,9 @@ class Config {
 
     // Message storage types
     messageStore = {
-        localStore: {
-            store: chrome.storage.local,
-            directory: 'messages',
+        localHost: {
+            url: 'http://localhost:5000',
+            path: '/x'
         }
     };
 }

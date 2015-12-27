@@ -1,23 +1,27 @@
 /// <reference path="dialog.ts" />
 /// <reference path="armor.ts" />
+/// <reference path="../modules.d.ts" />
 
-var config = new Config();
+var config = new Config(),
 
 // How we load the private key
-var privateKeyStore = new PrivateKeyStore.LocalStore(config);
+privateKeyStore = new PrivateKeyStore.LocalStore(config),
+
+// How we load messages TODO: move to prod
+messageStore = new MessageStore.RemoteService(config.messageStore.localHost),
 
 // Private key
-var privateKeyArmored: string;
-var privateKey: Keys.PrivateKey;
+privateKeyArmored: string,
+privateKey: Keys.PrivateKey,
 
 // Contains all loaded modules
-var loadedModules: Interfaces.Dictionary = {};
+loadedModules: Interfaces.Dictionary = {},
 
 // Observer for newly created elements
-var observer: MutationObserver;
+observer: MutationObserver,
 
 // Dialog object
-var dialog = new Dialog();
+dialog = new Dialog();
 
 /**************************************************
  * Loads a module on demand

@@ -114,17 +114,28 @@ class Dialog {
         this.el.dispatchEvent(new Event('input'));
     }
 
-    encrypt(armoredPublicKeys: Array<string>, callback: Interfaces.ResultCallback): void {
+    private encrypt(armoredPublicKeys: Array<string>, callback: Interfaces.ResultCallback): void {
         var keys: Array<openpgp.key.Key>;
+
+        var success = function(armored: string): void {
+            messageStore.save(armored, (id) => {
+                var url = messageStore.getURL(id);
+                callback(url);
+            })
+        };
+
+        var error = function(err) {
+            console.log(err); // TODO
+        };
 
         loadModule("openpgp", () => {
             keys = armoredPublicKeys.map((armoredText: string) => {
                 return openpgp.key.readArmored(armoredText).keys[0];
             })
 
-            openpgp.encryptMessage( keys, this.el.value ).then(callback).catch((err) => {
-                console.log(err); // TODO
-            })
+            openpgp.encryptMessage( keys, this.el.value )
+                .then(success)
+                .catch(error);
         });
     }
 }
