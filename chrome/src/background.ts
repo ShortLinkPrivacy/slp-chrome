@@ -1,6 +1,8 @@
 /// <reference path="../typings/chrome/chrome.d.ts" />
 /// <reference path="modules/interfaces.ts" />
 
+var menuId = "1";
+
 var modules = {
     openpgp: {
         filename: "bower_components/openpgp/dist/openpgp.min.js",
@@ -27,15 +29,18 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         chrome.tabs.executeScript(null, { file: filename }, () => {
             sendResponse({ property: property });
         });
+    } else if ( msg.contextMenu ) {
+        chrome.contextMenus.update( menuId, msg.update );
     }
 
     return true;
 });
 
-chrome.contextMenus.create({
-    id: "123",
+var mid = chrome.contextMenus.create({
+    id: menuId,
     title: "PGP Encrypt",
-    contexts: ["editable"]
+    contexts: ["editable"],
+    enabled: false
 });
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {

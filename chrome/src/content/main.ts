@@ -1,4 +1,4 @@
-/// <reference path="popup.ts" />
+/// <reference path="dialog.ts" />
 /// <reference path="armor.ts" />
 
 var config = new Config();
@@ -6,13 +6,18 @@ var config = new Config();
 // How we load the private key
 var privateKeyStore = new PrivateKeyStore.LocalStore(config);
 
+// Private key
 var privateKeyArmored: string;
 var privateKey: Keys.PrivateKey;
 
 // Contains all loaded modules
 var loadedModules: Interfaces.Dictionary = {};
 
+// Observer for newly created elements
 var observer: MutationObserver;
+
+// Dialog object
+var dialog = new Dialog();
 
 /**************************************************
  * Loads a module on demand
@@ -72,38 +77,27 @@ function traverseNodes(root: HTMLElement): void {
 }
 
 /************************************************************
- * Bind message listeners and popup class to each text area
+ * Bind context menu enable/disable
  ************************************************************/
 function prepareTextAreas(): void {
-
-    // Content page message listener. The iframe posts here.
-    window.addEventListener('message', (e) => {
-        var msg = e.data.message,
-            current: Popup = Popup.current;
-
-        if (e.data.iframe && msg) {
-            if (msg.closePopup && current) {
-                if ( msg.keys && msg.keys.length ) {
-                    current.encrypt(msg.keys, (encryptedText) => {
-                        current.closePopup(encryptedText)
-                    })
-                } else {
-                    current.closePopup()
-                }
-            }
-        }
-    });
-
-    // Textarea elements get UIs attached to them
     var textAreas = document.getElementsByTagName('textarea'),
         i: number;
 
+    var triggerContextMenu = function(el) {
+        return function(e) {
+            chrome.runtime.sendMessage({ 
+                contextMenu: true, 
+                update: { enabled: el.value ? true : false }
+            });
+        }
+    };
+
     for (i = 0; i < textAreas.length; ++i) {
-        var p = new Popup(textAreas[i]);
-        textAreas[i]["popup"] = p;
+        var el: HTMLTextAreaElement = textAreas[0];
+        el.addEventListener('focus', triggerContextMenu(el));
+        el.addEventListener('input', triggerContextMenu(el));
     }
 }
-
 
 /************************************************************
  * Bootstrap and run at window.onload
@@ -136,7 +130,7 @@ function run(): void {
             // listen for messages from the extension
             chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
                 if ( msg.popup ) {
-                    document.activeElement["popup"].openPopup(100, 100);
+                    dialog.open(<HTMLTextAreaElement>document.activeElement);
                 }
             });
 

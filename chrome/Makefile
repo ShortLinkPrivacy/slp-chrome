@@ -49,7 +49,7 @@ iframe:
 
 content:
 	tsc --out src/content.js \
-		src/content/popup.ts \
+		src/content/dialog.ts \
 		src/content/armor.ts \
 		src/content/main.ts
 
