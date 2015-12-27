@@ -59,7 +59,7 @@ class Dialog {
         popup.style.height = this.height + "px";
         popup.style.position = "absolute";
         popup.style.left = Math.max(0, (window.innerWidth - this.width) / 2) + "px";
-        popup.style.top = "0px";
+        popup.style.top = Math.max(0, (window.innerHeight - this.height) / 2) + "px";
         popup.style.boxShadow = "rgb(204, 204, 204) 5px 5px 10px";
 
         // iframe element

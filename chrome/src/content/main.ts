@@ -111,7 +111,7 @@ function run(): void {
             privateKeyArmored = value;
 
             // Prepare all textareas
-            prepareTextAreas();
+            //prepareTextAreas();
 
             // Decrypt existing nodes
             traverseNodes(document.body);
@@ -127,7 +127,7 @@ function run(): void {
             });
             observer.observe(document, { childList: true, subtree: true });
 
-            // listen for messages from the extension
+            // Listen for messages from the extension
             chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
                 if ( msg.popup ) {
                     dialog.open(<HTMLTextAreaElement>document.activeElement);

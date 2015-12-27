@@ -29,9 +29,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         chrome.tabs.executeScript(null, { file: filename }, () => {
             sendResponse({ property: property });
         });
-    } else if ( msg.contextMenu ) {
-        chrome.contextMenus.update( menuId, msg.update );
-    }
+    } 
 
     return true;
 });
@@ -39,8 +37,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 var mid = chrome.contextMenus.create({
     id: menuId,
     title: "PGP Encrypt",
-    contexts: ["editable"],
-    enabled: false
+    contexts: ["editable"]
 });
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
