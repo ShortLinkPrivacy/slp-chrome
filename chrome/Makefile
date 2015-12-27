@@ -8,6 +8,7 @@ help:
 	@echo "admin                   compile all admin files"
 	@echo "iframe                  compile all iframe files"
 	@echo "content                 compile all content files"
+	@echo "background              compile all background files"
 	@echo "build                   build all"
 
 #------------------------------------------------------------------
@@ -52,5 +53,8 @@ content:
 		src/content/armor.ts \
 		src/content/main.ts
 
-build: modules coffee admin iframe content
+background:
+	tsc --out src/background.js src/background.ts
+
+build: modules coffee admin iframe content background
 

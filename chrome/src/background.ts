@@ -1,4 +1,5 @@
 /// <reference path="../typings/chrome/chrome.d.ts" />
+/// <reference path="modules/interfaces.ts" />
 
 var modules = {
     openpgp: {
@@ -6,6 +7,12 @@ var modules = {
         property: "openpgp"
     }
 };
+
+function sendMessageToContent(msg: any, callback?: Interfaces.ResultCallback): void {
+    chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+        chrome.tabs.sendMessage(tabs[0].id, msg, callback);
+    });
+}
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     console.log ("Received runtime message:", msg);
@@ -25,14 +32,13 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     return true;
 });
 
-/*
 chrome.contextMenus.create({
     id: "123",
     title: "PGP Encrypt",
-    contexts: ["editable"],
+    contexts: ["editable"]
 });
 
-chrome.contextMenus.onClicked.addListener(() => {
-    console.log('click');
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+    sendMessageToContent({ popup: true, info: info });
 })
-*/
+

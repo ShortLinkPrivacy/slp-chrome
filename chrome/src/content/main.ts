@@ -99,7 +99,8 @@ function prepareTextAreas(): void {
         i: number;
 
     for (i = 0; i < textAreas.length; ++i) {
-        new Popup(textAreas[i]);
+        var p = new Popup(textAreas[i]);
+        textAreas[i]["popup"] = p;
     }
 }
 
@@ -131,6 +132,13 @@ function run(): void {
                 });
             });
             observer.observe(document, { childList: true, subtree: true });
+
+            // listen for messages from the extension
+            chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+                if ( msg.popup ) {
+                    document.activeElement["popup"].openPopup(100, 100);
+                }
+            });
 
         } else {
             // TODO: nag about adding public key
