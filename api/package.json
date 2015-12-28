@@ -6,15 +6,17 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "body-parser": "^1.14.1",
-    "config": "^1.16.0",
-    "express": "^4.13.3",
-    "log4js": "^0.6.27",
-    "mongoskin": "^2.0.3"
+    "body-parser": "*",
+    "config": "*",
+    "express": "*",
+    "kerberos": "*",
+    "log4js": "*",
+    "mongodb": "*",
+    "mongoskin": "*"
   },
   "devDependencies": {
-    "mocha": "^2.3.3",
-    "superagent": "^1.4.0",
-    "supertest": "^1.1.0"
+    "mocha": "*",
+    "superagent": "*",
+    "supertest": "*"
   }
 }
