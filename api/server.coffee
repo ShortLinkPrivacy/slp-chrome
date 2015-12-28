@@ -40,7 +40,7 @@ app.use (req, res, next)->
 # -----------------------------------------
 
 app.get '/x/:id', (req, res)->
-    
+
     id = req.params.id
     objId = null
 
@@ -49,7 +49,7 @@ app.get '/x/:id', (req, res)->
         objId = new ObjectId id
     catch e
         return res.sendStatus 404
-    
+
     # Not json? Return a text with a link to install the extension
     # TODO: Send a full HTML with links here
     unless req.get('Content-Type') == "application/json"
@@ -70,8 +70,8 @@ app.get '/x/:id', (req, res)->
 
 
 app.post '/x', (req, res)->
-    logger.trace "req.headers", req.headers
-    logger.trace "req.body", req.body
+    #logger.trace "req.headers", req.headers
+    #logger.trace "req.body", req.body
     payload = req.body
 
     err400 = (msg)->
@@ -80,14 +80,14 @@ app.post '/x', (req, res)->
 
     if not payload?
         return err400 "Payload missing"
-        
+
     unless payload.armor?
         return err400 "armor not defined"
 
     # TODO: find a way to limit POSTs to internal data only, so
     # idiots don't begin using this service as a free anonymous
     # key-value items
-    
+
     db.items.insertOne payload, (err, result)->
         if err?
             logger.error "insertOne (#{payload}) resulted in error: #{err}"

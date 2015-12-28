@@ -24,18 +24,25 @@ module MessageStore {
             r.open('POST', this.url + this.path, true);
             r.onreadystatechange = function() {
                 if (r.readyState == 4) {
-                    json = JSON.parse(r.responseText);   
-                    if (r.status != 201 || json.error) {
+                    try {
+                        json = JSON.parse(r.responseText);
+                    } catch (e) {
                         callback({
                             success: false,
-                            error: json.error || r.responseText
+                            error: "No response from server"
                         });
                         return;
                     }
-                    callback({
-                        success: true,
-                        id: json.id
-                    });
+
+                    if (r.status != 201 || json.error) {
+                        callback({
+                            success: false,
+                            error: json.error || r.responseText || "No response from server"
+                        });
+                        return;
+                    }
+
+                    callback({ success: true, id: json.id });
                 }
             }
             r.setRequestHeader('Content-Type', 'application/json');
@@ -57,7 +64,7 @@ module MessageStore {
                         });
                         return;
                     }
-                    json = JSON.parse(r.responseText);   
+                    json = JSON.parse(r.responseText);
                     callback({
                         success: true,
                         armor: json.armor
