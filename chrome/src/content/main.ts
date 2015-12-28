@@ -110,8 +110,6 @@ function prepareTextAreas(): void {
 function run(): void {
     privateKeyStore = new PrivateKeyStore.LocalStore(config);
 
-    Notif.error("This is an error", 2000);
-
     // All of this only matters if the guy has a private key set up
     privateKeyStore.getArmored((value) => {
         if ( value ) {
