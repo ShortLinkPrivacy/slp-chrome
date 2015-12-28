@@ -1,5 +1,6 @@
 /// <reference path="dialog.ts" />
 /// <reference path="armor.ts" />
+/// <reference path="notif.ts" />
 /// <reference path="../modules.d.ts" />
 
 var config = new Config(),
@@ -89,8 +90,8 @@ function prepareTextAreas(): void {
 
     var triggerContextMenu = function(el) {
         return function(e) {
-            chrome.runtime.sendMessage({ 
-                contextMenu: true, 
+            chrome.runtime.sendMessage({
+                contextMenu: true,
                 update: { enabled: el.value ? true : false }
             });
         }
@@ -108,6 +109,8 @@ function prepareTextAreas(): void {
  ************************************************************/
 function run(): void {
     privateKeyStore = new PrivateKeyStore.LocalStore(config);
+
+    Notif.error("This is an error", 2000);
 
     // All of this only matters if the guy has a private key set up
     privateKeyStore.getArmored((value) => {

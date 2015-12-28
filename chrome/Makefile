@@ -51,6 +51,7 @@ content:
 	tsc --out src/content.js \
 		src/content/dialog.ts \
 		src/content/armor.ts \
+		src/content/notif.ts \
 		src/content/main.ts
 
 background:
