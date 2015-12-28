@@ -3,6 +3,16 @@
 /// <reference path="../../typings/chrome/chrome.d.ts" />
 /// <reference path="../modules.d.ts" />
 
+interface EncryptResult {
+    success: boolean;
+    encryptedText?: string;
+    error?: string;
+}
+
+interface EncryptCallback {
+    (result: EncryptResult): void;
+}
+
 class Dialog {
 
     // Dialog size
@@ -37,8 +47,13 @@ class Dialog {
 
             if (msg.closePopup && this.isOpen) {
                 if ( msg.keys && msg.keys.length ) {
-                    this.encrypt(msg.keys, (encryptedText) => {
-                        this.accept(encryptedText)
+                    this.encrypt(msg.keys, (result) => {
+                        if ( result.success ) {
+                            this.accept(result.encryptedText)
+                        } else {
+                            this.cancel();
+                            Notif.error(result.error);
+                        }
                     })
                 } else {
                     this.cancel()
@@ -114,19 +129,8 @@ class Dialog {
         this.el.dispatchEvent(new Event('input'));
     }
 
-    private encrypt(armoredPublicKeys: Array<string>, callback: Interfaces.ResultCallback): void {
+    private encrypt(armoredPublicKeys: Array<string>, callback: EncryptCallback): void {
         var keys: Array<openpgp.key.Key>;
-
-        var success = function(armored: string): void {
-            messageStore.save(armored, (id) => {
-                var url = messageStore.getURL(id);
-                callback(url);
-            })
-        };
-
-        var error = function(err) {
-            console.log(err); // TODO
-        };
 
         loadModule("openpgp", () => {
             keys = armoredPublicKeys.map((armoredText: string) => {
@@ -134,8 +138,18 @@ class Dialog {
             })
 
             openpgp.encryptMessage( keys, this.el.value )
-                .then(success)
-                .catch(error);
+                .then((armoredText) => {
+                    messageStore.save(armoredText, (result) => {
+                        if ( result.success ) {
+                            callback({ success: true, encryptedText: messageStore.getURL(result.id) })
+                        } else {
+                            callback({ success: false, error: "Server Error: " + result.error })
+                        }
+                    });
+                })
+                .catch((err) => {
+                    callback({ success: false, error: "OpenPGP Error: " + err })
+                });
         });
     }
 }
