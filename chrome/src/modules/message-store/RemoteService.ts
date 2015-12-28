@@ -13,7 +13,7 @@ module MessageStore {
         constructor(config: any) {
             this.url = config.url;
             this.path = config.path;
-            this.regexp = new RegExp(this.url + this.path + "/\\w+", "gm");
+            this.regexp = new RegExp(this.url + this.path + "/(\\w+)", "gm");
         }
 
         save(armor: string, callback: MessageIdCallback): void {

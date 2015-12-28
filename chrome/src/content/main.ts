@@ -41,43 +41,66 @@ function loadModule(name: string, callback: Interfaces.Callback): void {
     }
 }
 
-function textContainsCode(text: string): boolean {
-    var armorType = getArmorType(text);
-    return ( armorType == 3 || armorType == 4 ); // TODO, these are messages only
+function unlockPrivateKey(callback: { (success: boolean): void }): void {
+    if (!privateKey) {
+        privateKey = new Keys.PrivateKey(privateKeyArmored);
+        privateKey.key.decrypt('Password-123'); // TODO
+    }
+    callback(true);
 }
 
+function decodeText(codedText: string, callback: { (decodedText): void }): void {
+    var match = messageStore.regexp.exec(codedText),
+        armoredText: string,
+        messageId: string;
 
-function decodeNode(node: Node): void {
-    loadModule("openpgp", () => {
-        if (!privateKey) {
-            privateKey = new Keys.PrivateKey(privateKeyArmored);
-            privateKey.key.decrypt('Password-123'); // TODO
+    if (!match) {
+        callback(codedText);
+        return;
+    }
+
+    messageId = match[1];
+
+    messageStore.load( messageId, (result) => {
+        if ( !result.success ) {
+           codedText = codedText.replace(messageStore.regexp, "[PGP MESSAGE:" + messageId + "]"); // TODO: add link
+           decodeText(codedText, callback);
+           return;
         }
 
-        var message = openpgp.message.readArmored(node.nodeValue); // TODO: there might be more
+        var armorType = getArmorType(result.armor);
+        if ( armorType == 3 || armorType == 4 ) { // TODO, these are messages only
+            loadModule("openpgp", () => {
+                unlockPrivateKey((success) => {
+                    var message = openpgp.message.readArmored(result.armor);
 
-        openpgp.decryptMessage( privateKey.key, message )
-           .then((plainText) => {
-               node.nodeValue = plainText;
-           })
-           .catch((error) => {
-               node.nodeValue = "&lt;PGP MESSAGE&gt;"; // TODO: icon
-           });
+                    openpgp.decryptMessage( privateKey.key, message )
+                       .then((plainText) => {
+                           codedText = codedText.replace(messageStore.regexp, plainText)
+                           decodeText(codedText, callback);
+                       })
+                       .catch((error) => {
+                           codedText = codedText.replace(messageStore.regexp, "[PGP MESSAGE:" + messageId + "]"); // TODO: add link
+                           decodeText(codedText, callback);
+                       });
+                });
+            });
+        }
     });
 };
 
 function traverseNodes(root: HTMLElement): void {
     var walk: TreeWalker,
-        node: Node,
-        armorType: number;
+        node: Node;
 
     // Create a walker from the root element, searching only for text nodes
     walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
 
     while (node = walk.nextNode()) {
-        if ( textContainsCode(node.nodeValue) ) {
-            decodeNode(node);
-        }
+        var n = node;
+        decodeText( n.nodeValue, (decodedText) => {
+            n.nodeValue = decodedText;
+        })
     }
 }
 
