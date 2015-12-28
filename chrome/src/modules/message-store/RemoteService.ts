@@ -8,46 +8,60 @@ module MessageStore {
     export class RemoteService implements Interface {
         url: string;
         path: string;
+        regexp: RegExp;
 
         constructor(config: any) {
             this.url = config.url;
             this.path = config.path;
+            this.regexp = new RegExp(this.url + this.path + "/\\w+", "gm");
         }
 
-        save(armored: string, callback: MessageIdCallback): void {
+        save(armor: string, callback: MessageIdCallback): void {
             var r: XMLHttpRequest,
-                json: { id: string };
+                json: MessageIdStruct;
 
             r = new XMLHttpRequest();
             r.open('POST', this.url + this.path, true);
             r.onreadystatechange = function() {
                 if (r.readyState == 4) {
-                    if (r.status != 201) {
-                        console.log(r); // TODO: error
+                    json = JSON.parse(r.responseText);   
+                    if (r.status != 201 || json.error) {
+                        callback({
+                            success: false,
+                            error: json.error || r.responseText
+                        });
                         return;
                     }
-                    json = JSON.parse(r.responseText);   
-                    callback(json.id);
+                    callback({
+                        success: true,
+                        id: json.id
+                    });
                 }
             }
             r.setRequestHeader('Content-Type', 'application/json');
-            r.send(JSON.stringify({armor: armored}));
+            r.send(JSON.stringify({armor: armor}));
         }
 
-        load(id: string, callback: MessageCallback): void {
+        load(id: string, callback: MessageArmoredCallback): void {
             var r: XMLHttpRequest,
-                json: { armored: string };
+                json: MessageArmoredStruct;
 
             r = new XMLHttpRequest();
             r.open('GET', this.getURL(id), true);
             r.onreadystatechange = function() {
                 if (r.readyState != 4) {
                     if (r.status != 200) {
-                        console.log(r); // TODO: error
+                        callback({
+                            success: false,
+                            error: r.responseText
+                        });
                         return;
                     }
                     json = JSON.parse(r.responseText);   
-                    callback(json.armored);
+                    callback({
+                        success: true,
+                        armor: json.armor
+                    });
                 }
             }
             r.setRequestHeader('Content-Type', 'application/json');

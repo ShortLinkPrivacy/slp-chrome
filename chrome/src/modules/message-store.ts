@@ -3,19 +3,32 @@
 
 module MessageStore {
 
+    export interface ResultStatus {
+        success?: boolean;
+        error?: string;
+    }
+
+    export interface MessageIdStruct extends ResultStatus {
+        id?: string
+    }
+
+    export interface MessageArmoredStruct extends ResultStatus {
+        armor?: string;
+    }
+
     // Callback interface for the function that returns the private key
-    export interface MessageCallback {
-        (armored: string): void;
+    export interface MessageArmoredCallback {
+        (result: MessageArmoredStruct): void;
     }
 
     export interface MessageIdCallback {
-        (id: string): void;
+        (result: MessageIdStruct): void;
     }
 
     // Anyone implementing settings should implements this
     export interface Interface {
-        save(armored: string, callback: MessageIdCallback): void;
-        load(id: string, callback: MessageCallback): void;
+        save(armor: string, callback: MessageIdCallback): void;
+        load(id: string, callback: MessageArmoredCallback): void;
     }
 
 }
