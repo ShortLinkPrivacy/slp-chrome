@@ -68,8 +68,8 @@ function decodeText(codedText: string, callback: { (decodedText): void }): void 
            return;
         }
 
-        var armorType = getArmorType(result.armor);
-        if ( armorType == 3 || armorType == 4 ) { // TODO, these are messages only
+        var armorType = Armor.getType(result.armor);
+        if ( armorType == Armor.Type.Signed || armorType == Armor.Type.Message ) { // TODO, other types
             loadModule("openpgp", () => {
                 unlockPrivateKey((success) => {
                     var message = openpgp.message.readArmored(result.armor);
@@ -89,6 +89,12 @@ function decodeText(codedText: string, callback: { (decodedText): void }): void 
     });
 };
 
+function decodeNode(node: Node ): void {
+    decodeText( node.nodeValue, (newValue) => {
+        node.nodeValue = newValue;
+    });
+}
+
 function traverseNodes(root: HTMLElement): void {
     var walk: TreeWalker,
         node: Node;
@@ -97,10 +103,7 @@ function traverseNodes(root: HTMLElement): void {
     walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
 
     while (node = walk.nextNode()) {
-        var n = node;
-        decodeText( n.nodeValue, (decodedText) => {
-            n.nodeValue = decodedText;
-        })
+        decodeNode(node);
     }
 }
 

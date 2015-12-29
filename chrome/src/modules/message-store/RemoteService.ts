@@ -56,7 +56,7 @@ module MessageStore {
             r = new XMLHttpRequest();
             r.open('GET', this.getURL(id), true);
             r.onreadystatechange = function() {
-                if (r.readyState != 4) {
+                if (r.readyState == 4) {
                     if (r.status != 200) {
                         callback({
                             success: false,
