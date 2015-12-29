@@ -141,6 +141,50 @@ function prepareTextAreas(): void {
     }
 }
 
+function encrypt(el: HTMLTextAreaElement, armoredPublicKeys: Array<string>): void {
+    var keys: Array<openpgp.key.Key>;
+
+    loadModule("openpgp", () => {
+        keys = armoredPublicKeys.map((armoredText: string) => {
+            return openpgp.key.readArmored(armoredText).keys[0];
+        })
+
+        openpgp.encryptMessage( keys, el.value )
+            .then((armoredText) => {
+                messageStore.save(armoredText, (result) => {
+                    if ( result.success ) {
+                        el.value = messageStore.getURL(result.id);
+                    } else {
+                        Notif.error(result.error);
+                    }
+                });
+            })
+            .catch((err) => {
+                Notif.error("OpenPGP Error: " + err );
+            });
+    });
+}
+
+// Listen for messages from the extension
+function messageListener() {
+    chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+        var el: HTMLTextAreaElement = <HTMLTextAreaElement>document.activeElement;
+
+        // Get the active element value. If the element is a TEXTAREA, then
+        // return its value. Otherwise returns null.
+        if ( msg.getElement ) {
+            var value;
+            if ( el.tagName == 'TEXTAREA' ) value = el.value || "";
+            sendResponse(value);
+        }
+
+        // Encrypt the current textarea
+        else if ( msg.encrypt ) {
+            encrypt(el, msg.keys );
+        }
+    });
+}
+
 /************************************************************
  * Bootstrap and run at window.onload
  ************************************************************/
@@ -169,12 +213,7 @@ function run(): void {
             });
             observer.observe(document, { childList: true, subtree: true });
 
-            // Listen for messages from the extension
-            chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-                if ( msg.popup ) {
-                    dialog.open(<HTMLTextAreaElement>document.activeElement);
-                }
-            });
+            messageListener();
 
         } else {
             // TODO: nag about adding public key

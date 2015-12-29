@@ -5,6 +5,12 @@
 
 var app: App;
 
+function sendMessageToContent(msg: any, callback?: Interfaces.ResultCallback): void {
+    chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+        chrome.tabs.sendMessage(tabs[0].id, msg, callback);
+    });
+}
+
 interface AppConfig {
     keyStore: KeyStore.Interface;
     privateKeyStore: PrivateKeyStore.Interface;
@@ -40,19 +46,6 @@ class App {
         this.foundKeys = [];
 
         this.filter = ""; // TODO - most used
-    }
-
-    sendMessageToBackground(msg: any, callback: Interfaces.ResultCallback): void {
-        chrome.runtime.sendMessage({ iframe: true, message: msg }, callback);
-    }
-
-    sendMessageToContent(msg: any): void {
-        window.parent.postMessage({ iframe: true, message: msg }, '*' );
-    }
-
-    close(e: MouseEvent): void {
-        e.preventDefault();
-        this.sendMessageToContent({ closePopup: true });
     }
 
     doFilter(): void {
@@ -92,7 +85,8 @@ class App {
         armoredTexts.push(this.key.toPublic().armored());
 
         // Close and send keys
-        this.sendMessageToContent({ closePopup: true, keys: armoredTexts });
+        sendMessageToContent({ encrypt: true, keys: armoredTexts });
+        window.close();
     }
 
     run(): void {
@@ -110,7 +104,7 @@ class App {
                 this.key = key;
             })
             this.doFilter();
-        })
+        });
     }
 
 }
