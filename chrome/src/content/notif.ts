@@ -15,7 +15,6 @@ module Notif {
         popup.style.textAlign = "center";
         popup.style.lineHeight = "50px";
         popup.style.fontWeight = "bold";
-        popup.style.cursor = "pointer";
 
         if ( boxType == BoxType.Info ) {
             popup.style.backgroundColor = "#BDE5F8";
@@ -31,8 +30,17 @@ module Notif {
             popup.style.color = "#D8000C";
         }
 
+        var closeEl = document.createElement('div');
+        closeEl.style.cssFloat = "right";
+        closeEl.style.position = "relative";
+        closeEl.style.width = "50px";
+        closeEl.style.cursor = "pointer";
+        closeEl.innerHTML = 'x';
+
         popup.innerHTML = message;
-        popup.addEventListener('click', (e) => {
+        popup.appendChild(closeEl);
+
+        closeEl.addEventListener('click', (e) => {
             e.stopPropagation();
             popup.remove();
         });

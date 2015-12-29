@@ -18,10 +18,10 @@ class Dialog {
     // Dialog size
     private width = 300;
     private height = 300;
-    
+
     // The texarea element we're modifying
     el: HTMLTextAreaElement;
-    
+
     // The popup div that will contain the iframe
     popup: HTMLElement;
 
@@ -32,7 +32,7 @@ class Dialog {
     private iframeSrc = chrome.runtime.getURL("/iframe.html");
 
     private isOpen = false;
-    
+
     // A this-bound version of closePopup
     cancelBound: EventListenerObject = this.cancel.bind(this);
 
@@ -96,20 +96,23 @@ class Dialog {
             document.addEventListener('click', this.cancelBound);
         }, 1000);
 
-        popup.appendChild(iframe)
-        document.body.appendChild(popup);
-
         // Fade in
         popup.style.opacity = "0";
-        (function fade() {
-            var o = parseFloat(popup.style.opacity);
-            if ((o += .1) < 1) {
-                popup.style.opacity = "" + o;
-                setTimeout(fade, 10);
-            } else {
-                popup.style.opacity = "1";
-            }
-        })();
+        iframe.onload = function() {
+            (function fade() {
+                var o = parseFloat(popup.style.opacity);
+                if ((o += .1) < 1) {
+                    popup.style.opacity = "" + o;
+                    setTimeout(fade, 10);
+                } else {
+                    popup.style.opacity = "1";
+                }
+            })();
+        }
+
+        // Attach
+        popup.appendChild(iframe)
+        document.body.appendChild(popup);
 
         this.popup = popup
         this.iframe = iframe
