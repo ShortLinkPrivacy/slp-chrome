@@ -89,9 +89,19 @@ function decodeText(codedText: string, callback: { (decodedText): void }): void 
     });
 };
 
-function decodeNode(node: Node ): void {
+function decodeNode(node: Node): void {
     decodeText( node.nodeValue, (newValue) => {
-        node.nodeValue = newValue;
+        if ( newValue != node.nodeValue ) {
+            node.nodeValue = newValue;
+
+            // Remove links (some sites hotlink URLs)
+            if ( node.parentElement.tagName == "A" ) {
+                var el = document.createElement('span');
+                el.innerHTML = node.nodeValue;
+                node.parentElement.parentElement.appendChild(el);
+                node.parentElement.remove();
+            }
+        }
     });
 }
 
@@ -103,7 +113,8 @@ function traverseNodes(root: HTMLElement): void {
     walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
 
     while (node = walk.nextNode()) {
-        decodeNode(node);
+        if (node.nodeValue.match(messageStore.regexp))
+            decodeNode(node);
     }
 }
 
