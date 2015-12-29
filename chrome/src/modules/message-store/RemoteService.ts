@@ -27,10 +27,7 @@ module MessageStore {
                     try {
                         json = JSON.parse(r.responseText);
                     } catch (e) {
-                        callback({
-                            success: false,
-                            error: "No response from server"
-                        });
+                        callback({ success: false, error: "No response from server" });
                         return;
                     }
 
@@ -58,19 +55,25 @@ module MessageStore {
             r.onreadystatechange = function() {
                 if (r.readyState == 4) {
                     if (r.status != 200) {
-                        callback({
-                            success: false,
-                            error: r.responseText
-                        });
+                        callback({ success: false, error: r.responseText });
                         return;
                     }
-                    json = JSON.parse(r.responseText);
-                    callback({
-                        success: true,
-                        armor: json.armor
-                    });
+
+                    try {
+                        json = JSON.parse(r.responseText);
+                    } catch (e) {
+                        callback({ success: false, error: "Bad server response" })
+                    }
+
+                    callback({ success: true, armor: json.armor });
                 }
+            };
+
+            r.onerror = function(r) {
+                console.log(r);
+                callback({ success: false, error: "Bad server response" })
             }
+
             r.setRequestHeader('Content-Type', 'application/json');
             r.send();
         }
