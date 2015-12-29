@@ -42,3 +42,9 @@ installation
 
 API
 ====================================
+
+
+
+Development
+====================================
+- Create a util module and use it (for functions like sentMessageToContent)
