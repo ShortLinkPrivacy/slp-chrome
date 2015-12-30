@@ -8,12 +8,6 @@ var modules = {
     }
 };
 
-function sendMessageToContent(msg: any, callback?: Interfaces.ResultCallback): void {
-    chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-        chrome.tabs.sendMessage(tabs[0].id, msg, callback);
-    });
-}
-
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     var name: string,
         filename: string,

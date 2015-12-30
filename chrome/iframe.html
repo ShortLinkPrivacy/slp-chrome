@@ -23,6 +23,7 @@
         Select recipients
       </div>
       <div id="content">
+        <div id="error" rv-show="error" rv-text="error"></div>
         <input id="filter" rv-value="filter" rv-on-keyup="doFilter" placeholder="filter">
         <ul>
           <li rv-on-click="select" rv-each-key="foundKeys"><input type="checkbox" rv-checked="key.selected" /><span rv-text="key.name"></span></li>

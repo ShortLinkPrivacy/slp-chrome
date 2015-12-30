@@ -118,53 +118,6 @@ function traverseNodes(root: HTMLElement): void {
     }
 }
 
-/************************************************************
- * Bind context menu enable/disable
- ************************************************************/
-function prepareTextAreas(): void {
-    var textAreas = document.getElementsByTagName('textarea'),
-        i: number;
-
-    var triggerContextMenu = function(el) {
-        return function(e) {
-            chrome.runtime.sendMessage({
-                contextMenu: true,
-                update: { enabled: el.value ? true : false }
-            });
-        }
-    };
-
-    for (i = 0; i < textAreas.length; ++i) {
-        var el: HTMLTextAreaElement = textAreas[0];
-        el.addEventListener('focus', triggerContextMenu(el));
-        el.addEventListener('input', triggerContextMenu(el));
-    }
-}
-
-function encrypt(el: HTMLTextAreaElement, armoredPublicKeys: Array<string>): void {
-    var keys: Array<openpgp.key.Key>;
-
-    loadModule("openpgp", () => {
-        keys = armoredPublicKeys.map((armoredText: string) => {
-            return openpgp.key.readArmored(armoredText).keys[0];
-        })
-
-        openpgp.encryptMessage( keys, el.value )
-            .then((armoredText) => {
-                messageStore.save(armoredText, (result) => {
-                    if ( result.success ) {
-                        el.value = messageStore.getURL(result.id);
-                    } else {
-                        Notif.error(result.error);
-                    }
-                });
-            })
-            .catch((err) => {
-                Notif.error("OpenPGP Error: " + err );
-            });
-    });
-}
-
 // Listen for messages from the extension
 function messageListener() {
     chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
@@ -179,10 +132,25 @@ function messageListener() {
         }
 
         // Encrypt the current textarea
-        else if ( msg.encrypt ) {
-            encrypt(el, msg.keys );
+        else if ( msg.setElement ) {
+            el.value = msg.setElement;
+            el.dispatchEvent(new Event('input'));
+            el.focus();
         }
     });
+}
+
+// Observe for new nodes
+function eventObserver() {
+    observer = new MutationObserver((mutationArray) => {
+        mutationArray.forEach((mutation) => {
+            for (var i = 0; i < mutation.addedNodes.length; i++) {
+                var node = mutation.addedNodes[i];
+                traverseNodes(<HTMLElement>node);
+            }
+        });
+    });
+    observer.observe(document, { childList: true, subtree: true });
 }
 
 /************************************************************
@@ -196,22 +164,10 @@ function run(): void {
         if ( value ) {
             privateKeyArmored = value;
 
-            // Prepare all textareas
-            //prepareTextAreas();
-
             // Decrypt existing nodes
             traverseNodes(document.body);
 
-            // Observe for new nodes
-            observer = new MutationObserver((mutationArray) => {
-                mutationArray.forEach((mutation) => {
-                    for (var i = 0; i < mutation.addedNodes.length; i++) {
-                        var node = mutation.addedNodes[i];
-                        traverseNodes(<HTMLElement>node);
-                    }
-                });
-            });
-            observer.observe(document, { childList: true, subtree: true });
+            eventObserver();
 
             messageListener();
 
@@ -220,8 +176,6 @@ function run(): void {
             // (perhaps only when there are nodes to decrypt)
         }
     });
-
-
 }
 
 run();

@@ -14,6 +14,7 @@ function sendMessageToContent(msg: any, callback?: Interfaces.ResultCallback): v
 interface AppConfig {
     keyStore: KeyStore.Interface;
     privateKeyStore: PrivateKeyStore.Interface;
+    messageStore: MessageStore.Interface;
 }
 
 class KeyItem {
@@ -34,18 +35,22 @@ class App {
     element: HTMLElement;
     config: AppConfig;
     keyStore: KeyStore.Interface;
+    messageStore: MessageStore.Interface;
     privateKeyStore: PrivateKeyStore.Interface;
     filter: string;
     foundKeys: Array<KeyItem>;
     key: Keys.PrivateKey;
+    error: string;
+    clearText: string;
 
     constructor( config: AppConfig ) {
         this.element = document.getElementById('iframe');
         this.keyStore = config.keyStore;
         this.privateKeyStore = config.privateKeyStore;
+        this.messageStore = config.messageStore;
         this.foundKeys = [];
 
-        this.filter = ""; // TODO - most used
+        this.filter = ""; // TODO - last used
     }
 
     doFilter(): void {
@@ -66,27 +71,43 @@ class App {
         keyItem.selected = !keyItem.selected;
     }
 
+    private encrypt(text: string, keyList: Array<openpgp.key.Key>, callback: Interfaces.ResultCallback): void {
+        openpgp.encryptMessage( keyList, text )
+            .then((armoredText) => {
+                this.messageStore.save(armoredText, (result) => {
+                    if ( result.success ) {
+                        callback(this.messageStore.getURL(result.id));
+                    } else {
+                        this.error = result.error;
+                    }
+                });
+            })
+            .catch((err) => {
+                this.error = "OpenPGP Error: " + err;
+            });
+    }
+
     submit(e: Event) {
-        var armoredTexts: Array<string> = [],
+        var keyList: Array<openpgp.key.Key> = [],
             i: number,
             key: KeyItem;
 
-        // We can't send objects with methods in a message, so we'll collect
-        // only the armored text of all keys
+        if (this.foundKeys.length == 0) return;     // TODO: show tip
+
         for (i = 0; i < this.foundKeys.length; i++) {
             key = this.foundKeys[i];
             if ( key.selected ) {
-                armoredTexts.push(key.publicKey.armored())
+                keyList.push(key.publicKey.openpgpKey())
             }
         }
 
-        // Last, but not least we push the guys own public key, so he can read
-        // his own messages
-        armoredTexts.push(this.key.toPublic().armored());
+        // Add our key too, so we can read our own messages
+        keyList.push(this.key.toPublic().openpgpKey());
 
-        // Close and send keys
-        sendMessageToContent({ encrypt: true, keys: armoredTexts });
-        window.close();
+        this.encrypt( this.clearText, keyList, (url) => {
+            sendMessageToContent({ setElement: url });
+            window.close();
+        });
     }
 
     run(): void {
@@ -100,10 +121,13 @@ class App {
         rivets.bind(this.element, this);
 
         this.keyStore.initialize(() => {
-            this.privateKeyStore.get((key) => {
+            this.privateKeyStore.get((key) => {     // TODO: what if there is no key?
                 this.key = key;
+                sendMessageToContent({ getElement: true }, (value) => {
+                    this.clearText = value;
+                    this.doFilter();
+                })
             })
-            this.doFilter();
         });
     }
 
@@ -112,7 +136,8 @@ class App {
 var config = new Config();
 app = window["app"] = new App({
     keyStore: new KeyStore.LocalStore(config),
-    privateKeyStore: new PrivateKeyStore.LocalStore(config)
+    privateKeyStore: new PrivateKeyStore.LocalStore(config),
+    messageStore: new MessageStore.RemoteService(config.messageStore.localHost)
 });
 
 window.onload = app.run.bind(app);
