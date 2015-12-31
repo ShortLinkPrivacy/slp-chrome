@@ -78,7 +78,7 @@ class App {
                     if ( result.success ) {
                         callback(this.messageStore.getURL(result.id));
                     } else {
-                        this.error = result.error;
+                        app.error = result.error;
                     }
                 });
             })
@@ -124,7 +124,7 @@ class App {
             this.privateKeyStore.get((key) => {     // TODO: what if there is no key?
                 this.key = key;
                 sendMessageToContent({ getElement: true }, (value) => {
-                    this.clearText = value;
+                    this.clearText = value || "boza"; // XXX
                     this.doFilter();
                 })
             })

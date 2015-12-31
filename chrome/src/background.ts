@@ -2,8 +2,9 @@
 /// <reference path="modules.d.ts" />
 
 var config = new Config(),
-    privateKeyStore = new PrivateKeyStore.LocalStore(config),
-    messageStore = new MessageStore.RemoteService(config.messageStore.localHost);
+    privateKeyStore: PrivateKeyStore.Interface = new PrivateKeyStore.LocalStore(config),
+    messageStore: MessageStore.Interface = new MessageStore.RemoteService(config.messageStore.localHost),
+    linkRe = new RegExp(messageStore.getRe());
 
 // Private key
 var privateKey: Keys.PrivateKey,
@@ -12,6 +13,7 @@ var privateKey: Keys.PrivateKey,
 //############################################################################
 
 var dispatcher = {
+    init: initVars,
     decryptLink: decryptLink
 };
 
@@ -85,7 +87,7 @@ function getArmorType(text: string): ArmorType {
 
 function decryptLink(request: any, sender: chrome.runtime.MessageSender, sendResponse: ResultCallback): void {
     var url: string = request.url,
-        match = messageStore.regexp.exec(url),
+        match = linkRe.exec(url),
         messageId: string;
 
     if (!match) {
@@ -116,6 +118,16 @@ function decryptLink(request: any, sender: chrome.runtime.MessageSender, sendRes
     });
 }
 
+function initVars(request: any, sender: chrome.runtime.MessageSender, sendResponse: ResultCallback): void {
+    sendResponse({
+        success: true,
+        value: {
+            linkRe: messageStore.getRe(),
+            isDecrypted: privateKey.isDecrypted()
+        }
+    });
+}
+
 //############################################################################
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
@@ -133,19 +145,7 @@ privateKeyStore.get((pk) => {
 
     if ( pk ) {
         privateKey = pk;
-        privateKeyDecrypted = privateKey.key.decrypt(privateKeyPassword); // TODO: what if it doesn't decrypt
-
-        message.backgroundReady = true;
-        message.linkRe = messageStore.regexp;
-        message.privateKeyDecrypted = privateKeyDecrypted;
-
-        // Tell all tabs that we're ready and send them some info
-        chrome.tabs.query({}, function(tabs) {
-            for (i = 0; i < tabs.length; i++) {
-                chrome.tabs.sendMessage(tabs[i].id, {greeting: "hello"});
-            }
-        });
-
+        privateKey.decrypt(privateKeyPassword); // TODO: what if it doesn't decrypt
     } else {
         // TODO: nag about adding a public key
     }

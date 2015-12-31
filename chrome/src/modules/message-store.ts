@@ -30,6 +30,7 @@ module MessageStore {
         save(armor: string, callback: MessageIdCallback): void;
         load(id: string, callback: MessageArmoredCallback): void;
         getURL(id: string): string;
+        getRe(): string;
     }
 
 }

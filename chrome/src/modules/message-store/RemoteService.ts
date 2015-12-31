@@ -8,12 +8,10 @@ module MessageStore {
     export class RemoteService implements Interface {
         url: string;
         path: string;
-        regexp: RegExp;
 
         constructor(config: any) {
             this.url = config.url;
             this.path = config.path;
-            this.regexp = new RegExp(this.url + this.path + "/(\\w+)");
         }
 
         save(armor: string, callback: MessageIdCallback): void {
@@ -80,6 +78,10 @@ module MessageStore {
 
         getURL(id: string): string {
             return this.url + this.path + '/' + id;
+        }
+
+        getRe(): string {
+            return this.url + this.path + "/(\\w+)";
         }
     }
 }

@@ -48,9 +48,7 @@ iframe:
 	tsc --out src/iframe.js src/iframe.ts
 
 content:
-	tsc --out src/content.js \
-		src/content/armor.ts \
-		src/content/main.ts
+	tsc --out src/content.js src/content.ts
 
 background:
 	tsc --out src/background.js src/background.ts

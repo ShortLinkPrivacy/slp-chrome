@@ -71,15 +71,26 @@ module Keys {
     }
 
     export class PrivateKey extends Key {
+        private _isDecrypted: boolean;
+
         constructor(armoredText: string) {
             super(armoredText);
             if (!this.key.isPrivate()) {
                 throw "key.not_private";
             }
+            this._isDecrypted = false;
         }
 
         toPublic(): Key {
             return new PublicKey(this.key.toPublic().armor());
+        }
+
+        decrypt(password: string): boolean {
+            return this._isDecrypted = this.key.decrypt(password);
+        }
+
+        isDecrypted(): boolean {
+            return this._isDecrypted;
         }
     }
 
