@@ -81,32 +81,44 @@ function eventObserver(): void {
     observer.observe(document, { childList: true, subtree: true });
 }
 
+function getInitVars(callback: Interfaces.Callback): void {
+    chrome.runtime.sendMessage({command: 'init'}, (result) => {
+        init = result.value;
+        callback()
+    });
+}
+
 // Listen for messages from the extension
 function listenToMessages() {
     chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-        var el: HTMLTextAreaElement = <HTMLTextAreaElement>document.activeElement;
+        var el: HTMLTextAreaElement;
 
         // Get the active element value. If the element is a TEXTAREA, then
         // return its value. Otherwise returns null.
         if ( msg.getElement ) {
             var value;
+            el = <HTMLTextAreaElement>document.activeElement;
             if ( el.tagName == 'TEXTAREA' ) value = el.value || "";
             sendResponse(value);
         }
 
         // Encrypt the current textarea
         else if ( msg.setElement ) {
+            el = <HTMLTextAreaElement>document.activeElement;
             el.value = msg.setElement;
             el.dispatchEvent(new Event('input'));
             el.focus();
+        }
+
+        else if ( msg.traverse ) {
+            getInitVars(() => { traverseNodes(document.body) });
         }
     });
 }
 
 // Get variables and bootstrap
-chrome.runtime.sendMessage({command: 'init'}, (result) => {
-    init = result.value;
+getInitVars(() => {
     traverseNodes(document.body);
     eventObserver();
     listenToMessages();
-});
+})

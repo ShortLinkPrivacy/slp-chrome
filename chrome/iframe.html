@@ -18,19 +18,15 @@
     <script src="src/iframe.js"></script>
   </head>
   <body>
-    <div id="password" rv-if="needPassword">
-      <h4>Private Key Password</h4>
-      <form rv-on-submit="enterPassword">
-        <input type="password" rv-value="password">
-        <button type="submit">Submit</button>
-      </form>
+    <div id="error" rv-if="error" rv-text="error"></div>
+    <div id="password" rv-hide="initVars.isDecrypted">
+        <input rv-value="password" rv-on-keyup="enterPassword" type="password" placeholder="private key password">
     </div>
-    <div id="iframe" rv-unless="needPassword">
+    <div id="iframe" rv-show="initVars.isDecrypted">
       <div id="header">
         Select recipients
       </div>
       <div id="content">
-        <div id="error" rv-show="error" rv-text="error"></div>
         <input id="filter" rv-value="filter" rv-on-keyup="doFilter" placeholder="filter">
         <ul>
           <li rv-on-click="select" rv-each-key="foundKeys"><input type="checkbox" rv-checked="key.selected" /><span rv-text="key.name"></span></li>

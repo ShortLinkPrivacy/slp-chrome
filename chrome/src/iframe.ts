@@ -49,6 +49,7 @@ class App {
         this.foundKeys = [];
 
         this.filter = ""; // TODO - last used
+        this.password = "";
     }
 
     doFilter(): void {
@@ -67,10 +68,6 @@ class App {
     select(e: Event, model: {index: number}) {
         var keyItem = this.foundKeys[model.index];
         keyItem.selected = !keyItem.selected;
-    }
-
-    needPassword() {
-        return !this.initVars.isDecrypted;
     }
 
     submit(e: Event) {
@@ -97,6 +94,25 @@ class App {
         })
     }
 
+    enterPassword(e: KeyboardEvent) {
+        if ( e.keyCode != 13 ) return;
+        if ( this.password ) {
+            chrome.runtime.sendMessage({ command: 'unlock', password: this.password }, (result) => {
+                if ( result.success ) {
+                    chrome.tabs.query({currentWindow: true}, (tabs) => {
+                        tabs.forEach((tab) => {
+                            chrome.tabs.sendMessage(tab.id, { traverse: true });
+                        });
+                    });
+                    chrome.browserAction.setBadgeText({text: ""});
+                    window.close();
+                } else {
+                    this.error = "Wrong password";
+                }
+            });
+        }
+    }
+
     run(): void {
         // Rivets
         this.element = document.getElementById('iframe');
@@ -105,12 +121,12 @@ class App {
                 this.call(app, ev, binding.model)
             }
         });
-        rivets.bind(this.element, this);
+        rivets.bind(document.body, this);
 
         this.keyStore.initialize(() => {
-            chrome.runtime.sendMessage({ command: 'init' }, (value) => { 
-                this.initVars = value 
-                sendMessageToContent({ getElement: true }, (value) => {
+            chrome.runtime.sendMessage({ command: 'init' }, (result: { value: Interfaces.InitVars }) => { 
+                this.initVars = result.value; 
+                sendMessageToContent({ getElement: true }, (value: string) => {
                     this.clearText = value;
                     this.doFilter();
                 });

@@ -29,7 +29,8 @@ var dispatcher: DispatchCall = {
     init: initVars,
     encryptMessage: encryptMessage,
     decryptLink: decryptLink,
-    needPassword: needPassword
+    needPassword: needPassword,
+    unlock: unlockPassword
 };
 
 //############################################################################
@@ -179,6 +180,17 @@ function initVars(request: any, sender: chrome.runtime.MessageSender, sendRespon
 
 function needPassword(request: any, sender: chrome.runtime.MessageSender, sendResponse: ResultCallback): void {
     chrome.browserAction.setBadgeText({text: '*'});
+}
+
+//-------------------------------------------------------------------------------
+
+function unlockPassword(request: any, sender: chrome.runtime.MessageSender, sendResponse: ResultCallback): void {
+    var success: boolean;
+
+    privateKeyPassword = request.password;
+    success = privateKey.decrypt(privateKeyPassword); 
+
+    sendResponse({ success: success });
 }
 
 //############################################################################
