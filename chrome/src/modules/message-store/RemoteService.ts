@@ -80,7 +80,7 @@ module MessageStore {
             return this.url + this.path + '/' + id;
         }
 
-        getRe(): string {
+        getReStr(): string {
             return this.url + this.path + "/(\\w+)";
         }
     }

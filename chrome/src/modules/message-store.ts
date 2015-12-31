@@ -29,8 +29,14 @@ module MessageStore {
     export interface Interface {
         save(armor: string, callback: MessageIdCallback): void;
         load(id: string, callback: MessageArmoredCallback): void;
+
+        // Get the URL from an id
         getURL(id: string): string;
-        getRe(): string;
+
+        // Returns a string for the regex that matches the url. Why string?
+        // Because we'll end up passing it to content via a message and RegExp
+        // is an object (i.e. it'll get lost in the message)
+        getReStr(): string;
     }
 
 }

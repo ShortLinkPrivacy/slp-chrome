@@ -18,7 +18,14 @@
     <script src="src/iframe.js"></script>
   </head>
   <body>
-    <div id="iframe">
+    <div id="password" rv-if="needPassword">
+      <h4>Private Key Password</h4>
+      <form rv-on-submit="enterPassword">
+        <input type="password" rv-value="password">
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+    <div id="iframe" rv-unless="needPassword">
       <div id="header">
         Select recipients
       </div>

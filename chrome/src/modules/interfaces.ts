@@ -11,4 +11,9 @@ module Interfaces {
         (result: any): void;
     }
 
+    export interface InitVars {
+        linkRe: string;
+        isDecrypted: boolean;
+    }
+
 }

@@ -15,21 +15,12 @@ content
 - Ask for password. When codes are detected, open a dialog to ask to unlock the private key. The dialog should have a "remember for 24 hours" checkbox. It should also have an OK and Cancel buttons. If the user has not set up a public key, the dialog should nag about setting up one.
 - Unify the way [PGP MESSAGE:1234] is displayed. Maybe move it in a method in messageStore
 - Recognize public key links and transform them into a clickable item. When clicked, import into the address book and show an info notif.
-- Make notifs slide down to open and slide up to close.
-- Test notifs in Slack. Make sure their z-index is right.
 - Once a text area has been encrypted, mark it as such, so it can not be double-encrypted.
 
 background
 ==================================
-- Add an icon to the content menu
-- Provide a button with a widget
-
-[Background Widget]
 - Add a giand ON/OFF button to start/stop decrypting. OFF should forget the private key password.
 - Link to Settings.
-- Link to Encrypt current textarea
-
-
 
 settings
 ====================================
@@ -42,7 +33,7 @@ installation
 
 API
 ====================================
-
+- Reject payload bigger than X bytes (so idiots don't overload your storage)
 
 
 Development

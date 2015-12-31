@@ -1,12 +1,8 @@
 /// <reference path="../typings/chrome/chrome.d.ts" />
-
-interface InitVars {
-    linkRe: string;
-    isDecrypted: boolean;
-}
+/// <reference path="modules.d.ts" />
 
 // These get initialized by the background page
-var init: InitVars;
+var init: Interfaces.InitVars;
 
 // Observer for newly created elements
 var observer: MutationObserver;
@@ -53,14 +49,22 @@ function decodeNode(node: Node): void {
 
 function traverseNodes(root: HTMLElement): void {
     var walk: TreeWalker,
-        node: Node;
+        node: Node,
+        re: RegExp;
+
+    re = new RegExp(init.linkRe);
 
     // Create a walker from the root element, searching only for text nodes
     walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
 
     while (node = walk.nextNode()) {
-        if (node.nodeValue.match(new RegExp(init.linkRe)))
-            decodeNode(node);
+        if (node.nodeValue.match(re)) {
+            if ( init.isDecrypted ) {
+                decodeNode(node);
+            } else {
+                chrome.runtime.sendMessage({ command: 'needPassword' });
+            }
+        }
     }
 }
 
@@ -101,12 +105,8 @@ function listenToMessages() {
 
 // Get variables and bootstrap
 chrome.runtime.sendMessage({command: 'init'}, (result) => {
-    if ( result.success ) {
-        init = result.value;
-        traverseNodes(document.body);
-        eventObserver();
-        listenToMessages();
-    } else {
-        throw "Handle this"; // TODO
-    }
+    init = result.value;
+    traverseNodes(document.body);
+    eventObserver();
+    listenToMessages();
 });

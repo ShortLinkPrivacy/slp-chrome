@@ -3,19 +3,13 @@
 
 var config = new Config(),
     privateKeyStore: PrivateKeyStore.Interface = new PrivateKeyStore.LocalStore(config),
-    messageStore: MessageStore.Interface = new MessageStore.RemoteService(config.messageStore.localHost),
-    linkRe = new RegExp(messageStore.getRe());
+    messageStore: MessageStore.Interface = new MessageStore.RemoteService(config.messageStore.localHost);
 
 // Private key
 var privateKey: Keys.PrivateKey,
-    privateKeyPassword: string = "Password-123"; // TODO
+    privateKeyPassword: string;
 
 //############################################################################
-
-var dispatcher = {
-    init: initVars,
-    decryptLink: decryptLink
-};
 
 interface ResultStruct {
     success: boolean;
@@ -26,6 +20,17 @@ interface ResultStruct {
 interface ResultCallback {
     (result: ResultStruct): void;
 }
+
+interface DispatchCall {
+    [method: string]: (request: any, sender: chrome.runtime.MessageSender, sendResponse: ResultCallback) => void;
+}
+
+var dispatcher: DispatchCall = {
+    init: initVars,
+    encryptMessage: encryptMessage,
+    decryptLink: decryptLink,
+    needPassword: needPassword
+};
 
 //############################################################################
 
@@ -86,9 +91,10 @@ function getArmorType(text: string): ArmorType {
 //############################################################################
 
 function decryptLink(request: any, sender: chrome.runtime.MessageSender, sendResponse: ResultCallback): void {
-    var url: string = request.url,
-        match = linkRe.exec(url),
-        messageId: string;
+    var re: RegExp, match: Array<string>, messageId: string;
+
+    re  = new RegExp(messageStore.getReStr());
+    match = re.exec(request.url)
 
     if (!match) {
         sendResponse({ success: false, error: 'match' });
@@ -118,14 +124,61 @@ function decryptLink(request: any, sender: chrome.runtime.MessageSender, sendRes
     });
 }
 
+//----------------------------------------------------------------------------
+
+function encryptMessage(request: any, sender: chrome.runtime.MessageSender, sendResponse: ResultCallback): void {
+    var keyList: Array<openpgp.key.Key> = [],
+        i: number;
+
+    for (i = 0; i < request.keyList.length; i++) {
+        var keyResult = openpgp.key.readArmored(request.keyList[i]);
+        keyList.push(keyResult.keys[0]);
+    }
+
+    // Also push our own key, so we can read our own message
+    keyList.push(privateKey.key.toPublic());
+
+    openpgp.encryptMessage( keyList, request.text )
+        .then((armoredText) => {
+            messageStore.save(armoredText, (result) => {
+                if ( result.success ) {
+                    sendResponse({
+                        success: true,
+                        value: messageStore.getURL(result.id)
+                    });
+                } else {
+                    sendResponse({ 
+                        success: false, 
+                        error: result.error 
+                    });
+                }
+            });
+        })
+        .catch((err) => {
+            //TODO: this.error = 
+            sendResponse({ 
+                success: false, 
+                error: "OpenPGP Error: " + err
+            });
+        });
+}
+
+//----------------------------------------------------------------------------
+
 function initVars(request: any, sender: chrome.runtime.MessageSender, sendResponse: ResultCallback): void {
     sendResponse({
         success: true,
         value: {
-            linkRe: messageStore.getRe(),
+            linkRe: messageStore.getReStr(),
             isDecrypted: privateKey.isDecrypted()
         }
     });
+}
+
+//----------------------------------------------------------------------------
+
+function needPassword(request: any, sender: chrome.runtime.MessageSender, sendResponse: ResultCallback): void {
+    chrome.browserAction.setBadgeText({text: '*'});
 }
 
 //############################################################################
@@ -138,14 +191,14 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     return true;
 });
 
-privateKeyStore.get((pk) => {
-    var i: number,
-        privateKeyDecrypted: boolean,
-        message: any = {};
+//----------------------------------------------------------------------------
 
+privateKeyStore.get((pk) => {
     if ( pk ) {
         privateKey = pk;
-        privateKey.decrypt(privateKeyPassword); // TODO: what if it doesn't decrypt
+        if ( privateKeyPassword ) {
+            privateKey.decrypt(privateKeyPassword); // TODO: what if it doesn't decrypt
+        }
     } else {
         // TODO: nag about adding a public key
     }
