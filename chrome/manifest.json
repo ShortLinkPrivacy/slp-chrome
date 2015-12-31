@@ -8,7 +8,11 @@
   "options_page": "settings.html",
 
   "background": {
-    "scripts": ["src/background.js"],
+    "scripts": [
+        "bower_components/openpgp/dist/openpgp.min.js",
+        "src/modules.js",
+        "src/background.js"
+    ],
     "persistent": false
   },
 
@@ -19,7 +23,6 @@
 
   "permissions": [
     "storage",
-    "contextMenus",
     "activeTab",
     "<all_urls>"
   ],
@@ -31,11 +34,6 @@
       "run_at": "document_end",
       "all_frames": true
     }
-  ],
-
-  "web_accessible_resources": [
-    "iframe.html",
-    "images/padlock.png"
   ],
 
   "author": "Stefan G."

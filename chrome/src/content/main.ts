@@ -1,6 +1,4 @@
-/// <reference path="dialog.ts" />
 /// <reference path="armor.ts" />
-/// <reference path="notif.ts" />
 /// <reference path="../modules.d.ts" />
 
 var config = new Config(),
@@ -19,10 +17,7 @@ privateKey: Keys.PrivateKey,
 loadedModules: Interfaces.Dictionary = {},
 
 // Observer for newly created elements
-observer: MutationObserver,
-
-// Dialog object
-dialog = new Dialog();
+observer: MutationObserver;
 
 /**************************************************
  * Loads a module on demand
@@ -44,9 +39,14 @@ function loadModule(name: string, callback: Interfaces.Callback): void {
 function unlockPrivateKey(callback: { (success: boolean): void }): void {
     if (!privateKey) {
         privateKey = new Keys.PrivateKey(privateKeyArmored);
-        privateKey.key.decrypt('Password-123'); // TODO
+        chrome.runtime.sendMessage({ getPassword: true }, (password) => {
+            var success = privateKey.key.decrypt(password);
+            if (!success) privateKey = null;
+            callback(success);
+        });
+    } else {
+        callback(true);
     }
-    callback(true);
 }
 
 function decodeText(codedText: string, callback: { (decodedText): void }): void {
@@ -119,7 +119,7 @@ function traverseNodes(root: HTMLElement): void {
 }
 
 // Listen for messages from the extension
-function messageListener() {
+function messageListener(): void {
     chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         var el: HTMLTextAreaElement = <HTMLTextAreaElement>document.activeElement;
 
@@ -141,7 +141,7 @@ function messageListener() {
 }
 
 // Observe for new nodes
-function eventObserver() {
+function eventObserver(): void {
     observer = new MutationObserver((mutationArray) => {
         mutationArray.forEach((mutation) => {
             for (var i = 0; i < mutation.addedNodes.length; i++) {
@@ -153,14 +153,14 @@ function eventObserver() {
     observer.observe(document, { childList: true, subtree: true });
 }
 
+
 /************************************************************
  * Bootstrap and run at window.onload
  ************************************************************/
 function run(): void {
-    privateKeyStore = new PrivateKeyStore.LocalStore(config);
 
     // All of this only matters if the guy has a private key set up
-    privateKeyStore.getArmored((value) => {
+    chrome.runtime.sendMessage({ getPrivateKey: true }, (value) => {
         if ( value ) {
             privateKeyArmored = value;
 
