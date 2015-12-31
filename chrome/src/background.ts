@@ -156,7 +156,6 @@ function encryptMessage(request: any, sender: chrome.runtime.MessageSender, send
             });
         })
         .catch((err) => {
-            //TODO: this.error = 
             sendResponse({ 
                 success: false, 
                 error: "OpenPGP Error: " + err
@@ -209,7 +208,7 @@ privateKeyStore.get((pk) => {
     if ( pk ) {
         privateKey = pk;
         if ( privateKeyPassword ) {
-            privateKey.decrypt(privateKeyPassword); // TODO: what if it doesn't decrypt
+            privateKey.decrypt(privateKeyPassword);
         }
     } else {
         // TODO: nag about adding a public key
