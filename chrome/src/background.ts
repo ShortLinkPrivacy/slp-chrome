@@ -3,18 +3,15 @@
 
 var config = new Config(),
     privateKeyStore = new PrivateKeyStore.LocalStore(config),
-    messageStore = new MessageStore.RemoteService(config.messageStore.localHost),
+    messageStore = new MessageStore.RemoteService(config.messageStore.localHost);
 
 // Private key
-var privateKey: Key.PrivateKey,
-    privateKeyArmored: string,
-    privateKeyPassword: string;
+var privateKey: Keys.PrivateKey,
+    privateKeyPassword: string = "Password-123"; // TODO
 
 //############################################################################
 
 var dispatcher = {
-    getPrivateKey: getPrivateKey,
-    getPassword: getPassword,
     decryptLink: decryptLink
 };
 
@@ -28,13 +25,63 @@ interface ResultCallback {
     (result: ResultStruct): void;
 }
 
-function getPrivateKey(request: any, sender: chrome.runtime.MessageSender, sendResponse: ResultCallback): void {
-    sendResponse({ success: true, value: privateKeyArmored });
+//############################################################################
+
+enum ArmorType { None, MultipartSection, MultipartLast, Signed, Message, PublicKey, PrivateKey };
+
+function getArmorType(text: string): ArmorType {
+  var reHeader = /^-----BEGIN PGP (MESSAGE, PART \d+\/\d+|MESSAGE, PART \d+|SIGNED MESSAGE|MESSAGE|PUBLIC KEY BLOCK|PRIVATE KEY BLOCK|SIGNATURE)-----/;
+
+  var header = text.match(reHeader);
+
+  if (!header) {
+      return ArmorType.None;
+  }
+
+  // BEGIN PGP MESSAGE, PART X/Y
+  // Used for multi-part messages, where the armor is split amongst Y
+  // parts, and this is the Xth part out of Y.
+  if (header[1].match(/MESSAGE, PART \d+\/\d+/)) {
+    return ArmorType.MultipartSection;
+  } else
+  // BEGIN PGP MESSAGE, PART X
+  // Used for multi-part messages, where this is the Xth part of an
+  // unspecified number of parts. Requires the MESSAGE-ID Armor
+  // Header to be used.
+  if (header[1].match(/MESSAGE, PART \d+/)) {
+    return ArmorType.MultipartLast;
+
+  } else
+  // BEGIN PGP SIGNATURE
+  // Used for detached signatures, OpenPGP/MIME signatures, and
+  // cleartext signatures. Note that PGP 2.x uses BEGIN PGP MESSAGE
+  // for detached signatures.
+  if (header[1].match(/SIGNED MESSAGE/)) {
+    return ArmorType.Signed;
+
+  } else
+  // BEGIN PGP MESSAGE
+  // Used for signed, encrypted, or compressed files.
+  if (header[1].match(/MESSAGE/)) {
+    return ArmorType.Message;
+
+  } else
+  // BEGIN PGP PUBLIC KEY BLOCK
+  // Used for armoring public keys.
+  if (header[1].match(/PUBLIC KEY BLOCK/)) {
+    return ArmorType.PublicKey;
+
+  } else
+  // BEGIN PGP PRIVATE KEY BLOCK
+  // Used for armoring private keys.
+  if (header[1].match(/PRIVATE KEY BLOCK/)) {
+    return ArmorType.PrivateKey;
+  }
+
+  return ArmorType.None;
 }
 
-function getPassword(request: any, sender: chrome.runtime.MessageSender, sendResponse: ResultCallback): void {
-    sendResponse({ success: true, value: privateKeyPassword });
-}
+//############################################################################
 
 function decryptLink(request: any, sender: chrome.runtime.MessageSender, sendResponse: ResultCallback): void {
     var url: string = request.url,
@@ -50,7 +97,7 @@ function decryptLink(request: any, sender: chrome.runtime.MessageSender, sendRes
 
     messageStore.load( messageId, (result) => {
         if ( !result.success ) {
-           sendResponse({ success: false, error: 'decode', id: messageId });
+           sendResponse({ success: false, error: 'decode', value: messageId });
            return;
         }
 
@@ -60,12 +107,10 @@ function decryptLink(request: any, sender: chrome.runtime.MessageSender, sendRes
 
             openpgp.decryptMessage( privateKey.key, message )
                .then((plainText) => {
-                   codedText = codedText.replace(messageStore.regexp, plainText)
-                   decodeText(codedText, callback);
+                   sendResponse({ success: true, value: plainText });
                })
                .catch((error) => {
-                   codedText = codedText.replace(messageStore.regexp, "[PGP MESSAGE:" + messageId + "]"); // TODO: add link
-                   decodeText(codedText, callback);
+                   sendResponse({ success: false, error: 'decode', value: messageId });
                });
         }
     });
@@ -81,11 +126,26 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     return true;
 });
 
+privateKeyStore.get((pk) => {
+    var i: number,
+        privateKeyDecrypted: boolean,
+        message: any = {};
 
-privateKeyStore.getArmored((value) => {
-    if ( value ) {
-        privateKeyPassword = "Password-123"; // TODO
-        privateKeyArmored = value;
+    if ( pk ) {
+        privateKey = pk;
+        privateKeyDecrypted = privateKey.key.decrypt(privateKeyPassword); // TODO: what if it doesn't decrypt
+
+        message.backgroundReady = true;
+        message.linkRe = messageStore.regexp;
+        message.privateKeyDecrypted = privateKeyDecrypted;
+
+        // Tell all tabs that we're ready and send them some info
+        chrome.tabs.query({}, function(tabs) {
+            for (i = 0; i < tabs.length; i++) {
+                chrome.tabs.sendMessage(tabs[i].id, {greeting: "hello"});
+            }
+        });
+
     } else {
         // TODO: nag about adding a public key
     }

@@ -1,57 +1,14 @@
-/// <reference path="armor.ts" />
-/// <reference path="../modules.d.ts" />
+/// <reference path="../../typings/chrome/chrome.d.ts" />
 
-var config = new Config(),
-
-// How we load the private key
-privateKeyStore = new PrivateKeyStore.LocalStore(config),
-
-// How we load messages TODO: move to prod
-messageStore = new MessageStore.RemoteService(config.messageStore.localHost),
-
-// Private key
-privateKeyArmored: string,
-privateKey: Keys.PrivateKey,
-
-// Contains all loaded modules
-loadedModules: Interfaces.Dictionary = {},
+// The get initialized by the background page
+var linkRe: RegExp,
+    privateKeyDecrypted: boolean;
 
 // Observer for newly created elements
-observer: MutationObserver;
-
-/**************************************************
- * Loads a module on demand
- **************************************************/
-function loadModule(name: string, callback: Interfaces.Callback): void {
-    if (!loadedModules[name]) {
-        chrome.runtime.sendMessage({ loadModule: name }, (res) => {
-            var property: string;
-            if ( property = res.property ) {
-                loadedModules[name] = window[property]
-                callback()
-            }
-        })
-    } else {
-        callback()
-    }
-}
-
-function unlockPrivateKey(callback: { (success: boolean): void }): void {
-    if (!privateKey) {
-        privateKey = new Keys.PrivateKey(privateKeyArmored);
-        chrome.runtime.sendMessage({ getPassword: true }, (password) => {
-            var success = privateKey.key.decrypt(password);
-            if (!success) privateKey = null;
-            callback(success);
-        });
-    } else {
-        callback(true);
-    }
-}
+var observer: MutationObserver;
 
 function decodeText(codedText: string, callback: { (decodedText): void }): void {
-    var match = messageStore.regexp.exec(codedText),
-        armoredText: string,
+    var match = linkRe.exec(codedText),
         messageId: string;
 
     if (!match) {
@@ -61,31 +18,13 @@ function decodeText(codedText: string, callback: { (decodedText): void }): void 
 
     messageId = match[1];
 
-    messageStore.load( messageId, (result) => {
-        if ( !result.success ) {
-           codedText = codedText.replace(messageStore.regexp, "[PGP MESSAGE:" + messageId + "]"); // TODO: add link
-           decodeText(codedText, callback);
-           return;
+    chrome.runtime.sendMessage({ command: "decryptLink" }, (result) => {
+        if ( result.success ) {
+            codedText = codedText.replace(linkRe, result.value);
+        } else {
+            codedText = codedText.replace(linkRe, "[PGP MESSAGE:" + messageId + "]"); // TODO: add link
         }
-
-        var armorType = Armor.getType(result.armor);
-        if ( armorType == Armor.Type.Signed || armorType == Armor.Type.Message ) { // TODO, other types
-            loadModule("openpgp", () => {
-                unlockPrivateKey((success) => {
-                    var message = openpgp.message.readArmored(result.armor);
-
-                    openpgp.decryptMessage( privateKey.key, message )
-                       .then((plainText) => {
-                           codedText = codedText.replace(messageStore.regexp, plainText)
-                           decodeText(codedText, callback);
-                       })
-                       .catch((error) => {
-                           codedText = codedText.replace(messageStore.regexp, "[PGP MESSAGE:" + messageId + "]"); // TODO: add link
-                           decodeText(codedText, callback);
-                       });
-                });
-            });
-        }
+        decodeText(codedText, callback);
     });
 };
 
@@ -113,31 +52,9 @@ function traverseNodes(root: HTMLElement): void {
     walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
 
     while (node = walk.nextNode()) {
-        if (node.nodeValue.match(messageStore.regexp))
+        if (node.nodeValue.match(linkRe))
             decodeNode(node);
     }
-}
-
-// Listen for messages from the extension
-function messageListener(): void {
-    chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-        var el: HTMLTextAreaElement = <HTMLTextAreaElement>document.activeElement;
-
-        // Get the active element value. If the element is a TEXTAREA, then
-        // return its value. Otherwise returns null.
-        if ( msg.getElement ) {
-            var value;
-            if ( el.tagName == 'TEXTAREA' ) value = el.value || "";
-            sendResponse(value);
-        }
-
-        // Encrypt the current textarea
-        else if ( msg.setElement ) {
-            el.value = msg.setElement;
-            el.dispatchEvent(new Event('input'));
-            el.focus();
-        }
-    });
 }
 
 // Observe for new nodes
@@ -162,15 +79,8 @@ function run(): void {
     // All of this only matters if the guy has a private key set up
     chrome.runtime.sendMessage({ getPrivateKey: true }, (value) => {
         if ( value ) {
-            privateKeyArmored = value;
-
-            // Decrypt existing nodes
             traverseNodes(document.body);
-
             eventObserver();
-
-            messageListener();
-
         } else {
             // TODO: nag about adding public key
             // (perhaps only when there are nodes to decrypt)
@@ -178,4 +88,30 @@ function run(): void {
     });
 }
 
-run();
+// Listen for messages from the extension
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+    var el: HTMLTextAreaElement = <HTMLTextAreaElement>document.activeElement;
+
+    // Get the active element value. If the element is a TEXTAREA, then
+    // return its value. Otherwise returns null.
+    if ( msg.getElement ) {
+        var value;
+        if ( el.tagName == 'TEXTAREA' ) value = el.value || "";
+        sendResponse(value);
+    }
+
+    // Encrypt the current textarea
+    else if ( msg.setElement ) {
+        el.value = msg.setElement;
+        el.dispatchEvent(new Event('input'));
+        el.focus();
+    }
+
+    // The background page is ready
+    else if ( msg.backgroundReady ) {
+        linkRe = msg.linkRe;
+        privateKeyDecrypted = msg.privateKeyDecrypted;
+        run();
+    }
+});
+
