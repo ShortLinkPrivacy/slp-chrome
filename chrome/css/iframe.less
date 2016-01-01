@@ -40,7 +40,7 @@ html,body {
 }
 
 #main {
-  width: 350px;
+  width: 360px;
   height: 300px;
   display: block;
   background-color: @color3;
@@ -52,28 +52,34 @@ html,body {
     ul {
       margin: 0;
       padding: 0;
+
       li {
-        color: @color3;
-        background-color: @color2;
         font-size: 115%;
         list-style-type: none;
         float: left;
+      }
+
+      a {
+        display: block;
+        text-decoration: none;
+        color: @color3;
+        background-color: @color2;
         padding: 0 15px;
         margin-right: 5px;
-        cursor: pointer;
         border: 1px solid @color4;
         border-bottom: none;
         border-top-left-radius: 10px;
         border-top-right-radius: 10px;
+        font-weight: bold;
+
         &:hover {
           color: @color4; 
         }
-      }
 
-      li.active {
-        background: @color3;
-        color: @color4;
-        font-weight: bold;
+        &.active  {
+          background: @color3;
+          color: @color4;
+        }
       }
     }
   }

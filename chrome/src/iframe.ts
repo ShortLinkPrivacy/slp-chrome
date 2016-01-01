@@ -156,14 +156,16 @@ class App extends Application.Main {
     }
 }
 
-app = window["app"] = new App({
-    element: document.getElementById('article'),
-    path: "src/templates/background",
-    keyStore: new KeyStore.LocalStore(config),
-    messageStore: new MessageStore.RemoteService(config.messageStore.localHost)
-});
+window.onload = function() {
+    app = window["app"] = new App({
+        element: document.getElementById('article'),
+        path: "src/templates/background",
+        keyStore: new KeyStore.LocalStore(config),
+        messageStore: new MessageStore.RemoteService(config.messageStore.localHost)
+    });
 
-window.onload = app.run.bind(app);
+    app.run();
+};
 
 
 
