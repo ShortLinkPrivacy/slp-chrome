@@ -1,9 +1,11 @@
 /// <reference path="../typings/openpgp/openpgp.d.ts" />
 /// <reference path="../typings/rivets/rivets.d.ts" />
 /// <reference path="../typings/chrome/chrome.d.ts" />
+/// <reference path="../typings/pathjs/pathjs.d.ts" />
 /// <reference path="modules.d.ts" />
 
-var app: App;
+var app: App,
+    config = new Config();
 
 function sendMessageToContent(msg: any, callback?: Interfaces.ResultCallback): void {
     chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
@@ -11,35 +13,7 @@ function sendMessageToContent(msg: any, callback?: Interfaces.ResultCallback): v
     });
 }
 
-// TODO: move to Interfaces
-interface Article {
-    articleId: string;
-    filename: string;
-    onBind?(args?: any): void;
-}
-
-interface AppConfig {
-    keyStore: KeyStore.Interface;
-    messageStore: MessageStore.Interface;
-}
-
-
-class Main {
-    path: string = "src/templates",
-    articles: { [name: string]: Article } = {};
-    binding: Rivets.View = null;
-    element: HTMLElement;
-    currentArticle: Article;
-    config: AppConfig;
-
-    constructor( config: AppConfig ) {
-        this.element = document.getElementById('article');
-        this.keyStore = config.keyStore;
-        this.messageStore = config.messageStore;
-    }
-}
-
-
+// TODO: belongs elsewhere
 class KeyItem {
     publicKey: Keys.PublicKey;
     selected: boolean;
@@ -54,28 +28,20 @@ class KeyItem {
     }
 }
 
-class App {
-    element: HTMLElement;
-    config: AppConfig;
-    keyStore: KeyStore.Interface;
-    messageStore: MessageStore.Interface;
-    initVars: Interfaces.InitVars;
+/*
+ * Address Book tab controller
+ */
+
+class AddressBookTab implements Application.Article {
+    filename = "address_book.html";
+    articleId = "addressBook";
     filter: string;
     foundKeys: Array<KeyItem>;
     error: string;
     clearText: string;
-    password: string;
-    tabs: { [name: string]: boolean } = {};
 
-    constructor( config: AppConfig ) {
-        this.element = document.getElementById('iframe');
-        this.keyStore = config.keyStore;
-        this.messageStore = config.messageStore;
-        this.foundKeys = [];
-
+    constructor() {
         this.filter = ""; // TODO - last used
-        this.password = null;
-        this.tabs["address-book"] = true; // TODO - last used
     }
 
     doFilter(): void {
@@ -84,7 +50,7 @@ class App {
             return;
         }
 
-        this.keyStore.searchPublicKey(this.filter, (keys) => {
+        app.keyStore.searchPublicKey(this.filter, (keys) => {
             this.foundKeys = keys.map((k) => {
                 return new KeyItem(k);
             })
@@ -94,9 +60,6 @@ class App {
     select(e: Event, model: {index: number}) {
         var keyItem = this.foundKeys[model.index];
         keyItem.selected = !keyItem.selected;
-    }
-
-    tabSelect(e: MouseEvent): void {
     }
 
     submit(e: Event) {
@@ -122,8 +85,35 @@ class App {
             }
         })
     }
+}
 
-    enterPassword(e: KeyboardEvent) {
+/*
+ * The main application handles all articles, bit it itself
+ * also handles the private key password entry screen.
+ */
+
+class App extends Application.Main {
+    initVars: Interfaces.InitVars;
+    error: string;
+    password: string;
+
+    constructor( config: Application.AppConfig ) {
+        super(config);
+
+        // Articles
+        this.registerArticle( new AddressBookTab() );
+
+        // Router
+        this.router();
+    }
+
+    router(): void {
+        Path.map("#/ab").to(() => {
+            this.loadArticle('addressBook');
+        });
+    }
+
+    enterPassword(e: KeyboardEvent): void {
         if ( e.keyCode != 13 ) return;
         if ( this.password ) {
             chrome.runtime.sendMessage({ command: 'unlock', password: this.password }, (result) => {
@@ -144,31 +134,36 @@ class App {
 
     run(): void {
         // Rivets
-        this.element = document.getElementById('iframe');
         rivets.configure({
             handler: function(target, ev, binding) {
-                this.call(app, ev, binding.model)
+                this.call(app, event, binding.view.models)
             }
         });
         rivets.bind(document.body, this);
 
+        // Path
+        Path.listen();
+
+        // Call background for init
         this.keyStore.initialize(() => {
             chrome.runtime.sendMessage({ command: 'init' }, (result: { value: Interfaces.InitVars }) => { 
                 this.initVars = result.value; 
-                sendMessageToContent({ getElement: true }, (value: string) => {
-                    this.clearText = value;
-                    this.doFilter();
-                });
+                if (this.initVars.isDecrypted) {
+                    window.location.hash = "#/ab";
+                }
             });
         });
     }
-
 }
 
-var config = new Config();
 app = window["app"] = new App({
+    element: document.getElementById('article'),
+    path: "src/templates/background",
     keyStore: new KeyStore.LocalStore(config),
     messageStore: new MessageStore.RemoteService(config.messageStore.localHost)
 });
 
 window.onload = app.run.bind(app);
+
+
+
