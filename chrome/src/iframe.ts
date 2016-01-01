@@ -11,10 +11,34 @@ function sendMessageToContent(msg: any, callback?: Interfaces.ResultCallback): v
     });
 }
 
+// TODO: move to Interfaces
+interface Article {
+    articleId: string;
+    filename: string;
+    onBind?(args?: any): void;
+}
+
 interface AppConfig {
     keyStore: KeyStore.Interface;
     messageStore: MessageStore.Interface;
 }
+
+
+class Main {
+    path: string = "src/templates",
+    articles: { [name: string]: Article } = {};
+    binding: Rivets.View = null;
+    element: HTMLElement;
+    currentArticle: Article;
+    config: AppConfig;
+
+    constructor( config: AppConfig ) {
+        this.element = document.getElementById('article');
+        this.keyStore = config.keyStore;
+        this.messageStore = config.messageStore;
+    }
+}
+
 
 class KeyItem {
     publicKey: Keys.PublicKey;
@@ -41,6 +65,7 @@ class App {
     error: string;
     clearText: string;
     password: string;
+    tabs: { [name: string]: boolean } = {};
 
     constructor( config: AppConfig ) {
         this.element = document.getElementById('iframe');
@@ -49,7 +74,8 @@ class App {
         this.foundKeys = [];
 
         this.filter = ""; // TODO - last used
-        this.password = "";
+        this.password = null;
+        this.tabs["address-book"] = true; // TODO - last used
     }
 
     doFilter(): void {
@@ -68,6 +94,9 @@ class App {
     select(e: Event, model: {index: number}) {
         var keyItem = this.foundKeys[model.index];
         keyItem.selected = !keyItem.selected;
+    }
+
+    tabSelect(e: MouseEvent): void {
     }
 
     submit(e: Event) {

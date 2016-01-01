@@ -22,17 +22,31 @@
     <div id="password" rv-hide="initVars.isDecrypted">
         <input rv-value="password" rv-on-keyup="enterPassword" type="password" placeholder="private key password">
     </div>
-    <div id="iframe" rv-show="initVars.isDecrypted">
-      <div id="header">
-        Select recipients
-      </div>
-      <div id="content">
-        <input id="filter" rv-value="filter" rv-on-keyup="doFilter" placeholder="filter">
+    <div id="main" rv-show="initVars.isDecrypted">
+      <div class="menu">
+          <ul>
+              <li class="active" rel="address-book" rv-on-click="tabs.address-book">Address Book</li>
+              <li rel="cloud-keys" rv-on-click="tabSelect">Cloud Keys</li>
+              <li rel="private-key" rv-on-click="tabSelect">Private Key</li>
+          </ul>
+      </div>      
+
+      <div id="address-book" class="tab" rv-show="tabAddressBook">
+        <input class="filter" rv-value="filter" rv-on-keyup="doFilter" placeholder="filter">
         <ul>
           <li rv-on-click="select" rv-each-key="foundKeys"><input type="checkbox" rv-checked="key.selected" /><span rv-text="key.name"></span></li>
         </ul>
         <button rv-on-click="submit">encrypt</button>
       </div>
+
+      <div id="cloud-keys" class="tab" rv-show="tabCloudKeys">
+        Work in progress ...
+      </div>
+
+      <div id="private-key" class="tab" rv-show="tabPrivateKey">
+        Private key
+      </div>
+
     </div>
   </body>
 </html>

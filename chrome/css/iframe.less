@@ -1,30 +1,25 @@
 
-@colorLight1: #A2CDF2;
-@colorLight2: #F2F2F2;
-
-@bgLight: #6C7D8C;
-@bgDark: #000D02;
-
-@accent: #D94436;
-
-@errorColor: @accent;
+@color1: #A2CDF2;
+@color2: #6C7D8C;
+@color3: #F2F2F2;
+@color4: #000D02;
+@color5: #D94436;
 
 html,body {
   margin: 0;
   padding: 0;
-  width: 300px;
 }
 
 #error {
-  background-color: @errorColor;
-  color: @bgDark;
+  background-color: @color5;
+  color: @color4;
   padding: 3px;
   font-weight: bold;
   text-align: center;
 }
 
 #password {
-  background-color: @bgLight;
+  background-color: @color2;
   width: 300px;
   height: 100px;
   display: table-cell;
@@ -39,55 +34,74 @@ html,body {
   input {
     font-size: 150%;
     padding: 5px;
-    border: 2px solid @bgDark;
+    border: 2px solid @color4;
   }
 
 }
 
-#iframe {
-  font-size: 12px;
-  font-family: sans-serif;
-  width: 300px;
+#main {
+  width: 350px;
   height: 300px;
-  background-color: #fff;
   display: block;
+  background-color: @color3;
 
-  #header {
-    padding: 2px 4px;
-    background-color: #ccc;
-    color: #111;
-    font-weight: bold;
-    text-align: left;
-    .close { float: right; cursor: pointer; }
-  }
+  .menu {
+    background-color: #fff;
+    height: 30px;
+    line-height: 30px;
+    ul {
+      margin: 0;
+      padding: 0;
+      li {
+        color: @color3;
+        background-color: @color2;
+        font-size: 115%;
+        list-style-type: none;
+        float: left;
+        padding: 0 15px;
+        margin-right: 5px;
+        cursor: pointer;
+        border: 1px solid @color4;
+        border-bottom: none;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        &:hover {
+          color: @color4; 
+        }
+      }
 
-  #content {
-    padding: 3px;
-  }
-
-  #filter {
-    margin-bottom: 3px;
-    width: 98%;
-    color: #00a;
-    font-weight: bold;
-  }
-
-  ul {
-    margin: 5px 0;
-    padding: 0;
-    input[type="checkbox"] {
-      cursor: pointer;
-    }
-    li {
-      padding: 2px 0;
-      list-style-type: none;
-      cursor: pointer;
-      &:hover {
-        background-color: #3b8bba;
-        color: #fff;
+      li.active {
+        background: @color3;
+        color: @color4;
+        font-weight: bold;
       }
     }
+  }
 
+  #address-book {
+    .filter {
+      margin-bottom: 3px;
+      width: 98%;
+      color: #00a;
+      font-weight: bold;
+    }
+
+    ul {
+      margin: 5px 0;
+      padding: 0;
+      input[type="checkbox"] {
+        cursor: pointer;
+      }
+      li {
+        padding: 2px 0;
+        list-style-type: none;
+        cursor: pointer;
+        &:hover {
+          background-color: #3b8bba;
+          color: #fff;
+        }
+      }
+    }
   }
 
   button {
