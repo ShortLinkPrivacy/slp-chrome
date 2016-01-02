@@ -18,7 +18,7 @@
 
   "browser_action": {
     "default_icon": "images/padlock.png",
-    "default_popup": "iframe.html"
+    "default_popup": "browser.html"
   },
 
   "permissions": [

@@ -6,7 +6,7 @@ help:
 	@echo "modules                 compile all module files"
 	@echo "coffee                  compile all coffee files"
 	@echo "admin                   compile all admin files"
-	@echo "iframe                  compile all iframe files"
+	@echo "browser                 compile all browser files"
 	@echo "content                 compile all content files"
 	@echo "background              compile all background files"
 	@echo "build                   build all"
@@ -44,8 +44,8 @@ admin:
 		src/admin/articles/public_key_list.ts \
 		src/admin/run.ts
 
-iframe:
-	tsc --out src/iframe.js src/iframe.ts
+browser:
+	tsc --out src/browser.js src/browser.ts
 
 content:
 	tsc --out src/content.js src/content.ts
@@ -53,5 +53,5 @@ content:
 background:
 	tsc --out src/background.js src/background.ts
 
-build: modules coffee admin iframe content background
+build: modules coffee admin browser content background
 
