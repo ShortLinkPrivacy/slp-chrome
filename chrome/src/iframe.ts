@@ -87,6 +87,16 @@ class AddressBookTab implements Application.Article {
     }
 }
 
+class CloudKeysTab implements Application.Article {
+    filename = "cloud_keys.html";
+    articleId = "cloudKeys";
+}
+
+class PrivateKeyTab implements Application.Article {
+    filename = "private_key.html";
+    articleId = "privateKey";
+}
+
 /*
  * The main application handles all articles, bit it itself
  * also handles the private key password entry screen.
@@ -96,21 +106,44 @@ class App extends Application.Main {
     initVars: Interfaces.InitVars;
     error: string;
     password: string;
+    tabs: any = {};
 
     constructor( config: Application.AppConfig ) {
         super(config);
 
         // Articles
         this.registerArticle( new AddressBookTab() );
+        this.registerArticle( new CloudKeysTab() );
+        this.registerArticle( new PrivateKeyTab() );
 
         // Router
         this.router();
     }
 
     router(): void {
-        Path.map("#/ab").to(() => {
-            this.loadArticle('addressBook');
-        });
+        Path.map("#/ab").to(() => { this.loadArticle('addressBook') });
+        Path.map("#/ck").to(() => { this.loadArticle('cloudKeys') });
+        Path.map("#/pk").to(() => { this.loadArticle('privateKey') });
+    }
+
+    activateTab(name: string): void {
+        var elements: HTMLCollection,
+            i: number;
+
+        elements = document.getElementById('tabs').children;
+        for (i = 0; i < elements.length; i++) {
+            var li: Element, 
+                a: Element;
+
+            li = elements[i];
+            a = (<HTMLElement>li).children[0];
+            a.className = a.getAttribute('rel') == name ? "active" : "";
+        }
+    }
+
+    loadArticle(articleId: string, onBindArgs?: any): void {
+        super.loadArticle(articleId, onBindArgs);
+        this.activateTab(articleId);
     }
 
     enterPassword(e: KeyboardEvent): void {

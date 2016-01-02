@@ -27,10 +27,10 @@
 
     <div id="main" rv-show="initVars.isDecrypted">
       <div class="menu">
-          <ul>
-            <li><a rv-class-active="currentArticle" href="#/ab">Address Book</a></li>
-            <li><a href="#/ck">Cloud Keys</a></li>
-            <li><a href="#/pk">Private Key</a></li>
+          <ul id="tabs">
+            <li><a rel="addressBook" href="#/ab">Address Book</a></li>
+            <li><a rel="cloudKeys"   href="#/ck">Cloud Keys</a></li>
+            <li><a rel="privateKey"  href="#/pk">Private Key</a></li>
           </ul>
       </div>      
       <div id="article">
