@@ -15,6 +15,15 @@
 @activeTabBg: @base;
 @activeTabFg: #333;
 
+@mainWidth: 360px;
+@mainHeight: 300px;
+@menuHeight: 30px;
+
+@borderSize: 2px;
+@border: @borderSize solid #73603D;
+@articlePadding: 10px;
+@articleHeight: @mainHeight - @menuHeight - @articlePadding * 2 - @borderSize;
+
 
 html,body {
   margin: 0;
@@ -39,7 +48,7 @@ html,body {
     font-size: 150%;
     padding: 5px;
     border: 2px solid @pwdInputBorder;
-    width: 75%;
+    width: ;
   }
 
   .error {
@@ -57,15 +66,15 @@ html,body {
 }
 
 #main {
-  width: 360px;
-  height: 300px;
+  width: @mainWidth;
+  height: @mainHeight;
   display: block;
   background-color: @base;
 
   .menu {
     background-color: #fff;
-    height: 30px;
-    line-height: 30px;
+    height: @menuHeight;
+    line-height: @menuHeight;
     ul {
       margin: 0;
       padding: 0;
@@ -82,7 +91,7 @@ html,body {
         color: @tabFg;
         background-color: @tabBg;
         padding: 0 15px;
-        margin-right: 5px;
+        margin-right: 3px;
         border-top-left-radius: 10px;
         border-top-right-radius: 10px;
         font-weight: bold;
@@ -94,44 +103,54 @@ html,body {
         &.active  {
           background: @activeTabBg;
           color: @activeTabFg;
+          border: @border;
+          border-bottom: none;
         }
       }
     }
   }
-  
 
-  article {
-    padding: 5px;
+}
+
+article {
+  padding: @articlePadding;
+  border: @border;
+  height: @articleHeight;
+}
+
+#address-book {
+
+  label {
+    display: block;
+
   }
 
-  #address-book {
+  .filter {
+    font-size: 120%;
+    margin-bottom: 3px;
+    color: #00a;
+    font-weight: bold;
+    border: 1px solid #666;
+  }
 
-
-    .filter {
-      margin-bottom: 3px;
-      color: #00a;
-      font-weight: bold;
+  ul {
+    margin: 5px 0;
+    padding: 0;
+    input[type="checkbox"] {
+      cursor: pointer;
     }
-
-    ul {
-      margin: 5px 0;
-      padding: 0;
-      input[type="checkbox"] {
-        cursor: pointer;
-      }
-      li {
-        padding: 2px 0;
-        list-style-type: none;
-        cursor: pointer;
-        &:hover {
-          background-color: #3b8bba;
-          color: #fff;
-        }
+    li {
+      padding: 2px 0;
+      list-style-type: none;
+      cursor: pointer;
+      &:hover {
+        background-color: #3b8bba;
+        color: #fff;
       }
     }
   }
+}
 
   button {
     font-weight: bold;
   }
-}
