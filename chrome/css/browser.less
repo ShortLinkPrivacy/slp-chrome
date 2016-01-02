@@ -1,9 +1,13 @@
 
+// Password
 @pwdBg: #002F2F;
-@pwdInputBorder: #FFB03B;
+@pwdInputBorder: #000;
 @pwdErrorBg: #8E2800;
 @pwdErrorFg: #FFF0A5;
+@pwdBoxWidth: 300px;
+@pwdBoxHeight: 125px;
 
+// Main
 @base: #EFECCA;
 @tabBg: #A7A37E;
 @tabFg: #333;
@@ -17,31 +21,37 @@ html,body {
   padding: 0;
 }
 
-#error {
-  background-color: @pwdErrorBg;
-  color: @pwdErrorFg;
-  padding: 3px;
-  font-weight: bold;
-  text-align: center;
-}
-
 #password {
   background-color: @pwdBg;
-  width: 300px;
-  height: 100px;
-  display: table-cell;
+  width: @pwdBoxWidth;
+  height: @pwdBoxHeight;
   text-align: center;
-  vertical-align: middle;
 
-  button {
-    font-size: 90%;
-    margin-top: 6px;
+  .center {
+    display: table-cell;
+    width: @pwdBoxWidth;
+    height: @pwdBoxHeight;
+    text-align: center;
+    vertical-align: middle;
   }
 
   input {
     font-size: 150%;
     padding: 5px;
     border: 2px solid @pwdInputBorder;
+    width: 75%;
+  }
+
+  .error {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: @pwdBoxWidth;
+    background-color: @pwdErrorBg;
+    color: @pwdErrorFg;
+    padding: 3px;
+    font-weight: bold;
+    text-align: center;
   }
 
 }
