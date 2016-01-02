@@ -152,7 +152,11 @@ class App extends Application.Main {
     }
 
     enterPassword(e: KeyboardEvent): void {
-        if ( e.keyCode != 13 ) return;
+        if ( e.keyCode != 13 ) { 
+            this.error = "";
+            return;
+        }
+
         if ( this.password ) {
             chrome.runtime.sendMessage({ command: 'unlock', password: this.password }, (result) => {
                 if ( result.success ) {
