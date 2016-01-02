@@ -126,6 +126,9 @@ class App extends Application.Main {
         Path.map("#/pk").to(() => { this.loadArticle('privateKey') });
     }
 
+    // Use the DOM API to manipulate the tabs. Why not rivets?  Because
+    // rivets doesn't allow for calculation within the HTML, so stuff
+    // like rv-class-active="currentTab == 'blah'" doesn't fly.
     activateTab(name: string): void {
         var elements: HTMLCollection,
             i: number;
@@ -141,6 +144,8 @@ class App extends Application.Main {
         }
     }
 
+    // Overload the parent loadArticle, so we can also activate the tab
+    // for that article.
     loadArticle(articleId: string, onBindArgs?: any): void {
         super.loadArticle(articleId, onBindArgs);
         this.activateTab(articleId);
@@ -191,8 +196,7 @@ class App extends Application.Main {
 
 window.onload = function() {
     app = window["app"] = new App({
-        element: document.getElementById('article'),
-        path: "src/templates/background",
+        path: "src/templates/browser",
         keyStore: new KeyStore.LocalStore(config),
         messageStore: new MessageStore.RemoteService(config.messageStore.localHost)
     });
