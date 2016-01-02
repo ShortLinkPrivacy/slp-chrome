@@ -24,6 +24,10 @@
 @articlePadding: 10px;
 @articleHeight: @mainHeight - @menuHeight - @articlePadding * 2 - @borderSize;
 
+@ulBg: #73603D;
+@ulFg: #fff;
+@ulBorder: #000;
+
 
 html,body {
   margin: 0;
@@ -120,32 +124,34 @@ article {
 
 #address-book {
 
-  label {
-    display: block;
-
-  }
-
   .filter {
+    width: 98%;
+    padding: 2px;
     font-size: 120%;
     margin-bottom: 3px;
-    color: #00a;
+    color: #002F2F;
     font-weight: bold;
     border: 1px solid #666;
   }
 
   ul {
+    max-height: @articleHeight / 2;
+    overflow-y: auto;
+    overflow-x: hidden;
     margin: 5px 0;
     padding: 0;
     input[type="checkbox"] {
       cursor: pointer;
     }
     li {
-      padding: 2px 0;
+      padding: 5px;
       list-style-type: none;
       cursor: pointer;
+      border: 1px solid @base;
       &:hover {
-        background-color: #3b8bba;
-        color: #fff;
+        background-color: @ulBg;
+        color: @ulFg;
+        border: 1px solid @ulBorder;
       }
     }
   }
