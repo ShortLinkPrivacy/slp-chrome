@@ -1,9 +1,16 @@
 
-@color1: #A2CDF2;
-@color2: #6C7D8C;
-@color3: #F2F2F2;
-@color4: #000D02;
-@color5: #D94436;
+@pwdBg: #002F2F;
+@pwdInputBorder: #FFB03B;
+@pwdErrorBg: #8E2800;
+@pwdErrorFg: #FFF0A5;
+
+@base: #EFECCA;
+@tabBg: #A7A37E;
+@tabFg: #333;
+@tabHover: #E6E2AF; 
+@activeTabBg: @base;
+@activeTabFg: #333;
+
 
 html,body {
   margin: 0;
@@ -11,15 +18,15 @@ html,body {
 }
 
 #error {
-  background-color: @color5;
-  color: @color4;
+  background-color: @pwdErrorBg;
+  color: @pwdErrorFg;
   padding: 3px;
   font-weight: bold;
   text-align: center;
 }
 
 #password {
-  background-color: @color2;
+  background-color: @pwdBg;
   width: 300px;
   height: 100px;
   display: table-cell;
@@ -34,7 +41,7 @@ html,body {
   input {
     font-size: 150%;
     padding: 5px;
-    border: 2px solid @color4;
+    border: 2px solid @pwdInputBorder;
   }
 
 }
@@ -43,7 +50,7 @@ html,body {
   width: 360px;
   height: 300px;
   display: block;
-  background-color: @color3;
+  background-color: @base;
 
   .menu {
     background-color: #fff;
@@ -62,32 +69,36 @@ html,body {
       a {
         display: block;
         text-decoration: none;
-        color: @color3;
-        background-color: @color2;
+        color: @tabFg;
+        background-color: @tabBg;
         padding: 0 15px;
         margin-right: 5px;
-        border: 1px solid @color4;
-        border-bottom: none;
         border-top-left-radius: 10px;
         border-top-right-radius: 10px;
         font-weight: bold;
 
         &:hover {
-          color: @color4; 
+          color: @tabHover; 
         }
 
         &.active  {
-          background: @color3;
-          color: @color4;
+          background: @activeTabBg;
+          color: @activeTabFg;
         }
       }
     }
   }
+  
+
+  article {
+    padding: 5px;
+  }
 
   #address-book {
+
+
     .filter {
       margin-bottom: 3px;
-      width: 98%;
       color: #00a;
       font-weight: bold;
     }
