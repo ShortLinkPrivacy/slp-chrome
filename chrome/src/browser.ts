@@ -62,6 +62,10 @@ class AddressBookTab implements Application.Article {
         keyItem.selected = !keyItem.selected;
     }
 
+    canSubmit(): boolean {
+        return false;
+    }
+
     submit(e: Event) {
         var keyList: Array<string> = [],
             i: number,

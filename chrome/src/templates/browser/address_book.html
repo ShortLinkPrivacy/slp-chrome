@@ -1,9 +1,8 @@
 <div id="address-book">
-  <div class="well">
-    <input class="filter" name="filter" rv-value="filter" rv-on-keyup="doFilter" placeholder="name or email">
-  </div>
+  <label for="filter">Encrypt text for:</label>
+  <input class="filter" rv-value="filter" rv-on-keyup="doFilter" placeholder="name or email">
   <ul>
     <li rv-on-click="select" rv-each-key="foundKeys"><input type="checkbox" rv-checked="key.selected" /><span rv-text="key.name"></span></li>
   </ul>
-  <button rv-on-click="submit">encrypt</button>
+  <button rv-on-click="submit" rv-show="canSubmit">encrypt</button>
 </div>
