@@ -24,9 +24,15 @@
 @articlePadding: 10px;
 @articleHeight: @mainHeight - @menuHeight - @articlePadding * 2 - @borderSize;
 
-@ulBg: #73603D;
-@ulFg: #fff;
-@ulBorder: #000;
+// Select
+@selectBg: #73603D;
+@selectFg: #fff;
+
+// Beads
+@beadBg: #AADDDD;
+@beadFg: #000;
+@beadBorder: 1px solid #666;
+@beadWidth: 75px;
 
 
 html,body {
@@ -34,6 +40,7 @@ html,body {
   padding: 0;
 }
 
+// General error
 .error {
   position: absolute;
   top: 0px;
@@ -46,6 +53,41 @@ html,body {
   text-align: center;
 }
 
+// General button
+button {
+    font-family: inherit;
+    font-size: 120%;
+    padding: 0.5em 1em;
+    color: rgba(0, 0, 0, 0.80);
+    border: none rgba(0, 0, 0, 0); 
+    background-color: #E6E6E6;
+    text-decoration: none;
+    border-radius: 2px;
+    &:hover,
+    &:focus {
+      background-image: linear-gradient(transparent, rgba(0,0,0, 0.05) 40%, rgba(0,0,0, 0.10));
+    }
+
+    &::focus {
+      outline: 0;
+    }
+
+    background-color: rgb(0, 120, 231);
+    color: #fff;
+
+    cursor: pointer;
+
+    &[disabled] {
+      border: none;
+      background-image: none;
+      filter: alpha(opacity=40);
+      opacity: 0.40;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+}
+
+// Password screen
 #password {
   background-color: @pwdBg;
   width: @pwdBoxWidth;
@@ -66,10 +108,9 @@ html,body {
     border: 2px solid @pwdInputBorder;
     width: ;
   }
-
-
 }
 
+// Main view of the dialog
 #main {
   width: @mainWidth;
   height: @mainHeight;
@@ -114,7 +155,6 @@ html,body {
       }
     }
   }
-
 }
 
 article {
@@ -123,6 +163,7 @@ article {
   height: @articleHeight;
 }
 
+// Address book tab
 #address-book {
 
   position: relative;
@@ -164,8 +205,8 @@ article {
       padding: 5px;
       cursor: pointer;
       &:hover {
-        background-color: @ulBg;
-        color: @ulFg;
+        background-color: @selectBg;
+        color: @selectFg;
       }
     }
   }
@@ -181,53 +222,30 @@ article {
     height: @articleHeight / 5;
     overflow-y: auto;
     li {
+      position: relative;
       float: left;
       padding: 1px 2px;
       margin-right: 4px;
-      max-width: 50px;
+      width: @beadWidth;
       max-height: 15px;
       line-height: 15px;
       overflow: hidden;
-      background-color: #AADDDD; 
-      border: 1px solid #666;
+      color: @beadFg;
+      background-color: @beadBg; 
+      border: @beadBorder;
       font-variant: small-caps;
       text-transform: lowercase;
       border-radius: 5px;
+      .remove {
+        position: absolute;
+        left: @beadWidth - 5;
+        top: 0;
+        width: 5px;
+        font-variant: none;
+        font-weight: bold;
+        cursor: pointer;
+      }
     }
   }
 }
-
-button {
-    font-family: inherit;
-    font-size: 120%;
-    padding: 0.5em 1em;
-    color: rgba(0, 0, 0, 0.80);
-    border: none rgba(0, 0, 0, 0); 
-    background-color: #E6E6E6;
-    text-decoration: none;
-    border-radius: 2px;
-    &:hover,
-    &:focus {
-      background-image: linear-gradient(transparent, rgba(0,0,0, 0.05) 40%, rgba(0,0,0, 0.10));
-    }
-
-    &::focus {
-      outline: 0;
-    }
-
-    background-color: rgb(0, 120, 231);
-    color: #fff;
-
-    cursor: pointer;
-
-    &[disabled] {
-      border: none;
-      background-image: none;
-      filter: alpha(opacity=40);
-      opacity: 0.40;
-      cursor: not-allowed;
-      box-shadow: none;
-    }
-}
-
 

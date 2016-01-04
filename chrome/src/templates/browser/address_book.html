@@ -2,13 +2,13 @@
   <div class="error" rv-show="error">{ error }</div>
   <label for="filter">Search address book:</label>
   <input class="filter" rv-value="filter" rv-on-keyup="doFilter" placeholder="name or email">
-  <ul class="found-keys" rv-show="hasFoundKeys < triggers.found">
+  <ul class="found-keys" rv-show="hasFoundKeys < foundKeys">
     <li rv-on-click="select" rv-each-key="foundKeys"><span>{ key.getPrimaryUser }</span></li>
   </ul>
   <div class="bottom" rv-show="hasSelectedKeys < triggers.select">
     <label>Encrypt for:</label>
     <ul class="selected-keys">
-      <li rv-each-key="selectedKeys">{ key.getPrimaryUser }</li>
+      <li rv-each-key="selectedKeys">{ key.getPrimaryUser }<div class="remove" rv-on-click="remove">x</div></li>
     </ul>
     <button rv-on-click="submit">encrypt</button>
   </div>

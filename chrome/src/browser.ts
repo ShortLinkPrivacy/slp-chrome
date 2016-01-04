@@ -26,7 +26,6 @@ class AddressBookTab implements Application.Article {
     error: string;
     clearText: string;
     triggers = {
-        found: 0,
         select: 0
     };
 
@@ -35,14 +34,13 @@ class AddressBookTab implements Application.Article {
     }
 
     doFilter(): void {
-        if ( this.filter == "" || this.filter == null ) {
+        if ( !this.filter ) {
             this.foundKeys = [];
             return;
         }
 
         app.keyStore.searchPublicKey(this.filter, (keys) => {
             this.foundKeys = keys;
-            this.triggers.found++;
         });
     }
 
