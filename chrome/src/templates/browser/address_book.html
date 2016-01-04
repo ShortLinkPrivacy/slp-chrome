@@ -4,5 +4,5 @@
   <ul>
     <li rv-on-click="select" rv-each-key="foundKeys"><input type="checkbox" rv-checked="key.selected" /><span rv-text="key.name"></span></li>
   </ul>
-  <button rv-on-click="submit" rv-show="hasSelected">encrypt</button>
+  <button rv-on-click="submit" rv-show="hasSelected < triggers.select">encrypt</button>
 </div>

@@ -39,6 +39,9 @@ class AddressBookTab implements Application.Article {
     foundKeys: Array<KeyItem> = [];
     error: string;
     clearText: string;
+    triggers = {
+        select: 0
+    };
 
     constructor() {
         this.filter = ""; // TODO - last used
@@ -60,6 +63,9 @@ class AddressBookTab implements Application.Article {
     select(e: Event, model: {index: number}) {
         var keyItem = this.foundKeys[model.index];
         keyItem.selected = !keyItem.selected;
+
+        // This will trigger the re-computation of 'hasSelected'
+        this.triggers.select++;
     }
 
     hasSelected(): boolean {
