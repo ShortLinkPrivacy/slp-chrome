@@ -36,7 +36,7 @@ class AddressBookTab implements Application.Article {
     filename = "address_book.html";
     articleId = "addressBook";
     filter: string;
-    foundKeys: Array<KeyItem>;
+    foundKeys: Array<KeyItem> = [];
     error: string;
     clearText: string;
 
@@ -62,7 +62,11 @@ class AddressBookTab implements Application.Article {
         keyItem.selected = !keyItem.selected;
     }
 
-    canSubmit(): boolean {
+    hasSelected(): boolean {
+        var i: number;
+        for (i = 0; i < this.foundKeys.length; i++) {
+            if ( this.foundKeys[i].selected ) return true;
+        }
         return false;
     }
 
