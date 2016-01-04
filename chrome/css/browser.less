@@ -32,7 +32,15 @@
 @beadBg: #AADDDD;
 @beadFg: #000;
 @beadBorder: 1px solid #666;
-@beadWidth: 75px;
+@beadWidth: 100px;
+@beadHeight: 15px;
+@beadPadding: 2px;
+@beadRadius: 5px;
+
+// Bead remove
+@beadRemoveWidth: 15px;
+@beadRemoveBg: #619090;
+@beadRemoveFg: #fff;
 
 
 html,body {
@@ -224,26 +232,40 @@ article {
     li {
       position: relative;
       float: left;
-      padding: 1px 2px;
+      padding: 0;
       margin-right: 4px;
       width: @beadWidth;
-      max-height: 15px;
-      line-height: 15px;
-      overflow: hidden;
+      height: @beadHeight;
+      line-height: @beadHeight;
       color: @beadFg;
       background-color: @beadBg; 
       border: @beadBorder;
-      font-variant: small-caps;
-      text-transform: lowercase;
-      border-radius: 5px;
+      border-radius: @beadRadius;
+      .name {
+        padding: @beadPadding;
+        line-height: @beadHeight - 2 * @beadPadding;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: clip;
+        font-variant: small-caps;
+        text-transform: lowercase;
+      }
       .remove {
         position: absolute;
-        left: @beadWidth - 5;
         top: 0;
-        width: 5px;
-        font-variant: none;
+        left: @beadWidth - @beadRemoveWidth;
+        width: @beadRemoveWidth;
         font-weight: bold;
         cursor: pointer;
+        text-align: center;
+        border-left: @beadBorder;
+        color: @beadRemoveFg;
+        background-color: @beadRemoveBg;
+        border-top-right-radius: @beadRadius;
+        border-bottom-right-radius: @beadRadius;
+        &:hover{
+          background-color: lighten(@beadRemoveBg, 10%);
+        }
       }
     }
   }

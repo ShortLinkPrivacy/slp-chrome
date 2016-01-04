@@ -8,7 +8,7 @@
   <div class="bottom" rv-show="hasSelectedKeys < triggers.select">
     <label>Encrypt for:</label>
     <ul class="selected-keys">
-      <li rv-each-key="selectedKeys">{ key.getPrimaryUser }<div class="remove" rv-on-click="remove">x</div></li>
+      <li rv-each-key="selectedKeys"><div class="name">{ key.getPrimaryUser }</div><div class="remove" rv-on-click="remove">x</div></li>
     </ul>
     <button rv-on-click="submit">encrypt</button>
   </div>
