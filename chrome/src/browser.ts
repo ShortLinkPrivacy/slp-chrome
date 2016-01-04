@@ -13,21 +13,6 @@ function sendMessageToContent(msg: any, callback?: Interfaces.ResultCallback): v
     });
 }
 
-// TODO: belongs elsewhere
-class KeyItem {
-    publicKey: Keys.PublicKey;
-    selected: boolean;
-
-    constructor(key: Keys.PublicKey) {
-        this.publicKey = key;
-        this.selected = false;
-    }
-
-    name(): string {
-        return this.publicKey.getPrimaryUser();
-    }
-}
-
 /*
  * Address Book tab controller
  */
@@ -36,10 +21,12 @@ class AddressBookTab implements Application.Article {
     filename = "address_book.html";
     articleId = "addressBook";
     filter: string;
-    foundKeys: Array<KeyItem> = [];
+    foundKeys: Array<Keys.PublicKey> = [];
+    selectedKeys: Array<Keys.PublicKey> = [];
     error: string;
     clearText: string;
     triggers = {
+        found: 0,
         select: 0
     };
 
@@ -54,42 +41,50 @@ class AddressBookTab implements Application.Article {
         }
 
         app.keyStore.searchPublicKey(this.filter, (keys) => {
-            this.foundKeys = keys.map((k) => {
-                return new KeyItem(k);
-            })
+            this.foundKeys = keys;
+            this.triggers.found++;
         });
     }
 
-    select(e: Event, model: {index: number}) {
-        var keyItem = this.foundKeys[model.index];
-        keyItem.selected = !keyItem.selected;
-
-        // This will trigger the re-computation of 'hasSelected'
-        this.triggers.select++;
+    hasSelectedKeys(): boolean {
+        return this.selectedKeys.length > 0;
     }
 
-    hasSelected(): boolean {
+    hasFoundKeys(): boolean {
+        return this.foundKeys.length > 0;
+    }
+
+    // Checks if 'key' is already in the 'selectedKeys' array
+    private isSelected(key: Keys.PublicKey): boolean {
         var i: number;
-        for (i = 0; i < this.foundKeys.length; i++) {
-            if ( this.foundKeys[i].selected ) return true;
+        for (i = 0; i < this.selectedKeys.length; i++) {
+            var testKey = this.selectedKeys[i];
+            if ( key.fingerprint() == testKey.fingerprint())
+                return true;
         }
+
         return false;
     }
 
-    submit(e: Event) {
-        var keyList: Array<string> = [],
-            i: number,
-            key: KeyItem;
-
-        if (this.foundKeys.length == 0) return;     // TODO: show tip
-
-        for (i = 0; i < this.foundKeys.length; i++) {
-            key = this.foundKeys[i];
-            if ( key.selected ) {
-                keyList.push(key.publicKey.armored())
-            }
+    select(e: Event, model: {index: number}) {
+        var key = this.foundKeys[model.index];
+        if ( !this.isSelected(key) ) {
+            this.selectedKeys.push(key);
+            this.triggers.select++; // this will trigger hasSelected
         }
+    }
 
+    submit(e: Event) {
+        var keyList: Array<string>,
+            i: number;
+
+        // This should never happen because we don't show the submit button
+        if (!this.hasSelectedKeys) return;
+
+        keyList = this.selectedKeys.map((k) => { return k.armored() })
+
+        // We can encrypt here, but we chose to delegate that to the background
+        // page, because it already has an unlocked copy of the private key.
         chrome.runtime.sendMessage({ command: 'encryptMessage', text: this.clearText, keyList: keyList }, (result) => {
             if ( result.success ) {
                 sendMessageToContent({ setElement: result.value });

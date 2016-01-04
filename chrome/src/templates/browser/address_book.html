@@ -1,8 +1,15 @@
 <div id="address-book">
-  <label for="filter">Encrypt text for:</label>
+  <div class="error" rv-show="error">{ error }</div>
+  <label for="filter">Search address book:</label>
   <input class="filter" rv-value="filter" rv-on-keyup="doFilter" placeholder="name or email">
-  <ul>
-    <li rv-on-click="select" rv-each-key="foundKeys"><input type="checkbox" rv-checked="key.selected" /><span rv-text="key.name"></span></li>
+  <ul class="found-keys" rv-show="hasFoundKeys < triggers.found">
+    <li rv-on-click="select" rv-each-key="foundKeys"><span>{ key.getPrimaryUser }</span></li>
   </ul>
-  <button rv-on-click="submit" rv-show="hasSelected < triggers.select">encrypt</button>
+  <div class="bottom" rv-show="hasSelectedKeys < triggers.select">
+    <label>Encrypt for:</label>
+    <ul class="selected-keys">
+      <li rv-each-key="selectedKeys">{ key.getPrimaryUser }</li>
+    </ul>
+    <button rv-on-click="submit">encrypt</button>
+  </div>
 </div>
