@@ -87,7 +87,7 @@ module Application {
             this.loadPage(article.filename, () => {
                 rivets.configure({
                     handler: function(target, ev, binding) {
-                        this.call(article, event, binding.view.models)
+                        this.call(article, ev, binding.view.models)
                     }
                 });
                 this.binding = rivets.bind(this.element, article);
