@@ -25,9 +25,6 @@ class AddressBookTab implements Application.Article {
     selectedKeys: Array<Keys.PublicKey> = [];
     error: string;
     clearText: string;
-    triggers = {
-        select: 0
-    };
 
     constructor() {
         this.filter = ""; // TODO - last used
@@ -68,7 +65,6 @@ class AddressBookTab implements Application.Article {
         var key = this.foundKeys[model.index];
         if ( !this.isSelected(key) ) {
             this.selectedKeys.push(key);
-            this.triggers.select++; // this will trigger hasSelected
         }
     }
 
