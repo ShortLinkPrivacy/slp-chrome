@@ -13,8 +13,9 @@ module Application {
     }
 
     export interface AppConfig {
-        keyStore: KeyStore.Interface;
-        messageStore: MessageStore.Interface;
+        keyStore?: KeyStore.Interface;
+        messageStore?: MessageStore.Interface;
+        privateKeyStore?: PrivateKeyStore.Interface;
         path?: string;
         element?: HTMLElement;
     }
