@@ -72,6 +72,10 @@ class AddressBookTab implements Application.Article {
         }
     }
 
+    remove(e: Event, model: {index: number}) {
+        this.selectedKeys.splice(model.index, 1);
+    }
+
     submit(e: Event) {
         var keyList: Array<string>,
             i: number;
@@ -185,7 +189,7 @@ class App extends Application.Main {
         // Rivets
         rivets.configure({
             handler: function(target, ev, binding) {
-                this.call(app, event, binding.view.models)
+                this.call(app, ev, binding.view.models)
             }
         });
         rivets.bind(document.body, this);
