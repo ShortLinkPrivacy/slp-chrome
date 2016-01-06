@@ -38,9 +38,9 @@ class KeyItem {
 }
 */
 
-class AddressBookTab implements Application.Article {
-    filename = "address_book.html";
-    articleId = "addressBook";
+class EncryptTab implements Application.Article {
+    filename = "encrypt.html";
+    articleId = "encrypt";
     filter: string;
     foundKeys = [];
     selectedKeys = [];
@@ -121,14 +121,25 @@ class AddressBookTab implements Application.Article {
     }
 }
 
-class CloudKeysTab implements Application.Article {
-    filename = "cloud_keys.html";
-    articleId = "cloudKeys";
+class MyKeyTab implements Application.Article {
+    filename = "mykey.html";
+    articleId = "myKey";
 }
 
-class PrivateKeyTab implements Application.Article {
-    filename = "private_key.html";
-    articleId = "privateKey";
+class ControlTab implements Application.Article {
+    filename = "control.html";
+    articleId = "control";
+}
+
+class LockTab implements Application.Article {
+    filename = "lock.html";
+    articleId = "lock";
+
+    submit(): void {
+        chrome.runtime.sendMessage({ command: 'lock' }, () => {
+            window.close();
+        });
+    }
 }
 
 /*
@@ -146,18 +157,20 @@ class App extends Application.Main {
         super(config);
 
         // Articles
-        this.registerArticle( new AddressBookTab() );
-        this.registerArticle( new CloudKeysTab() );
-        this.registerArticle( new PrivateKeyTab() );
+        this.registerArticle( new EncryptTab() );
+        this.registerArticle( new MyKeyTab() );
+        this.registerArticle( new ControlTab() );
+        this.registerArticle( new LockTab() );
 
         // Router
         this.router();
     }
 
     router(): void {
-        Path.map("#/ab").to(() => { this.loadArticle('addressBook') });
-        Path.map("#/ck").to(() => { this.loadArticle('cloudKeys') });
-        Path.map("#/pk").to(() => { this.loadArticle('privateKey') });
+        Path.map("#/a").to(() => { this.loadArticle('encrypt') });
+        Path.map("#/b").to(() => { this.loadArticle('myKey') });
+        Path.map("#/c").to(() => { this.loadArticle('control') });
+        Path.map("#/d").to(() => { this.loadArticle('lock') });
     }
 
     // Use the DOM API to manipulate the tabs. Why not rivets?  Because
@@ -225,7 +238,7 @@ class App extends Application.Main {
             chrome.runtime.sendMessage({ command: 'init' }, (result: { value: Interfaces.InitVars }) => { 
                 this.initVars = result.value; 
                 if (this.initVars.isDecrypted) {
-                    window.location.hash = "#/ab";
+                    window.location.hash = "#/a";
                 } 
             });
         });

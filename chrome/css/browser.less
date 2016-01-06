@@ -65,6 +65,7 @@ textarea:focus, input:focus{
   text-align: center;
 }
 
+
 // General button
 button {
     font-family: inherit;
@@ -99,6 +100,17 @@ button {
     }
 }
 
+.button-large {
+  font-size: 150%;
+}
+
+.middle {
+  display: table-cell;
+  width: @mainWidth;
+  text-align: center;
+  vertical-align: middle;
+}
+
 // Password screen
 #password {
   background-color: @pwdBg;
@@ -106,19 +118,19 @@ button {
   height: @pwdBoxHeight;
   text-align: center;
 
+  input {
+    font-size: 150%;
+    padding: 5px;
+    border: 2px solid @pwdInputBorder;
+    width: ;
+  }
+
   .center {
     display: table-cell;
     width: @pwdBoxWidth;
     height: @pwdBoxHeight;
     text-align: center;
     vertical-align: middle;
-  }
-
-  input {
-    font-size: 150%;
-    padding: 5px;
-    border: 2px solid @pwdInputBorder;
-    width: ;
   }
 }
 
@@ -176,9 +188,7 @@ article {
 }
 
 // Address book tab
-#address-book {
-
-  position: relative;
+#encrypt-tab {
 
   label {
     font-weight: bold;
@@ -224,14 +234,12 @@ article {
   }
 
   .bottom {
-    position: absolute;
-    height: @articleHeight / 2;
-    top: @articleHeight - @articleHeight / 2;
+    margin-top: 10px;
   }
 
   ul.selected-keys {
-    margin-bottom: 10px;
-    height: @articleHeight / 5;
+    margin-bottom: 20px;
+    max-height: @articleHeight / 5;
     overflow-y: auto;
     li {
       position: relative;

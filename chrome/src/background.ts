@@ -30,7 +30,8 @@ var dispatcher: DispatchCall = {
     encryptMessage: encryptMessage,
     decryptLink: decryptLink,
     needPassword: needPassword,
-    unlock: unlockPassword
+    unlock: unlockPassword,
+    lock: lockPassword
 };
 
 //############################################################################
@@ -190,6 +191,17 @@ function unlockPassword(request: any, sender: chrome.runtime.MessageSender, send
     success = privateKey.decrypt(privateKeyPassword); 
 
     sendResponse({ success: success });
+}
+
+//-------------------------------------------------------------------------------
+
+function lockPassword(request: any, sender: chrome.runtime.MessageSender, sendResponse: ResultCallback): void {
+    var success: boolean;
+
+    privateKeyPassword = null;
+    privateKey.lock(); 
+
+    sendResponse({ success: true });
 }
 
 //############################################################################

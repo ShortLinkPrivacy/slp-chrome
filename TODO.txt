@@ -1,4 +1,4 @@
-iframe tabs
+browser
 ==================================
 [Public Keys]
 - Order keys by most used and show the last ones used.
@@ -6,21 +6,17 @@ iframe tabs
 [Private Key]
 - Send private key as a link. Save the link in localStore, so it can be reused next time.
 
-[Unlock Private Key (full screen tab)]
-
 
 content
 ==================================
 - Provide a key shortcut to auto-encrypt current text with the last public key (or combination of public keys).
-- Ask for password. When codes are detected, open a dialog to ask to unlock the private key. The dialog should have a "remember for 24 hours" checkbox. It should also have an OK and Cancel buttons. If the user has not set up a public key, the dialog should nag about setting up one.
 - Unify the way [PGP MESSAGE:1234] is displayed. Maybe move it in a method in messageStore
 - Recognize public key links and transform them into a clickable item. When clicked, import into the address book and show an info notif.
 - Once a text area has been encrypted, mark it as such, so it can not be double-encrypted.
+- Once the password is locked, restore all tabs' decrypted texts back to links
 
 background
 ==================================
-- Add a giand ON/OFF button to start/stop decrypting. OFF should forget the private key password.
-- Link to Settings.
 
 settings
 ====================================
@@ -38,4 +34,3 @@ API
 
 Development
 ====================================
-- Create a util module and use it (for functions like sentMessageToContent) ??? (not needed ???)

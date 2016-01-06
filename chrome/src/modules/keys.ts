@@ -19,11 +19,15 @@ module Keys {
         key: openpgp.key.Key;
 
         constructor(armoredText: string) {
-            var result: openpgp.key.KeyResult;
-
             if (!armoredText) {
                 throw new KeyError('missing');
             }
+
+            this.key = this.fromArmored(armoredText);
+        }
+
+        fromArmored(armoredText: string): openpgp.key.Key {
+            var result: openpgp.key.KeyResult;
 
             result = openpgp.key.readArmored(armoredText);
 
@@ -35,8 +39,7 @@ module Keys {
                 throw new KeyError('error', 'unknown');
             }
 
-            this.key = result.keys[0];
-
+            return result.keys[0];
         }
 
         fingerprint(): string {
@@ -87,6 +90,11 @@ module Keys {
 
         decrypt(password: string): boolean {
             return this._isDecrypted = this.key.decrypt(password);
+        }
+
+        lock(): void {
+            this.key = this.fromArmored(this.armored());
+            this._isDecrypted = false;
         }
 
         isDecrypted(): boolean {
