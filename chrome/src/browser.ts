@@ -17,12 +17,33 @@ function sendMessageToContent(msg: any, callback?: Interfaces.ResultCallback): v
  * Address Book tab controller
  */
 
+function KeyItem(k) {
+  this.key = k;
+  this.getPrimaryUser = function() {
+    return this.key.getPrimaryUser()
+  }
+}
+
+/*
+class KeyItem {
+    key: Keys.PublicKey;
+
+    constructor(key: Keys.PublicKey) {
+        this.key = key;
+    }
+
+    getPrimaryUser(): string {
+        return this.key.getPrimaryUser();
+    }
+}
+*/
+
 class AddressBookTab implements Application.Article {
     filename = "address_book.html";
     articleId = "addressBook";
     filter: string;
-    foundKeys: Array<Keys.PublicKey> = [];
-    selectedKeys: Array<Keys.PublicKey> = [];
+    foundKeys = [];
+    selectedKeys = [];
     error: string;
     clearText: string;
 
@@ -37,7 +58,7 @@ class AddressBookTab implements Application.Article {
         }
 
         app.keyStore.searchPublicKey(this.filter, (keys) => {
-            this.foundKeys = keys;
+            this.foundKeys = keys.map( k => { return new KeyItem(k) } );
         });
     }
 
@@ -50,11 +71,11 @@ class AddressBookTab implements Application.Article {
     }
 
     // Checks if 'key' is already in the 'selectedKeys' array
-    private isSelected(key: Keys.PublicKey): boolean {
+    private isSelected(item): boolean {
         var i: number;
         for (i = 0; i < this.selectedKeys.length; i++) {
-            var testKey = this.selectedKeys[i];
-            if ( key.fingerprint() == testKey.fingerprint())
+            var testItem = this.selectedKeys[i];
+            if ( item.key.fingerprint() == testItem.key.fingerprint())
                 return true;
         }
 
@@ -62,9 +83,9 @@ class AddressBookTab implements Application.Article {
     }
 
     select(e: Event, model: {index: number}) {
-        var key = this.foundKeys[model.index];
-        if ( !this.isSelected(key) ) {
-            this.selectedKeys.push(key);
+        var item = this.foundKeys[model.index];
+        if ( !this.isSelected(item) ) {
+            this.selectedKeys.push(item);
         }
     }
 
@@ -79,7 +100,7 @@ class AddressBookTab implements Application.Article {
         // This should never happen because we don't show the submit button
         if (!this.hasSelectedKeys) return;
 
-        keyList = this.selectedKeys.map((k) => { return k.armored() })
+        keyList = this.selectedKeys.map((item) => { return item.key.armored() })
 
         // We can encrypt here, but we chose to delegate that to the background
         // page, because it already has an unlocked copy of the private key.
@@ -208,8 +229,7 @@ class App extends Application.Main {
 window.onload = function() {
     app = window["app"] = new App({
         path: "src/templates/browser",
-        keyStore: new KeyStore.LocalStore(config),
-        messageStore: new MessageStore.RemoteService(config.messageStore.localHost)
+        keyStore: new KeyStore.LocalStore(config)
     });
 
     app.run();
