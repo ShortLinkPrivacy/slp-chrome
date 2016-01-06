@@ -31,7 +31,8 @@ var dispatcher: DispatchCall = {
     decryptLink: decryptLink,
     needPassword: needPassword,
     unlock: unlockPassword,
-    lock: lockPassword
+    lock: lockPassword,
+    encryptKey: encryptKey
 };
 
 //############################################################################
@@ -126,8 +127,6 @@ function decryptLink(request: any, sender: chrome.runtime.MessageSender, sendRes
     });
 }
 
-//----------------------------------------------------------------------------
-
 function encryptMessage(request: any, sender: chrome.runtime.MessageSender, sendResponse: ResultCallback): void {
     var keyList: Array<openpgp.key.Key> = [],
         i: number;
@@ -164,8 +163,6 @@ function encryptMessage(request: any, sender: chrome.runtime.MessageSender, send
         });
 }
 
-//----------------------------------------------------------------------------
-
 function initVars(request: any, sender: chrome.runtime.MessageSender, sendResponse: ResultCallback): void {
     sendResponse({
         success: true,
@@ -176,13 +173,9 @@ function initVars(request: any, sender: chrome.runtime.MessageSender, sendRespon
     });
 }
 
-//----------------------------------------------------------------------------
-
 function needPassword(request: any, sender: chrome.runtime.MessageSender, sendResponse: ResultCallback): void {
     chrome.browserAction.setBadgeText({text: '*'});
 }
-
-//-------------------------------------------------------------------------------
 
 function unlockPassword(request: any, sender: chrome.runtime.MessageSender, sendResponse: ResultCallback): void {
     var success: boolean;
@@ -193,15 +186,36 @@ function unlockPassword(request: any, sender: chrome.runtime.MessageSender, send
     sendResponse({ success: success });
 }
 
-//-------------------------------------------------------------------------------
-
 function lockPassword(request: any, sender: chrome.runtime.MessageSender, sendResponse: ResultCallback): void {
     var success: boolean;
 
     privateKeyPassword = null;
     privateKey.lock(); 
 
+    // TODO: broadcast to all tabs to hide messages
+
     sendResponse({ success: true });
+}
+
+function encryptKey(request: any, sender: chrome.runtime.MessageSender, sendResponse: ResultCallback): void {
+    var armoredText: string;
+
+    // TODO: cache this link in the settings
+    armoredText = privateKey.toPublic().armored();
+
+    messageStore.save(armoredText, (result) => {
+        if ( result.success ) {
+            sendResponse({
+                success: true,
+                value: messageStore.getURL(result.id)
+            });
+        } else {
+            sendResponse({ 
+                success: false, 
+                error: result.error 
+            });
+        }
+    });
 }
 
 //############################################################################

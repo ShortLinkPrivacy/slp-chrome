@@ -44,7 +44,6 @@ class EncryptTab implements Application.Article {
     filter: string;
     foundKeys = [];
     selectedKeys = [];
-    error: string;
     clearText: string;
 
     constructor() {
@@ -115,7 +114,7 @@ class EncryptTab implements Application.Article {
                 sendMessageToContent({ setElement: result.value });
                 window.close();
             } else {
-                this.error = result.error;
+                app.error = result.error;
             }
         })
     }
@@ -124,6 +123,18 @@ class EncryptTab implements Application.Article {
 class MyKeyTab implements Application.Article {
     filename = "mykey.html";
     articleId = "myKey";
+    publicKey: string;
+
+    submit(): void {
+        chrome.runtime.sendMessage({ command: 'encryptKey' }, (result) => {
+            if ( result.success ) {
+                sendMessageToContent({ setElement: result.value });
+                window.close();
+            } else {
+                app.error = result.error;
+            }
+        })
+    }
 }
 
 class ControlTab implements Application.Article {

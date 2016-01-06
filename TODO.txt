@@ -6,6 +6,11 @@ browser
 [Private Key]
 - Send private key as a link. Save the link in localStore, so it can be reused next time.
 
+[My Key]
+- Disable if no text area is active
+- Add more text
+
+
 
 content
 ==================================
@@ -17,6 +22,7 @@ content
 
 background
 ==================================
+- cache the public key link in the settings and reuse it
 
 settings
 ====================================
