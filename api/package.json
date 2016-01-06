@@ -6,13 +6,13 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "body-parser": "*",
-    "config": "*",
-    "express": "*",
-    "kerberos": "*",
-    "log4js": "*",
-    "mongodb": "*",
-    "mongoskin": "*"
+    "body-parser": "^1.14.2",
+    "config": "^1.17.1",
+    "express": "^4.13.3",
+    "kerberos": "0.0.17",
+    "log4js": "^0.6.29",
+    "mongodb": "2.0.*",
+    "mongoskin": "^2.0.3"
   },
   "devDependencies": {
     "mocha": "*",

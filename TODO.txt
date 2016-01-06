@@ -35,6 +35,7 @@ installation
 
 API
 ====================================
+- Remove dependency on mongoskin, so you can use the latest mongo driver
 - Reject payload bigger than X bytes (so idiots don't overload your storage)
 
 
