@@ -51,6 +51,12 @@ class AddressBookTab implements Application.Article {
         this.filter = ""; // TODO - last used
     }
 
+    onBind(): void {
+        sendMessageToContent({ getElement: true }, (value) => {
+            this.clearText = value;
+        });
+    }
+
     doFilter(): void {
         if ( !this.filter ) {
             this.foundKeys = [];
@@ -100,7 +106,7 @@ class AddressBookTab implements Application.Article {
         // This should never happen because we don't show the submit button
         if (!this.hasSelectedKeys) return;
 
-        keyList = this.selectedKeys.map((item) => { return item.key.armored() })
+        keyList = this.selectedKeys.map(item => { return item.key.armored() })
 
         // We can encrypt here, but we chose to delegate that to the background
         // page, because it already has an unlocked copy of the private key.
@@ -220,7 +226,7 @@ class App extends Application.Main {
                 this.initVars = result.value; 
                 if (this.initVars.isDecrypted) {
                     window.location.hash = "#/ab";
-                }
+                } 
             });
         });
     }
