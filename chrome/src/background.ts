@@ -7,7 +7,7 @@ var config = new Config(),
 
 // Private key
 var privateKey: Keys.PrivateKey,
-    privateKeyPassword: string = "Password-123"; // XXX
+    privateKeyPassword: string;
 
 //############################################################################
 

@@ -7,9 +7,10 @@ var init: Interfaces.InitVars;
 // Observer for newly created elements
 var observer: MutationObserver;
 
+// Classes and attributes to add to decrypted nodes
+var pgpClassName = '__pgp',         // The class name to add to dectypted nodes
+    pgpData = '__pgp_data';         // Propery to add to nodes with the original content
 
-// The class name to use to mark nodes as decrypted
-var pgpClassName = '__pgp';
 
 function decodeText(codedText: string, callback: { (decodedText): void }): void {
     var re = new RegExp(init.linkRe),
@@ -27,7 +28,7 @@ function decodeText(codedText: string, callback: { (decodedText): void }): void 
 
     chrome.runtime.sendMessage({ command: "decryptLink", url: url }, (result) => {
         if ( result.success ) {
-            codedText = codedText.replace(url, "<span class='" + pgpClassName + "' rel=" + messageId + ">" + result.value + "</span>");
+            codedText = codedText.replace(url, result.value);
         } else {
             codedText = codedText.replace(url, "[PGP MESSAGE:" + messageId + "]"); // TODO: add link
         }
@@ -38,16 +39,19 @@ function decodeText(codedText: string, callback: { (decodedText): void }): void 
 function decodeNode(node: Node): void {
     decodeText( node.nodeValue, (newValue) => {
         if ( newValue != node.nodeValue ) {
+            var parentEl = node.parentElement;
 
             // Remove links (some sites hotlink URLs)
-            if ( node.parentElement.tagName == "A" ) {
-                var el = document.createElement('span');
-                el.innerHTML = newValue;
-                node.parentElement.parentElement.appendChild(el);
-                node.parentElement.remove();
-            } else {
-                node.parentElement.innerHTML = newValue;
+            if ( parentEl.tagName == 'A' ) {
+                parentEl = parentEl.parentElement;
             }
+
+            // Save the current value of the element and give it a new class
+            parentEl.attributes[pgpData] = parentEl.innerHTML; 
+            parentEl.classList.add(pgpClassName);
+
+            // Set the new value
+            parentEl.innerHTML = newValue;
         }
     });
 }
@@ -86,6 +90,8 @@ function eventObserver(): void {
     observer.observe(document, { childList: true, subtree: true });
 }
 
+// Retrieves variables indicating the status of the background page, such as
+// 'isDecrypted' (the private key) and others.
 function getInitVars(callback: Interfaces.Callback): void {
     chrome.runtime.sendMessage({command: 'init'}, (result) => {
         init = result.value;
@@ -98,7 +104,7 @@ function listenToMessages() {
 
     // The name of the flag that we will use in the text area element to
     // signal that it has been encrypted.
-    var _crypted = '_pgp_crypt';
+    var _crypted = '__pgp_crypted';
 
 
     // The handler function to be added oninput to each encrypted element.
@@ -107,14 +113,13 @@ function listenToMessages() {
         e.target[_crypted] = false;
     };
 
-
     chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-        var el: HTMLTextAreaElement;
 
         // Get the active element. It should be analyzed by the caller.
         // ------------------------------------------------------------
         if ( msg.getElement ) {
-            el = <HTMLTextAreaElement>document.activeElement;
+            var el = <HTMLTextAreaElement>document.activeElement;
+
             sendResponse({
                 tagName: el.tagName,
                 value: el.value,
@@ -125,7 +130,7 @@ function listenToMessages() {
         // Set the active element and mark it as encrypted
         // ------------------------------------------------------------
         else if ( msg.setElement ) {
-            el = <HTMLTextAreaElement>document.activeElement;
+            var el = <HTMLTextAreaElement>document.activeElement;
 
             if ( el.tagName == 'TEXTAREA' ) {
                 el.value = msg.setElement;
@@ -148,16 +153,30 @@ function listenToMessages() {
             getInitVars(() => { traverseNodes(document.body) });
         }
 
-        // Return all nodes to their cryptic urls
+        // Return all decrypted nodes to their original values
         // ------------------------------------------------------------
         else if ( msg.lock ) {
-            var els = document.getElementsByClassName(pgpClassName);
-            var i: number;
-            for (i = 0; i < els.length; i++) {
-                var e = <HTMLElement>els[i];
-                var id = e.getAttribute('rel');
-                e.innerHTML = "http://localhost:8080/x/" + id;
-            }
+            var els = document.getElementsByClassName(pgpClassName),
+                i: number,
+                parentEl: HTMLElement,
+                orgValue: string;
+
+            observer.disconnect()
+            getInitVars(() => {
+                // getElementsByClassName returns a live collection, which will
+                // change as the collection criteria changes. This is why we
+                // remove the class names in reverse
+                for (i = els.length - 1; i >= 0; i--) {
+                    parentEl = <HTMLElement>els[i];
+                    parentEl.classList.remove(pgpClassName);
+                    if ( orgValue = parentEl.attributes[pgpData] ) {
+                        parentEl.innerHTML = orgValue;
+                        delete parentEl.attributes[pgpData];
+                    }
+                }
+                observer.observe(document, { childList: true, subtree: true });
+            });
+
         }
     });
 }
