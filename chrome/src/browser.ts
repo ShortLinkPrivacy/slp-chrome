@@ -48,11 +48,11 @@ class EncryptTab implements Application.Article {
 
     constructor() {
         this.filter = ""; // TODO - last used
-    }
 
-    onBind(): void {
-        sendMessageToContent({ getElement: true }, (value) => {
-            this.clearText = value;
+        sendMessageToContent({ getElement: true }, (el: HTMLTextAreaElement) => {
+            if ( el.tagName == 'TEXTAREA' ) {
+                this.clearText = el.value;
+            }
         });
     }
 
@@ -193,7 +193,7 @@ class App extends Application.Main {
 
         elements = document.getElementById('tabs').children;
         for (i = 0; i < elements.length; i++) {
-            var li: Element, 
+            var li: Element,
                 a: Element;
 
             li = elements[i];
@@ -210,7 +210,7 @@ class App extends Application.Main {
     }
 
     enterPassword(e: KeyboardEvent): void {
-        if ( e.keyCode != 13 ) { 
+        if ( e.keyCode != 13 ) {
             this.error = "";
             return;
         }
@@ -246,11 +246,11 @@ class App extends Application.Main {
 
         // Call background for init
         this.keyStore.initialize(() => {
-            chrome.runtime.sendMessage({ command: 'init' }, (result: { value: Interfaces.InitVars }) => { 
-                this.initVars = result.value; 
+            chrome.runtime.sendMessage({ command: 'init' }, (result: { value: Interfaces.InitVars }) => {
+                this.initVars = result.value;
                 if (this.initVars.isDecrypted) {
                     window.location.hash = "#/a";
-                } 
+                }
             });
         });
     }

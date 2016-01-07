@@ -93,13 +93,13 @@ function listenToMessages() {
     chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         var el: HTMLTextAreaElement;
 
-        // Get the active element value. If the element is a TEXTAREA, then
-        // return its value. Otherwise returns null.
+        // Get the active element. It should be analyzed by the caller.
         if ( msg.getElement ) {
-            var value;
             el = <HTMLTextAreaElement>document.activeElement;
-            if ( el.tagName == 'TEXTAREA' ) value = el.value || "";
-            sendResponse(value);
+            sendResponse({
+                tagName: el.tagName,
+                value: el.value,
+            });
         }
 
         // Encrypt the current textarea
