@@ -1,23 +1,26 @@
 <div id="encrypt-tab">
-  <div rv-show="clearText">
-    <div class="error" rv-show="error">{ error }</div>
-    <label for="filter">Search address book:</label>
-    <input class="filter" rv-value="filter" rv-on-keyup="doFilter" placeholder="name or email">
-    <ul class="found-keys" rv-show="hasFoundKeys < foundKeys">
-      <li rv-on-click="select" rv-each-key="foundKeys"><span>{ key.getPrimaryUser }</span></li>
-    </ul>
-    <div class="bottom" rv-show="hasSelectedKeys < selectedKeys">
-      <label>Encrypt for:</label>
-      <ul class="selected-keys">
-        <li rv-each-key="selectedKeys"><div class="name">{ key.getPrimaryUser }</div><div class="remove" rv-on-click="remove">x</div></li>
+  <div rv-hide="alreadyEncrypted">
+    <div rv-show="clearText">
+      <div class="error" rv-show="error">{ error }</div>
+      <label for="filter">Search address book:</label>
+      <input class="filter" rv-value="filter" rv-on-keyup="doFilter" placeholder="name or email">
+      <ul class="found-keys" rv-show="hasFoundKeys < foundKeys">
+        <li rv-on-click="select" rv-each-key="foundKeys"><span>{ key.getPrimaryUser }</span></li>
       </ul>
-      <button rv-on-click="submit">encrypt</button>
+      <div class="bottom" rv-show="hasSelectedKeys < selectedKeys">
+        <label>Encrypt for:</label>
+        <ul class="selected-keys">
+          <li rv-each-key="selectedKeys"><div class="name">{ key.getPrimaryUser }</div><div class="remove" rv-on-click="remove">x</div></li>
+        </ul>
+        <button rv-on-click="submit">encrypt</button>
+      </div>
+    </div>
+    <div rv-hide="clearText">
+      Type your message in a text area in the page, then open this dialog again
+      for encryption options.
     </div>
   </div>
-  <div rv-hide="clearText">
-    To encrypt a message for someone, close this widget and type your message
-    in a text area in the page.  When you're done typing, activate this dialog
-    again and you'll be presented with a form to choose for who to encrypt your
-    message.
+  <div rv-show="alreadyEncrypted">
+    This message has already been encrypted. You can send it now.
   </div>
 </div>

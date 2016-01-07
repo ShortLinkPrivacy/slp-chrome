@@ -90,24 +90,51 @@ function getInitVars(callback: Interfaces.Callback): void {
 
 // Listen for messages from the extension
 function listenToMessages() {
+
+    // The name of the flag that we will use in the text area element to
+    // signal that it has been encrypted.
+    var _crypted = '_pgp_crypt';
+
+
+    // The handler function to be added oninput to each encrypted element.
+    // It listens for changes in value and marks the element as non-encrypted.
+    var inputListener = function(e: Event) {
+        e.target[_crypted] = false;
+    };
+
+
     chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         var el: HTMLTextAreaElement;
 
         // Get the active element. It should be analyzed by the caller.
+        // ------------------------------------------------------------
         if ( msg.getElement ) {
             el = <HTMLTextAreaElement>document.activeElement;
             sendResponse({
                 tagName: el.tagName,
                 value: el.value,
+                crypted: el[_crypted]
             });
         }
 
-        // Encrypt the current textarea
+        // Set the active element and mark it as encrypted
+        // ------------------------------------------------------------
         else if ( msg.setElement ) {
             el = <HTMLTextAreaElement>document.activeElement;
-            el.value = msg.setElement;
-            el.dispatchEvent(new Event('input'));
-            el.focus();
+
+            if ( el.tagName == 'TEXTAREA' ) {
+                el.value = msg.setElement;
+                el.dispatchEvent(new Event('input'));
+                el.focus();
+
+                // Mark the element as encrypted, so it can not be double-encrypted
+                el[_crypted] = true;
+
+                // If the element value ever changes, then clear the encrypted flag.
+                // You can not double-bind the same function, so there is no need to
+                // wrap this in a condition.
+                el.addEventListener('input', inputListener);
+            }
         }
 
         else if ( msg.traverse ) {

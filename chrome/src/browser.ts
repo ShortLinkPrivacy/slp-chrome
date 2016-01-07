@@ -45,14 +45,14 @@ class EncryptTab implements Application.Article {
     foundKeys = [];
     selectedKeys = [];
     clearText: string;
+    alreadyEncrypted: boolean;
 
     constructor() {
         this.filter = ""; // TODO - last used
 
         sendMessageToContent({ getElement: true }, (el: HTMLTextAreaElement) => {
-            if ( el.tagName == 'TEXTAREA' ) {
-                this.clearText = el.value;
-            }
+            if ( this.alreadyEncrypted = el["crypted"] ) return;
+            if ( el.tagName == 'TEXTAREA' ) this.clearText = el.value;
         });
     }
 

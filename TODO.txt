@@ -10,6 +10,9 @@ browser
 - Disable if no text area is active
 - Add more text
 
+[Encrypt]
+- Add images to the "you can not encrypt now" texts
+
 
 
 content
@@ -17,7 +20,6 @@ content
 - Provide a key shortcut to auto-encrypt current text with the last public key (or combination of public keys).
 - Unify the way [PGP MESSAGE:1234] is displayed. Maybe move it in a method in messageStore
 - Recognize public key links and transform them into a clickable item. When clicked, import into the address book and show an info notif.
-- Once a text area has been encrypted, mark it as such, so it can not be double-encrypted.
 - Once the password is locked, restore all tabs' decrypted texts back to links
 
 background
