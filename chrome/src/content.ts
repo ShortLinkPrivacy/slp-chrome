@@ -7,6 +7,10 @@ var init: Interfaces.InitVars;
 // Observer for newly created elements
 var observer: MutationObserver;
 
+
+// The class name to use to mark nodes as decrypted
+var pgpClassName = '__pgp';
+
 function decodeText(codedText: string, callback: { (decodedText): void }): void {
     var re = new RegExp(init.linkRe),
         match = re.exec(codedText),
@@ -23,7 +27,7 @@ function decodeText(codedText: string, callback: { (decodedText): void }): void 
 
     chrome.runtime.sendMessage({ command: "decryptLink", url: url }, (result) => {
         if ( result.success ) {
-            codedText = codedText.replace(url, result.value);
+            codedText = codedText.replace(url, "<span class='" + pgpClassName + "' rel=" + messageId + ">" + result.value + "</span>");
         } else {
             codedText = codedText.replace(url, "[PGP MESSAGE:" + messageId + "]"); // TODO: add link
         }
@@ -34,14 +38,15 @@ function decodeText(codedText: string, callback: { (decodedText): void }): void 
 function decodeNode(node: Node): void {
     decodeText( node.nodeValue, (newValue) => {
         if ( newValue != node.nodeValue ) {
-            node.nodeValue = newValue;
 
             // Remove links (some sites hotlink URLs)
             if ( node.parentElement.tagName == "A" ) {
                 var el = document.createElement('span');
-                el.innerHTML = node.nodeValue;
+                el.innerHTML = newValue;
                 node.parentElement.parentElement.appendChild(el);
                 node.parentElement.remove();
+            } else {
+                node.parentElement.innerHTML = newValue;
             }
         }
     });
@@ -137,8 +142,22 @@ function listenToMessages() {
             }
         }
 
+        // Decrypt all nodes
+        // ------------------------------------------------------------
         else if ( msg.traverse ) {
             getInitVars(() => { traverseNodes(document.body) });
+        }
+
+        // Return all nodes to their cryptic urls
+        // ------------------------------------------------------------
+        else if ( msg.lock ) {
+            var els = document.getElementsByClassName(pgpClassName);
+            var i: number;
+            for (i = 0; i < els.length; i++) {
+                var e = <HTMLElement>els[i];
+                var id = e.getAttribute('rel');
+                e.innerHTML = "http://localhost:8080/x/" + id;
+            }
         }
     });
 }

@@ -7,7 +7,7 @@ var config = new Config(),
 
 // Private key
 var privateKey: Keys.PrivateKey,
-    privateKeyPassword: string;
+    privateKeyPassword: string = "Password-123"; // XXX
 
 //############################################################################
 
@@ -192,7 +192,11 @@ function lockPassword(request: any, sender: chrome.runtime.MessageSender, sendRe
     privateKeyPassword = null;
     privateKey.lock(); 
 
-    // TODO: broadcast to all tabs to hide messages
+    chrome.tabs.query({currentWindow: true}, (tabs) => {
+        tabs.forEach((tab) => {
+            chrome.tabs.sendMessage(tab.id, { lock: true });
+        });
+    });
 
     sendResponse({ success: true });
 }
