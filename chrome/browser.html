@@ -19,8 +19,8 @@
     <script src="src/browser.js"></script>
   </head>
   <body>
+    <div class="error" rv-if="error" rv-text="error"></div>
     <div id="password" rv-hide="initVars.isDecrypted">
-      <div class="error" rv-if="error" rv-text="error"></div>
       <div class="center">
         <input rv-value="password" rv-on-keyup="enterPassword" type="password" placeholder="private key password">
       </div>
@@ -34,7 +34,7 @@
             <li><a rel="control" href="#/c">Control</a></li>
             <li><a rel="lock"    href="#/d">Lock</a></li>
           </ul>
-      </div>      
+      </div>
       <article>
       </article>
     </div>

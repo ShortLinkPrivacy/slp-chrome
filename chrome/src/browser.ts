@@ -50,9 +50,12 @@ class EncryptTab implements Application.Article {
     constructor() {
         this.filter = ""; // TODO - last used
 
-        sendMessageToContent({ getElement: true }, (el: HTMLTextAreaElement) => {
-            if ( this.alreadyEncrypted = el["crypted"] ) return;
-            if ( el.tagName == 'TEXTAREA' ) this.clearText = el.value;
+        sendMessageToContent({ getElement: true }, (el) => {
+            var re = new RegExp(app.bg["messageStore"].getReStr());
+            if ( el ) {
+                this.alreadyEncrypted = re.exec(el.value) ? true : false;
+                if ( el.tagName == 'TEXTAREA' ) this.clearText = el.value;
+            }
         });
     }
 

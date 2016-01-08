@@ -117,12 +117,6 @@ function listenToMessages() {
     // signal that it has been encrypted.
     var _crypted = '__pgp_crypted';
 
-    // The handler function to be added oninput to each encrypted element.
-    // It listens for changes in value and marks the element as non-encrypted.
-    var inputListener = function(e: Event) {
-        $data(<HTMLElement>e.target, _crypted, null);
-    };
-
     // Set the textarea value and fire the change events
     var setElementValue = function(el: HTMLTextAreaElement, value: string): void {
         el.value = value;
@@ -130,16 +124,11 @@ function listenToMessages() {
         el.focus();
     }
 
-    // Get the active element and some metadata about it
+    // Get the active element and its value
     // ------------------------------------------------------------
     var getElement = function(msg, sendResponse) {
         var el = <HTMLTextAreaElement>document.activeElement;
-
-        sendResponse({
-            tagName: el.tagName,
-            value: el.value,
-            crypted: $data(el, _crypted) ? true : false
-        });
+        sendResponse({ tagName: el.tagName, value: el.value });
     }
 
     // Set the active element and mark it as encrypted
@@ -148,20 +137,11 @@ function listenToMessages() {
         var el = <HTMLTextAreaElement>document.activeElement;
 
         if ( el.tagName == 'TEXTAREA' ) {
-            // Save the original value of the element and mark it as encrypted.
-            // We will do two thing with this:
-            // 1) We'll be able to restore the clear text if requested.
-            // 2) We will recognize this element as encrypted and will not allow
-            //    that it gets encrypted again.
+            // Save the original value of the element so it can be restored
             $data(el, _crypted, el.value);
 
             // Set new value (encrypted url)
             setElementValue(el, msg.setElement);
-
-            // If the element value ever changes, then clear the encrypted flag.
-            // You can not double-bind the same function, so there is no need to
-            // wrap this in a condition.
-            el.addEventListener('input', inputListener);
         }
     }
 
