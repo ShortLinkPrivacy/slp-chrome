@@ -47,7 +47,7 @@ function decodeNode(node: Node): void {
             }
 
             // Save the current value of the element and give it a new class
-            parentEl.attributes[pgpData] = parentEl.innerHTML; 
+            $data(parentEl, pgpData, parentEl.innerHTML)
             parentEl.classList.add(pgpClassName);
 
             // Set the new value
@@ -99,6 +99,14 @@ function getInitVars(callback: Interfaces.Callback): void {
     });
 }
 
+function $data(el: HTMLElement, name: string, value?: any): string {
+    if ( typeof value != "undefined" ) {
+        el.attributes[name] = value;
+    }
+
+    return el.attributes[name];
+}
+
 // Listen for messages from the extension
 function listenToMessages() {
 
@@ -110,7 +118,7 @@ function listenToMessages() {
     // The handler function to be added oninput to each encrypted element.
     // It listens for changes in value and marks the element as non-encrypted.
     var inputListener = function(e: Event) {
-        e.target[_crypted] = false;
+        $data(<HTMLElement>e.target, _crypted, false);
     };
 
     chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
@@ -123,7 +131,7 @@ function listenToMessages() {
             sendResponse({
                 tagName: el.tagName,
                 value: el.value,
-                crypted: el[_crypted]
+                crypted: $data(el, _crypted)
             });
         }
 
@@ -138,7 +146,7 @@ function listenToMessages() {
                 el.focus();
 
                 // Mark the element as encrypted, so it can not be double-encrypted
-                el[_crypted] = true;
+                $data(el, _crypted, true);
 
                 // If the element value ever changes, then clear the encrypted flag.
                 // You can not double-bind the same function, so there is no need to
@@ -169,9 +177,9 @@ function listenToMessages() {
                 for (i = els.length - 1; i >= 0; i--) {
                     parentEl = <HTMLElement>els[i];
                     parentEl.classList.remove(pgpClassName);
-                    if ( orgValue = parentEl.attributes[pgpData] ) {
+                    if ( orgValue = $data(parentEl, pgpData) ) {
                         parentEl.innerHTML = orgValue;
-                        delete parentEl.attributes[pgpData];
+                        $data(parentEl, pgpData, null);
                     }
                 }
                 observer.observe(document, { childList: true, subtree: true });
