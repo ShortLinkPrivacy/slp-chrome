@@ -118,6 +118,16 @@ class EncryptTab implements Application.Article {
             }
         })
     }
+
+    restore(e: Event) {
+        sendMessageToContent({ restore: true }, (result) => {
+            if ( result.success ) {
+                window.close();
+            } else {
+                app.error = "There was an error";
+            }
+        })
+    }
 }
 
 class MyKeyTab implements Application.Article {
@@ -163,6 +173,7 @@ class App extends Application.Main {
     error: string;
     password: string;
     tabs: any = {};
+    bg = chrome.extension.getBackgroundPage();
 
     constructor( config: Application.AppConfig ) {
         super(config);

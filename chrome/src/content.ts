@@ -114,78 +114,113 @@ function listenToMessages() {
     // signal that it has been encrypted.
     var _crypted = '__pgp_crypted';
 
-
     // The handler function to be added oninput to each encrypted element.
     // It listens for changes in value and marks the element as non-encrypted.
     var inputListener = function(e: Event) {
         $data(<HTMLElement>e.target, _crypted, false);
     };
 
-    chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+    // Set the textarea value and fire the change events
+    var setElementValue = function(el: HTMLTextAreaElement, value: string): void {
+        el.value = value;
+        el.dispatchEvent(new Event('input'));
+        el.focus();
+    }
 
-        // Get the active element. It should be analyzed by the caller.
-        // ------------------------------------------------------------
-        if ( msg.getElement ) {
-            var el = <HTMLTextAreaElement>document.activeElement;
+    // Get the active element and some metadata about it
+    // ------------------------------------------------------------
+    var getElement = function(msg, sendResponse) {
+        var el = <HTMLTextAreaElement>document.activeElement;
 
-            sendResponse({
-                tagName: el.tagName,
-                value: el.value,
-                crypted: $data(el, _crypted)
-            });
+        sendResponse({
+            tagName: el.tagName,
+            value: el.value,
+            crypted: $data(el, _crypted) ? true : false
+        });
+    }
+
+    // Set the active element and mark it as encrypted
+    // ------------------------------------------------------------
+    var setElement = function(msg, sendResponse) {
+        var el = <HTMLTextAreaElement>document.activeElement;
+
+        if ( el.tagName == 'TEXTAREA' ) {
+            // Save the original value of the element and mark it as encrypted.
+            // We will do two thing with this:
+            // 1) We'll be able to restore the clear text if requested.
+            // 2) We will recognize this element as encrypted and will not allow
+            //    that it gets encrypted again.
+            $data(el, _crypted, el.value);
+
+            // Set new value (encrypted url)
+            setElementValue(el, msg.setElement);
+
+            // If the element value ever changes, then clear the encrypted flag.
+            // You can not double-bind the same function, so there is no need to
+            // wrap this in a condition.
+            el.addEventListener('input', inputListener);
         }
+    }
 
-        // Set the active element and mark it as encrypted
-        // ------------------------------------------------------------
-        else if ( msg.setElement ) {
-            var el = <HTMLTextAreaElement>document.activeElement;
+    // Restore the original text of the textarea
+    // ------------------------------------------------------------
+    var restoreElement = function(msg, sendResponse) {
+        var el = <HTMLTextAreaElement>document.activeElement,
+            orgValue: string;
 
-            if ( el.tagName == 'TEXTAREA' ) {
-                el.value = msg.setElement;
-                el.dispatchEvent(new Event('input'));
-                el.focus();
-
-                // Mark the element as encrypted, so it can not be double-encrypted
-                $data(el, _crypted, true);
-
-                // If the element value ever changes, then clear the encrypted flag.
-                // You can not double-bind the same function, so there is no need to
-                // wrap this in a condition.
-                el.addEventListener('input', inputListener);
-            }
+        orgValue = $data(el, _crypted);
+        if ( typeof orgValue != "undefined" && orgValue != null ) {
+            setElementValue(el, orgValue);
+            sendResponse({ success: true })
+        } else {
+            sendResponse({ success: false });
         }
+    }
 
-        // Decrypt all nodes
-        // ------------------------------------------------------------
-        else if ( msg.traverse ) {
-            getInitVars(() => { traverseNodes(document.body) });
-        }
+    // Return all decrypted nodes to their original values
+    // ------------------------------------------------------------
+    var lock = function(msg, sendResponse) {
+        var els = document.getElementsByClassName(pgpClassName),
+            i: number,
+            parentEl: HTMLElement,
+            orgValue: string;
 
-        // Return all decrypted nodes to their original values
-        // ------------------------------------------------------------
-        else if ( msg.lock ) {
-            var els = document.getElementsByClassName(pgpClassName),
-                i: number,
-                parentEl: HTMLElement,
-                orgValue: string;
-
-            observer.disconnect()
-            getInitVars(() => {
-                // getElementsByClassName returns a live collection, which will
-                // change as the collection criteria changes. This is why we
-                // remove the class names in reverse
-                for (i = els.length - 1; i >= 0; i--) {
-                    parentEl = <HTMLElement>els[i];
-                    parentEl.classList.remove(pgpClassName);
-                    if ( orgValue = $data(parentEl, pgpData) ) {
-                        parentEl.innerHTML = orgValue;
-                        $data(parentEl, pgpData, null);
-                    }
+        observer.disconnect()
+        getInitVars(() => {
+            // getElementsByClassName returns a live collection, which will
+            // change as the collection criteria changes. This is why we
+            // remove the class names in reverse
+            for (i = els.length - 1; i >= 0; i--) {
+                parentEl = <HTMLElement>els[i];
+                parentEl.classList.remove(pgpClassName);
+                if ( orgValue = $data(parentEl, pgpData) ) {
+                    parentEl.innerHTML = orgValue;
+                    $data(parentEl, pgpData, null);
                 }
-                observer.observe(document, { childList: true, subtree: true });
-            });
+            }
+            observer.observe(document, { childList: true, subtree: true });
+        });
+    }
 
-        }
+    // Decrypt all nodes
+    // ------------------------------------------------------------
+    var traverse = function(msg, sendResponse) {
+        getInitVars(() => { traverseNodes(document.body) });
+    }
+
+    // Message listener
+    // ============================================================
+    chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+        if ( msg.getElement )
+            getElement(msg, sendResponse)
+        else if ( msg.setElement )
+            setElement(msg, sendResponse)
+        else if ( msg.traverse )
+            traverse(msg, sendResponse)
+        else if ( msg.lock )
+            lock(msg, sendResponse)
+        else if ( msg.restore )
+            restoreElement(msg, sendResponse)
     });
 }
 

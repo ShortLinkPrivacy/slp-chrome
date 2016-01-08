@@ -20,7 +20,8 @@
       for encryption options.
     </div>
   </div>
-  <div rv-show="alreadyEncrypted">
-    This message has already been encrypted. You can send it now.
+  <div rv-show="alreadyEncrypted" class="middle">
+    <p>This message has already been encrypted. You can send it now.</p>
+    <button rv-on-click="restore">Decrypt your message</button>
   </div>
 </div>
