@@ -101,7 +101,10 @@ function getInitVars(callback: Interfaces.Callback): void {
 
 function $data(el: HTMLElement, name: string, value?: any): string {
     if ( typeof value != "undefined" ) {
-        el.attributes[name] = value;
+        if ( value == null )
+            delete el.attributes[name]
+        else
+            el.attributes[name] = value;
     }
 
     return el.attributes[name];
@@ -117,7 +120,7 @@ function listenToMessages() {
     // The handler function to be added oninput to each encrypted element.
     // It listens for changes in value and marks the element as non-encrypted.
     var inputListener = function(e: Event) {
-        $data(<HTMLElement>e.target, _crypted, false);
+        $data(<HTMLElement>e.target, _crypted, null);
     };
 
     // Set the textarea value and fire the change events
@@ -170,6 +173,7 @@ function listenToMessages() {
 
         orgValue = $data(el, _crypted);
         if ( typeof orgValue != "undefined" && orgValue != null ) {
+            $data(el, _crypted, null);
             setElementValue(el, orgValue);
             sendResponse({ success: true })
         } else {
