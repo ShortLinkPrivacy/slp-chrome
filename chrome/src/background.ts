@@ -7,8 +7,7 @@ var config = new Config(),
     keyStore: KeyStore.Interface = new KeyStore.LocalStore(config);
 
 // Private key
-var privateKey: Keys.PrivateKey,
-    privateKeyPassword: string;
+var privateKey: Keys.PrivateKey;
 
 //############################################################################
 
@@ -31,10 +30,7 @@ var dispatcher: DispatchCall = {
         sendResponse({ success: true, value: initVars() });
     },
     decryptLink: decryptLink,
-    needPassword: needPassword,
-    unlock: unlockPassword,
-    lock: lockPassword,
-    encryptKey: encryptKey
+    needPassword: needPassword
 };
 
 //############################################################################
@@ -129,7 +125,6 @@ function decryptLink(request: any, sender: chrome.runtime.MessageSender, sendRes
     });
 }
 
-
 function initVars(): Interfaces.InitVars {
     return {
         linkRe: messageStore.getReStr(),
@@ -139,51 +134,6 @@ function initVars(): Interfaces.InitVars {
 
 function needPassword(request: any, sender: chrome.runtime.MessageSender, sendResponse: ResultCallback): void {
     chrome.browserAction.setBadgeText({text: '*'});
-}
-
-function unlockPassword(request: any, sender: chrome.runtime.MessageSender, sendResponse: ResultCallback): void {
-    var success: boolean;
-
-    privateKeyPassword = request.password;
-    success = privateKey.decrypt(privateKeyPassword); 
-
-    sendResponse({ success: success });
-}
-
-function lockPassword(request: any, sender: chrome.runtime.MessageSender, sendResponse: ResultCallback): void {
-    var success: boolean;
-
-    privateKeyPassword = null;
-    privateKey.lock(); 
-
-    chrome.tabs.query({currentWindow: true}, (tabs) => {
-        tabs.forEach((tab) => {
-            chrome.tabs.sendMessage(tab.id, { lock: true });
-        });
-    });
-
-    sendResponse({ success: true });
-}
-
-function encryptKey(request: any, sender: chrome.runtime.MessageSender, sendResponse: ResultCallback): void {
-    var armoredText: string;
-
-    // TODO: cache this link in the settings
-    armoredText = privateKey.toPublic().armored();
-
-    messageStore.save(armoredText, (result) => {
-        if ( result.success ) {
-            sendResponse({
-                success: true,
-                value: messageStore.getURL(result.id)
-            });
-        } else {
-            sendResponse({ 
-                success: false, 
-                error: result.error 
-            });
-        }
-    });
 }
 
 //############################################################################

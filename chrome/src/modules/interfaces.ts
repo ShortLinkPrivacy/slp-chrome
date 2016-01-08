@@ -16,4 +16,13 @@ module Interfaces {
         isDecrypted: boolean;
     }
 
+    export interface SuccessStruct {
+        success: boolean;
+        error?: string;
+        value?: any;
+    }
+
+    export interface SuccessCallback {
+        (result: SuccessStruct): void;
+    }
 }

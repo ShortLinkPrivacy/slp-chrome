@@ -110,7 +110,7 @@ class EncryptTab implements Application.Article {
         this.selectedKeys.splice(model.index, 1);
     }
 
-    private encryptMessage(text: string, keyList: Array<openpgp.key.Key>, callback: Interfaces.ResultCallback): void {
+    private encryptMessage(text: string, keyList: Array<openpgp.key.Key>, callback: Interfaces.SuccessCallback): void {
 
         openpgp.encryptMessage( keyList, text )
             .then((armoredText) => {
@@ -173,8 +173,29 @@ class MyKeyTab implements Application.Article {
     articleId = "myKey";
     publicKey: string;
 
+    private encryptKey(sendResponse: Interfaces.SuccessCallback): void {
+        var armoredText: string;
+
+        // TODO: cache this link in the settings
+        armoredText = bg.privateKey.toPublic().armored();
+
+        bg.messageStore.save(armoredText, (result) => {
+            if ( result.success ) {
+                sendResponse({
+                    success: true,
+                    value: bg.messageStore.getURL(result.id)
+                })
+            } else {
+                sendResponse({ 
+                    success: false, 
+                    error: result.error 
+                })
+            }
+        });
+    }
+
     submit(): void {
-        chrome.runtime.sendMessage({ command: 'encryptKey' }, (result) => {
+        this.encryptKey((result) => {
             if ( result.success ) {
                 sendMessageToContent({ setElement: result.value });
                 window.close();
@@ -195,9 +216,15 @@ class LockTab implements Application.Article {
     articleId = "lock";
 
     submit(): void {
-        chrome.runtime.sendMessage({ command: 'lock' }, () => {
-            window.close();
+        bg.privateKey.lock(); 
+
+        chrome.tabs.query({currentWindow: true}, (tabs) => {
+            tabs.forEach((tab) => {
+                chrome.tabs.sendMessage(tab.id, { lock: true });
+            });
         });
+
+        window.close();
     }
 }
 
@@ -267,19 +294,17 @@ class App extends Application.Main {
         }
 
         if ( this.password ) {
-            chrome.runtime.sendMessage({ command: 'unlock', password: this.password }, (result) => {
-                if ( result.success ) {
-                    chrome.tabs.query({currentWindow: true}, (tabs) => {
-                        tabs.forEach((tab) => {
-                            chrome.tabs.sendMessage(tab.id, { traverse: true });
-                        });
+            if ( bg.privateKey.decrypt(this.password) ) {
+                chrome.tabs.query({currentWindow: true}, (tabs) => {
+                    tabs.forEach((tab) => {
+                        chrome.tabs.sendMessage(tab.id, { traverse: true });
                     });
-                    chrome.browserAction.setBadgeText({text: ""});
-                    window.close();
-                } else {
-                    this.error = "Wrong password";
-                }
-            });
+                });
+                chrome.browserAction.setBadgeText({text: ""});
+                window.close();
+            } else {
+                this.error = "Wrong password";
+            }
         }
     }
 
