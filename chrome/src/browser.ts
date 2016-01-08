@@ -10,7 +10,6 @@ interface BackgroundPage extends Window {
     messageStore: MessageStore.Interface;
     keyStore: KeyStore.Interface;
     privateKey: Keys.PrivateKey;
-    initVars: { (): Interfaces.InitVars };
 }
 
 var app: App,
@@ -234,16 +233,13 @@ class LockTab implements Application.Article {
  */
 
 class App extends Application.Main {
-    initVars: Interfaces.InitVars;
     error: string;
     password: string;
     tabs: any = {};
-    bg = chrome.extension.getBackgroundPage();
+    isDecrypted = bg.privateKey.isDecrypted();
 
     constructor( config: Application.AppConfig ) {
         super(config);
-
-        this.initVars = bg.initVars();
 
         // Articles
         this.registerArticle( new EncryptTab() );
@@ -321,7 +317,7 @@ class App extends Application.Main {
         Path.listen();
 
         // Init
-        if (this.initVars.isDecrypted) {
+        if (this.isDecrypted) {
             window.location.hash = "#/a";
         }
     }

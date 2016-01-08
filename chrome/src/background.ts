@@ -11,24 +11,12 @@ var privateKey: Keys.PrivateKey;
 
 //############################################################################
 
-interface ResultStruct {
-    success: boolean;
-    error?: string;
-    value?: any;
-}
-
-interface ResultCallback {
-    (result: ResultStruct): void;
-}
-
 interface DispatchCall {
-    [method: string]: (request: any, sender: chrome.runtime.MessageSender, sendResponse: ResultCallback) => void;
+    [method: string]: (request: any, sender: chrome.runtime.MessageSender, sendResponse: Interfaces.SuccessCallback) => void;
 }
 
 var dispatcher: DispatchCall = {
-    init: function(request, sender, sendResponse: ResultCallback) {
-        sendResponse({ success: true, value: initVars() });
-    },
+    init: initVars,
     decryptLink: decryptLink,
     needPassword: needPassword
 };
@@ -91,7 +79,17 @@ function getArmorType(text: string): ArmorType {
 
 //############################################################################
 
-function decryptLink(request: any, sender: chrome.runtime.MessageSender, sendResponse: ResultCallback): void {
+function initVars(request: any, sender: chrome.runtime.MessageSender, sendResponse: Interfaces.SuccessCallback): void {
+    sendResponse({
+        success: true,
+        value: {
+            linkRe: messageStore.getReStr(),
+            isDecrypted: privateKey.isDecrypted()
+        }
+    });
+}
+
+function decryptLink(request: any, sender: chrome.runtime.MessageSender, sendResponse: Interfaces.SuccessCallback): void {
     var re: RegExp, match: Array<string>, messageId: string;
 
     re  = new RegExp(messageStore.getReStr());
@@ -125,14 +123,7 @@ function decryptLink(request: any, sender: chrome.runtime.MessageSender, sendRes
     });
 }
 
-function initVars(): Interfaces.InitVars {
-    return {
-        linkRe: messageStore.getReStr(),
-        isDecrypted: privateKey.isDecrypted()
-    }
-}
-
-function needPassword(request: any, sender: chrome.runtime.MessageSender, sendResponse: ResultCallback): void {
+function needPassword(request: any, sender: chrome.runtime.MessageSender, sendResponse: Interfaces.SuccessCallback): void {
     chrome.browserAction.setBadgeText({text: '*'});
 }
 
