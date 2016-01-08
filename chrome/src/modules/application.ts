@@ -13,9 +13,6 @@ module Application {
     }
 
     export interface AppConfig {
-        keyStore?: KeyStore.Interface;
-        messageStore?: MessageStore.Interface;
-        privateKeyStore?: PrivateKeyStore.Interface;
         path?: string;
         element?: HTMLElement;
     }
@@ -26,14 +23,10 @@ module Application {
         articles: ArticleDict = {};
         binding: Rivets.View = null;
         currentArticle: Article;
-        keyStore: KeyStore.Interface;
-        messageStore: MessageStore.Interface;
 
         constructor( config: AppConfig ) {
             this.element = config.element || (document.getElementsByTagName('article'))[0];
             this.path = config.path || "src/templates";
-            this.keyStore = config.keyStore;
-            this.messageStore = config.messageStore;
         }
 
         private xmlGet(url: string, success: Interfaces.ResultCallback): void {

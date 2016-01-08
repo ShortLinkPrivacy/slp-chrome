@@ -27,7 +27,6 @@ module KeyStore {
     }
 
     export interface Interface {
-        initialize(callback: Interfaces.Callback): void;
         storePublicKey(key: Keys.PublicKey, callback: Interfaces.Callback): void;
         loadPublicKey(fingerprint: string, callback: PublicKeyCallback): void;
         searchPublicKey(userId: string, callback: PublicKeySearchCallback): void;

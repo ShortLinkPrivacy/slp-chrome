@@ -161,12 +161,10 @@ module Admin {
 
             // App
             this.element = $('article');
-            this.keyStore.initialize(() => {
-                this.privateKeyStore.get((key) => {
-                    this.key = key
-                    Path.listen();
-                    window.location.hash = "#/key/view";
-                });
+            this.privateKeyStore.get((key) => {
+                this.key = key
+                Path.listen();
+                window.location.hash = "#/key/view";
             });
         }
     }

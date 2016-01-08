@@ -4,8 +4,16 @@
 /// <reference path="../typings/pathjs/pathjs.d.ts" />
 /// <reference path="modules.d.ts" />
 
+interface BackgroundPage extends Window {
+    config: Config;
+    privateKeyStore: PrivateKeyStore.Interface;
+    messageStore: MessageStore.Interface;
+    keyStore: KeyStore.Interface;
+    privateKey: Keys.PrivateKey;
+}
+
 var app: App,
-    config = new Config();
+    bg: BackgroundPage = <BackgroundPage>chrome.extension.getBackgroundPage();
 
 function sendMessageToContent(msg: any, callback?: Interfaces.ResultCallback): void {
     chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
@@ -51,7 +59,7 @@ class EncryptTab implements Application.Article {
         this.filter = ""; // TODO - last used
 
         sendMessageToContent({ getElement: true }, (el) => {
-            var re = new RegExp(app.bg["messageStore"].getReStr());
+            var re = new RegExp(bg.messageStore.getReStr());
             if ( el ) {
                 this.alreadyEncrypted = re.exec(el.value) ? true : false;
                 if ( el.tagName == 'TEXTAREA' ) this.clearText = el.value;
@@ -65,7 +73,7 @@ class EncryptTab implements Application.Article {
             return;
         }
 
-        app.keyStore.searchPublicKey(this.filter, (keys) => {
+        bg.keyStore.searchPublicKey(this.filter, (keys) => {
             this.foundKeys = keys.map( k => { return new KeyItem(k) } );
         });
     }
@@ -259,21 +267,18 @@ class App extends Application.Main {
         Path.listen();
 
         // Call background for init
-        this.keyStore.initialize(() => {
-            chrome.runtime.sendMessage({ command: 'init' }, (result: { value: Interfaces.InitVars }) => {
-                this.initVars = result.value;
-                if (this.initVars.isDecrypted) {
-                    window.location.hash = "#/a";
-                }
-            });
+        chrome.runtime.sendMessage({ command: 'init' }, (result: { value: Interfaces.InitVars }) => {
+            this.initVars = result.value;
+            if (this.initVars.isDecrypted) {
+                window.location.hash = "#/a";
+            }
         });
     }
 }
 
 window.onload = function() {
     app = window["app"] = new App({
-        path: "src/templates/browser",
-        keyStore: new KeyStore.LocalStore(config)
+        path: "src/templates/browser"
     });
 
     app.run();

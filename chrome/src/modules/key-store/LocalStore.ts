@@ -18,7 +18,7 @@ module KeyStore {
     }
 
     export class LocalStore implements Interface {
-        private directory: KeyDirectory = {};
+        private directory: KeyDirectory;
         private messages: Interfaces.Dictionary = {};
         private config: LocalStoreConfig;
 
@@ -32,8 +32,13 @@ module KeyStore {
             }
         }
 
-        initialize(callback: Interfaces.Callback): void {
+        private initialize(callback: Interfaces.Callback): void {
             var d = this.config.directory;
+
+            if ( this.directory ) {
+                callback();
+                return;
+            }
 
             // Load the directory with public keys and messages
             this.config.store.get(d, (result) => {
@@ -48,20 +53,22 @@ module KeyStore {
                 k = this.config.directory,
                 setter = {};
 
-            if ( this.directory[p] ) {
-                if (callback) callback();
-                return;
-            }
+            this.initialize(() => {
+                if ( this.directory[p] ) {
+                    if (callback) callback();
+                    return;
+                }
 
-            this.directory[p] = key.userIds();
+                this.directory[p] = key.userIds();
 
-            setter[p] = key.armored();
-            setter[k] = this.directory;
+                setter[p] = key.armored();
+                setter[k] = this.directory;
 
-            this.config.store.set( setter, () => {
-                this.checkRuntimeError();
-                if (callback) callback();
-            });
+                this.config.store.set( setter, () => {
+                    this.checkRuntimeError();
+                    if (callback) callback();
+                });
+            })
         }
 
         loadPublicKey(fingerprint: string, callback: PublicKeyCallback): void {
@@ -77,35 +84,41 @@ module KeyStore {
                 re = new RegExp(userId),
                 getter: Array<string> = [];
 
-            Object.keys(this.directory).forEach((p) => {
-                var userIds = this.directory[p];
-                userIds.forEach(id => {
-                    if (id.match(re)) getter.push(p);
+            this.initialize(() => {
+                Object.keys(this.directory).forEach((p) => {
+                    var userIds = this.directory[p];
+                    userIds.forEach(id => {
+                        if (id.match(re)) getter.push(p);
+                    });
+                })
+
+                this.config.store.get( getter, (item) => {
+                    var key: Keys.PublicKey;
+
+                    this.checkRuntimeError();
+
+                    Object.keys(item).forEach((p) => {
+                        key = new Keys.PublicKey( item[p] );
+                        result.push( key );
+                    });
+
+                    if (callback) callback(result);
                 });
             })
-
-            this.config.store.get( getter, (item) => {
-                var key: Keys.PublicKey;
-
-                this.checkRuntimeError();
-
-                Object.keys(item).forEach((p) => {
-                    key = new Keys.PublicKey( item[p] );
-                    result.push( key );
-                });
-
-                if (callback) callback(result);
-            });
         }
 
         deleteAllPublicKeys(callback: Interfaces.Callback): void {
-            var deleter: Array<string> = Object.keys(this.directory);
+            var deleter: Array<string>;
 
-            this.config.store.remove( deleter, () => {
-                this.checkRuntimeError();
-                this.directory = {};
-                callback();
-            });
+            this.initialize(() => {
+                deleter = Object.keys(this.directory);
+
+                this.config.store.remove( deleter, () => {
+                    this.checkRuntimeError();
+                    this.directory = {};
+                    callback();
+                });
+            })
         }
 
     }

@@ -3,7 +3,8 @@
 
 var config = new Config(),
     privateKeyStore: PrivateKeyStore.Interface = new PrivateKeyStore.LocalStore(config),
-    messageStore: MessageStore.Interface = new MessageStore.RemoteService(config.messageStore.localHost);
+    messageStore: MessageStore.Interface = new MessageStore.RemoteService(config.messageStore.localHost),
+    keyStore: KeyStore.Interface = new KeyStore.LocalStore(config);
 
 // Private key
 var privateKey: Keys.PrivateKey,
@@ -237,9 +238,6 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 privateKeyStore.get((pk) => {
     if ( pk ) {
         privateKey = pk;
-        if ( privateKeyPassword ) {
-            privateKey.decrypt(privateKeyPassword);
-        }
     } else {
         // TODO: nag about adding a public key
     }
