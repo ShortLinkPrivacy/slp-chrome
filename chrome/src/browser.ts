@@ -10,6 +10,7 @@ interface BackgroundPage extends Window {
     messageStore: MessageStore.Interface;
     keyStore: KeyStore.Interface;
     privateKey: Keys.PrivateKey;
+    initVars: { (): Interfaces.InitVars };
 }
 
 var app: App,
@@ -100,7 +101,7 @@ class EncryptTab implements Application.Article {
 
     select(e: Event, model: {index: number}) {
         var item = this.foundKeys[model.index];
-        if ( !this.isSelected(item) ) {
+        if ( this.isSelected(item) == false ) {
             this.selectedKeys.push(item);
         }
     }
@@ -109,18 +110,44 @@ class EncryptTab implements Application.Article {
         this.selectedKeys.splice(model.index, 1);
     }
 
+    private encryptMessage(text: string, keyList: Array<openpgp.key.Key>, callback: Interfaces.ResultCallback): void {
+
+        openpgp.encryptMessage( keyList, text )
+            .then((armoredText) => {
+                bg.messageStore.save(armoredText, (result) => {
+                    if ( result.success ) {
+                        callback({
+                            success: true,
+                            value: bg.messageStore.getURL(result.id)
+                        });
+                    } else {
+                        callback({ 
+                            success: false, 
+                            error: result.error 
+                        });
+                    }
+                });
+            })
+            .catch((err) => {
+                callback({ 
+                    success: false, 
+                    error: "OpenPGP Error: " + err
+                });
+            });
+    }
+
     submit(e: Event) {
-        var keyList: Array<string>,
-            i: number;
+        var keyList: Array<openpgp.key.Key>;
 
         // This should never happen because we don't show the submit button
-        if (!this.hasSelectedKeys) return;
+        if (this.hasSelectedKeys() == false) return;
 
-        keyList = this.selectedKeys.map(item => { return item.key.armored() })
+        keyList = this.selectedKeys.map(item => { return item.key.openpgpKey() })
 
-        // We can encrypt here, but we chose to delegate that to the background
-        // page, because it already has an unlocked copy of the private key.
-        chrome.runtime.sendMessage({ command: 'encryptMessage', text: this.clearText, keyList: keyList }, (result) => {
+        // Also push our own key, so we can read our own message
+        keyList.push(bg.privateKey.key.toPublic());
+
+        this.encryptMessage(this.clearText, keyList, (result) => {
             if ( result.success ) {
                 sendMessageToContent({ setElement: result.value });
                 window.close();
@@ -188,6 +215,8 @@ class App extends Application.Main {
 
     constructor( config: Application.AppConfig ) {
         super(config);
+
+        this.initVars = bg.initVars();
 
         // Articles
         this.registerArticle( new EncryptTab() );
@@ -266,13 +295,10 @@ class App extends Application.Main {
         // Path
         Path.listen();
 
-        // Call background for init
-        chrome.runtime.sendMessage({ command: 'init' }, (result: { value: Interfaces.InitVars }) => {
-            this.initVars = result.value;
-            if (this.initVars.isDecrypted) {
-                window.location.hash = "#/a";
-            }
-        });
+        // Init
+        if (this.initVars.isDecrypted) {
+            window.location.hash = "#/a";
+        }
     }
 }
 

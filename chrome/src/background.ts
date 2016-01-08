@@ -27,8 +27,9 @@ interface DispatchCall {
 }
 
 var dispatcher: DispatchCall = {
-    init: initVars,
-    encryptMessage: encryptMessage,
+    init: function(request, sender, sendResponse: ResultCallback) {
+        sendResponse({ success: true, value: initVars() });
+    },
     decryptLink: decryptLink,
     needPassword: needPassword,
     unlock: unlockPassword,
@@ -128,50 +129,12 @@ function decryptLink(request: any, sender: chrome.runtime.MessageSender, sendRes
     });
 }
 
-function encryptMessage(request: any, sender: chrome.runtime.MessageSender, sendResponse: ResultCallback): void {
-    var keyList: Array<openpgp.key.Key> = [],
-        i: number;
 
-    for (i = 0; i < request.keyList.length; i++) {
-        var keyResult = openpgp.key.readArmored(request.keyList[i]);
-        keyList.push(keyResult.keys[0]);
+function initVars(): Interfaces.InitVars {
+    return {
+        linkRe: messageStore.getReStr(),
+        isDecrypted: privateKey.isDecrypted()
     }
-
-    // Also push our own key, so we can read our own message
-    keyList.push(privateKey.key.toPublic());
-
-    openpgp.encryptMessage( keyList, request.text )
-        .then((armoredText) => {
-            messageStore.save(armoredText, (result) => {
-                if ( result.success ) {
-                    sendResponse({
-                        success: true,
-                        value: messageStore.getURL(result.id)
-                    });
-                } else {
-                    sendResponse({ 
-                        success: false, 
-                        error: result.error 
-                    });
-                }
-            });
-        })
-        .catch((err) => {
-            sendResponse({ 
-                success: false, 
-                error: "OpenPGP Error: " + err
-            });
-        });
-}
-
-function initVars(request: any, sender: chrome.runtime.MessageSender, sendResponse: ResultCallback): void {
-    sendResponse({
-        success: true,
-        value: {
-            linkRe: messageStore.getReStr(),
-            isDecrypted: privateKey.isDecrypted()
-        }
-    });
 }
 
 function needPassword(request: any, sender: chrome.runtime.MessageSender, sendResponse: ResultCallback): void {
