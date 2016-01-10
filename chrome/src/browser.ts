@@ -4,16 +4,8 @@
 /// <reference path="../typings/pathjs/pathjs.d.ts" />
 /// <reference path="modules.d.ts" />
 
-interface BackgroundPage extends Window {
-    config: Config;
-    privateKeyStore: PrivateKeyStore.Interface;
-    messageStore: MessageStore.Interface;
-    keyStore: KeyStore.Interface;
-    privateKey: Keys.PrivateKey;
-}
-
 var app: App,
-    bg: BackgroundPage = <BackgroundPage>chrome.extension.getBackgroundPage();
+    bg: Interfaces.BackgroundPage = <Interfaces.BackgroundPage>chrome.extension.getBackgroundPage();
 
 function sendMessageToContent(msg: any, callback?: Interfaces.ResultCallback): void {
     chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
@@ -120,16 +112,16 @@ class EncryptTab implements Application.Article {
                             value: bg.messageStore.getURL(result.id)
                         });
                     } else {
-                        callback({ 
-                            success: false, 
-                            error: result.error 
+                        callback({
+                            success: false,
+                            error: result.error
                         });
                     }
                 });
             })
             .catch((err) => {
-                callback({ 
-                    success: false, 
+                callback({
+                    success: false,
                     error: "OpenPGP Error: " + err
                 });
             });
@@ -185,9 +177,9 @@ class MyKeyTab implements Application.Article {
                     value: bg.messageStore.getURL(result.id)
                 })
             } else {
-                sendResponse({ 
-                    success: false, 
-                    error: result.error 
+                sendResponse({
+                    success: false,
+                    error: result.error
                 })
             }
         });
@@ -215,7 +207,7 @@ class LockTab implements Application.Article {
     articleId = "lock";
 
     submit(): void {
-        bg.privateKey.lock(); 
+        bg.privateKey.lock();
 
         chrome.tabs.query({currentWindow: true}, (tabs) => {
             tabs.forEach((tab) => {
@@ -236,10 +228,12 @@ class App extends Application.Main {
     error: string;
     password: string;
     tabs: any = {};
-    isDecrypted = bg.privateKey.isDecrypted();
+    initVars: Interfaces.InitVars;
 
     constructor( config: Application.AppConfig ) {
         super(config);
+
+        this.initVars = bg.initialize();
 
         // Articles
         this.registerArticle( new EncryptTab() );
@@ -304,6 +298,10 @@ class App extends Application.Main {
         }
     }
 
+    goSettings(e: MouseEvent): void {
+        chrome.runtime.openOptionsPage(() => {});
+    }
+
     run(): void {
         // Rivets
         rivets.configure({
@@ -317,7 +315,7 @@ class App extends Application.Main {
         Path.listen();
 
         // Init
-        if (this.isDecrypted) {
+        if (this.initVars.isDecrypted) {
             window.location.hash = "#/a";
         }
     }

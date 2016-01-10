@@ -210,7 +210,9 @@ function listenToMessages() {
 
 // Get variables and bootstrap
 getInitVars(() => {
-    traverseNodes(document.body);
-    eventObserver();
-    listenToMessages();
+    if ( init.hasPrivateKey ) {
+        traverseNodes(document.body);
+        eventObserver();
+        listenToMessages();
+    }
 })

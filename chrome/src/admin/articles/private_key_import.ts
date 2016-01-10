@@ -11,7 +11,8 @@ module Admin {
             e.preventDefault();
 
             try {
-                app.privateKeyStore.set(this.key, () => {
+                app.privateKeyStore.set(this.key, (pk) => {
+                    bg.privateKey = pk;
                     window.location.hash = "#/key/view"
                 });
             } catch (err) {

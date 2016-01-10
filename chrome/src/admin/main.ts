@@ -9,6 +9,7 @@ module Admin {
     var in_testing = typeof window["mocha"] != "undefined";
 
     export var app: App;
+    export var bg: Interfaces.BackgroundPage = <Interfaces.BackgroundPage>chrome.extension.getBackgroundPage();
 
     export interface Article {
         articleId: string;

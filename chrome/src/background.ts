@@ -77,16 +77,23 @@ function getArmorType(text: string): ArmorType {
   return ArmorType.None;
 }
 
+/*
+ * Initialize variables, settings, etc.
+ */
+function initialize(): Interfaces.InitVars {
+    var result: Interfaces.InitVars = {};
+
+    result.linkRe = messageStore.getReStr();
+    result.hasPrivateKey = privateKey ? true : false;
+    result.isDecrypted = privateKey ? privateKey.isDecrypted() : false;
+
+    return result;
+}
+
 //############################################################################
 
 function initVars(request: any, sender: chrome.runtime.MessageSender, sendResponse: Interfaces.SuccessCallback): void {
-    sendResponse({
-        success: true,
-        value: {
-            linkRe: messageStore.getReStr(),
-            isDecrypted: privateKey.isDecrypted()
-        }
-    });
+    sendResponse({ success: true, value: initialize() });
 }
 
 function decryptLink(request: any, sender: chrome.runtime.MessageSender, sendResponse: Interfaces.SuccessCallback): void {

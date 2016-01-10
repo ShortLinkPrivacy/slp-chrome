@@ -26,7 +26,7 @@ module PrivateKeyStore {
             }
         }
 
-        set(key: Keys.PrivateKey|string, callback: Interfaces.Callback): void {
+        set(key: Keys.PrivateKey|string, callback: PrivateKeyCallback): void {
             var setter: Interfaces.Dictionary = {},
                 _key: Keys.PrivateKey;
 
@@ -39,7 +39,7 @@ module PrivateKeyStore {
             setter[this.privateKeyLabel] = _key.armored();
             this.store.set(setter, () => {
                 this.checkRuntimeError();
-                callback();
+                callback(_key);
             });
         }
 

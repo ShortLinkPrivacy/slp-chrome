@@ -20,24 +20,35 @@
   </head>
   <body>
     <div class="error" rv-if="error" rv-text="error"></div>
-    <div id="password" rv-hide="isDecrypted">
-      <div class="center">
-        <input rv-value="password" rv-on-keyup="enterPassword" type="password" placeholder="private key password">
-      </div>
-    </div>
 
-    <div id="main" rv-show="isDecrypted">
-      <div class="menu">
-          <ul id="tabs">
-            <li><a rel="encrypt" href="#/a">Encrypt</a></li>
-            <li><a rel="myKey"   href="#/b">My Key</a></li>
-            <li><a rel="control" href="#/c">Control</a></li>
-            <li><a rel="lock"    href="#/d">Lock</a></li>
-          </ul>
+    <div rv-show="initVars.hasPrivateKey">
+      <div id="password" rv-hide="isDecrypted">
+        <div class="center">
+          <input rv-value="password" rv-on-keyup="enterPassword" type="password" placeholder="private key password">
+        </div>
       </div>
-      <article>
-      </article>
-    </div>
+
+      <div id="main" rv-show="isDecrypted">
+        <div class="menu">
+            <ul id="tabs">
+              <li><a rel="encrypt" href="#/a">Encrypt</a></li>
+              <li><a rel="myKey"   href="#/b">My Key</a></li>
+              <li><a rel="control" href="#/c">Control</a></li>
+              <li><a rel="lock"    href="#/d">Lock</a></li>
+            </ul>
+        </div>
+        <article>
+        </article>
+      </div>
+    </div><!-- hasPrivateKey -->
+
+    <div id="no-key" rv-hide="initVars.hasPrivateKey">
+      <span class="middle">
+        <p>You have not created or imported your PGP key yet.</p>
+        <button rv-on-click="goSettings">Setup</button>
+      </span>
+
+    </div><!-- not hasPrivateKey -->
 
   </body>
 </html>

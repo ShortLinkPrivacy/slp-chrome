@@ -12,7 +12,7 @@ module PrivateKeyStore {
 
     // Anyone implementing settings should implements this
     export interface Interface {
-        set(key: Keys.PrivateKey|string, callback: Interfaces.Callback): void;
+        set(key: Keys.PrivateKey|string, callback: PrivateKeyCallback): void;
         get(callback: PrivateKeyCallback): void;
         remove(callback: Interfaces.Callback): void;
     }
