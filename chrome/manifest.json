@@ -3,7 +3,7 @@
 
   "name": "Pretty Good Plugin",
   "short_name": "PGPlugin",
-  "description": "This extension allows you to use PGP to encrypt and decrypt text in your browser. It will automatically recognize encrypted text and allow you to decrypt it with a click of the mouse. You will be able to send encrypted text anywhere. That means email, social networks, insta-whatevers, you name it",
+  "description": "End to end PGP encryption for most types of online conversations.",
   "version": "1.0",
   "options_page": "settings.html",
 

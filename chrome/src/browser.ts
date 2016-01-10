@@ -233,8 +233,6 @@ class App extends Application.Main {
     constructor( config: Application.AppConfig ) {
         super(config);
 
-        this.initVars = bg.initialize();
-
         // Articles
         this.registerArticle( new EncryptTab() );
         this.registerArticle( new MyKeyTab() );
@@ -303,6 +301,8 @@ class App extends Application.Main {
     }
 
     run(): void {
+        this.initVars = bg.initialize();
+
         // Rivets
         rivets.configure({
             handler: function(target, ev, binding) {
