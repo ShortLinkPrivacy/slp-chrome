@@ -11,10 +11,12 @@ var observer: MutationObserver;
 var pgpClassName = '__pgp',         // The class name to add to dectypted nodes
     pgpData = '__pgp_data';         // Propery to add to nodes with the original content
 
+// Regular expression for the url
+var urlRe: RegExp;
 
 function decodeText(codedText: string, callback: { (decodedText): void }): void {
-    var re = new RegExp(init.linkRe),
-        match = re.exec(codedText),
+    //var re = new RegExp(init.linkRe),
+     var   match = urlRe.exec(codedText),
         messageId: string,
         url: string;
 
@@ -58,16 +60,13 @@ function decodeNode(node: Node): void {
 
 function traverseNodes(root: HTMLElement): void {
     var walk: TreeWalker,
-        node: Node,
-        re: RegExp;
-
-    re = new RegExp(init.linkRe);
+        node: Node;
 
     // Create a walker from the root element, searching only for text nodes
     walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
 
     while (node = walk.nextNode()) {
-        if (node.nodeValue.match(re)) {
+        if (node.nodeValue.match(urlRe)) {
             if ( init.isDecrypted ) {
                 decodeNode(node);
             } else {
@@ -95,6 +94,7 @@ function eventObserver(): void {
 function getInitVars(callback: Interfaces.Callback): void {
     chrome.runtime.sendMessage({command: 'init'}, (result) => {
         init = result.value;
+        urlRe = new RegExp(init.linkRe);
         callback()
     });
 }
