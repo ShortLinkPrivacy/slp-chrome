@@ -1,27 +1,27 @@
-<div rv-hide="key">
+<div rv-hide="hasPrivateKey">
   <h1>No personal PGP key found</h1>
   <a href="#/key/generate" class="pure-button">Create a new PGP key</a>
   <a href="#/key/import" class="pure-button">Import an existing PGP key</a>
 </div>
 
-<div rv-show="key">
+<div rv-show="hasPrivateKey">
   <h1>Your PGP key</h1>
   <table class="pure-table">
     <tbody>
       <tr>
         <td>Fingerprint</td>
-        <td>{ publicKey.fingerprint }</td>
+        <td>{ fingerprint }</td>
       </tr>
       <tr>
         <td>User IDs</td>
         <td>
           <ul>
-            <li rv-each-user="key.userIds">{ key.userIds }</li>
+            <li rv-each-user="privateKey.userIds">{ userIds }</li>
           </ul>
         </td>
       </tr>
       <tr>
-        <td colspan="2"><pre>{ publicKey.armored }</pre></td>
+        <td colspan="2"><pre>{ armored }</pre></td>
       </tr>
     </tbody>
   </table>

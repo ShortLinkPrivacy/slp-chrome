@@ -1,7 +1,6 @@
-/// <reference path="../main.ts" />
 
 module Admin {
-    class PrivateKeyGenerate implements Application.Article {
+    export class PrivateKeyGenerate implements Application.Article {
 
         filename = "generate.html";
         articleId = "privateKeyGenerate";
@@ -46,6 +45,4 @@ module Admin {
                })
         }
     }
-
-    app.registerArticle( new PrivateKeyGenerate() );
 }

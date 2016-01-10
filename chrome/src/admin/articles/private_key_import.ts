@@ -1,7 +1,6 @@
-/// <reference path="../main.ts" />
 
 module Admin {
-    class PrivateKeyImport implements Application.Article {
+    export class PrivateKeyImport implements Application.Article {
 
         filename = "import.html";
         articleId = "privateKeyImport";
@@ -13,6 +12,7 @@ module Admin {
             try {
                 bg.privateKeyStore.set(this.key, (pk) => {
                     bg.privateKey = pk;
+                    this.key = "";
                     window.location.hash = "#/key/view"
                 });
             } catch (err) {
@@ -21,6 +21,4 @@ module Admin {
 
         }
     }
-
-    app.registerArticle( new PrivateKeyImport() );
 }

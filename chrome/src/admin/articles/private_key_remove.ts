@@ -1,7 +1,6 @@
-/// <reference path="../main.ts" />
 
 module Admin {
-    class PrivateKeyRemove implements Application.Article {
+    export class PrivateKeyRemove implements Application.Article {
 
         filename = "remove.html";
         articleId = "privateKeyRemove";
@@ -13,5 +12,4 @@ module Admin {
             });
         }
     }
-    app.registerArticle( new PrivateKeyRemove() );
 }

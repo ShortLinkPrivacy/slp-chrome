@@ -1,21 +1,25 @@
-/// <reference path="../main.ts" />
 
 module Admin {
-    class PrivateKeyView implements Application.Article {
+    export class PrivateKeyView implements Application.Article {
 
         filename = "view.html";
         articleId = "privateKeyView";
 
-        key: Keys.PrivateKey;
-        publicKey: Keys.PublicKey;
+        hasPrivateKey: boolean;
+        fingerprint: string;
+        userIds: Array<string>;
+        armored: string;
 
         onBind() {
-            this.key = bg.privateKey;
-            if (this.key != null) {
-                this.publicKey = this.key.toPublic();
+            var pub: Keys.PublicKey;
+
+            this.hasPrivateKey = bg.privateKey ? true : false;
+            if ( this.hasPrivateKey == true ) {
+                pub = bg.privateKey.toPublic();
+                this.fingerprint = pub.fingerprint();
+                this.userIds = pub.userIds();
+                this.armored = pub.armored();
             }
         }
-
     }
-    app.registerArticle( new PrivateKeyView() );
 }

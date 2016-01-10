@@ -29,6 +29,14 @@ module Admin {
 
         constructor(args: Application.AppConfig) {
             super(args);
+
+            this.registerArticle( new PrivateKeyGenerate() );
+            this.registerArticle( new PrivateKeyImport() );
+            this.registerArticle( new PrivateKeyRemove() );
+            this.registerArticle( new PrivateKeyView() );
+            this.registerArticle( new PublicKeyImport() );
+            this.registerArticle( new PublicKeyList() );
+
             this.initRouter();
         }
 
@@ -90,6 +98,8 @@ module Admin {
         app = window["app"] = new App({
             path: "src/templates/admin"
         });
+
+        app.run();
     }
 }
 

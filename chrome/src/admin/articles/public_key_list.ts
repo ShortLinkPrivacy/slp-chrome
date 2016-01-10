@@ -1,7 +1,6 @@
-/// <reference path="../main.ts" />
 
 module Admin {
-    class PublicKeyList implements Application.Article {
+    export class PublicKeyList implements Application.Article {
 
         filename = "pub_list.html";
         articleId = "publicKeyList";
@@ -20,6 +19,5 @@ module Admin {
         }
 
     }
-    app.registerArticle( new PublicKeyList() );
 }
 
