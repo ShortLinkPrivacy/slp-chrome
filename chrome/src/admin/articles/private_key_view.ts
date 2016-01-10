@@ -1,16 +1,16 @@
 /// <reference path="../main.ts" />
 
 module Admin {
-    class PrivateKeyView implements Article {
+    class PrivateKeyView implements Application.Article {
 
-        filename = "key/view.html";
+        filename = "view.html";
         articleId = "privateKeyView";
 
         key: Keys.PrivateKey;
         publicKey: Keys.PublicKey;
 
         onBind() {
-            this.key = app.key;
+            this.key = bg.privateKey;
             if (this.key != null) {
                 this.publicKey = this.key.toPublic();
             }

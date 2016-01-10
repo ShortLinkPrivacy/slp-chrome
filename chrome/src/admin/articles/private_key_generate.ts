@@ -1,9 +1,9 @@
 /// <reference path="../main.ts" />
 
 module Admin {
-    class PrivateKeyGenerate implements Article {
+    class PrivateKeyGenerate implements Application.Article {
 
-        filename = "key/generate.html";
+        filename = "generate.html";
         articleId = "privateKeyGenerate";
 
         spinner: boolean = false;
@@ -14,7 +14,7 @@ module Admin {
         numBits: number;
 
         constructor() {
-            this.numBits = app.config.defaultBits;
+            this.numBits = bg.config.defaultBits;
         }
 
         submit(e: Event): void {
@@ -28,15 +28,15 @@ module Admin {
             this.spinner = true;
 
             var options = {
-                numBits: app.config.defaultBits,
+                numBits: bg.config.defaultBits,
                 userId: '"' + this.name + '" <' + this.email + '>',
                 passphrase: this.passphrase
             };
 
             openpgp.generateKeyPair(options)
                .then((generated)=>{
-                    var key = app.key = bg.privateKey = new Keys.PrivateKey(generated.privateKeyArmored);
-                    app.privateKeyStore.set(key, () => {
+                    var key = bg.privateKey = new Keys.PrivateKey(generated.privateKeyArmored);
+                    bg.privateKeyStore.set(key, () => {
                         this.spinner = false;
                         window.location.hash = "#/key/view";
                     })

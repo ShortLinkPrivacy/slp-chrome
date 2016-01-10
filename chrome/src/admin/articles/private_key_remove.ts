@@ -1,14 +1,14 @@
 /// <reference path="../main.ts" />
 
 module Admin {
-    class PrivateKeyRemove implements Article {
+    class PrivateKeyRemove implements Application.Article {
 
-        filename = "key/remove.html";
+        filename = "remove.html";
         articleId = "privateKeyRemove";
 
         doRemove(): void {
-            app.privateKeyStore.remove(() => {
-                app.key = null;
+            bg.privateKeyStore.remove(() => {
+                bg.privateKey = null;
                 window.location.hash = '#/key/view';
             });
         }

@@ -1,4 +1,10 @@
-<div>
+<div rv-hide="key">
+  <h1>No personal PGP key found</h1>
+  <a href="#/key/generate" class="pure-button">Create a new PGP key</a>
+  <a href="#/key/import" class="pure-button">Import an existing PGP key</a>
+</div>
+
+<div rv-show="key">
   <h1>Your PGP key</h1>
   <table class="pure-table">
     <tbody>

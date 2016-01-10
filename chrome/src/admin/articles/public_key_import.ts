@@ -1,9 +1,9 @@
 /// <reference path="../main.ts" />
 
 module Admin {
-    class PublicKeyImport implements Article {
+    class PublicKeyImport implements Application.Article {
 
-        filename = "public/import.html";
+        filename = "pub_import.html";
         articleId = "publicKeyImport";
         key: string;
 
@@ -19,7 +19,7 @@ module Admin {
             }
 
             try {
-                app.keyStore.storePublicKey(publicKey, () => {
+                bg.keyStore.storePublicKey(publicKey, () => {
                     app.log("Added: ", publicKey);
                     app.notify.info = "Key for " + publicKey.getPrimaryUser() + " added successfully";
                     this.key = "";

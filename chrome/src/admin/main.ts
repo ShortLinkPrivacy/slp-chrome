@@ -11,18 +11,6 @@ module Admin {
     export var app: App;
     export var bg: Interfaces.BackgroundPage = <Interfaces.BackgroundPage>chrome.extension.getBackgroundPage();
 
-    export interface Article {
-        articleId: string;
-        filename: string;
-        onBind?(args?: Object): void;
-    }
-
-    interface AppInitialize {
-        config: Config;
-        keyStore: KeyStore.Interface;
-        privateKeyStore: PrivateKeyStore.Interface;
-    }
-
     class Notify {
         error: string;
         info: string;
@@ -36,26 +24,16 @@ module Admin {
         }
     }
 
-    export class App {
-
-        path: string = "src/templates";
-        articles: { [index: string]: Article } = {};
-        binding: Rivets.View = null;
-        element: JQuery;
-        currentArticle: Article;
-        config: Config;
-
-        key: Keys.PrivateKey;
-        keyStore: KeyStore.Interface;
-        privateKeyStore: PrivateKeyStore.Interface;
-
+    export class App extends Application.Main {
         notify: Notify = new Notify();
 
-        constructor(args: AppInitialize) {
-            this.config = args.config;
-            this.keyStore = args.keyStore;
-            this.privateKeyStore = args.privateKeyStore;
+        constructor(args: Application.AppConfig) {
+            super(args);
             this.initRouter();
+        }
+
+        key(): Keys.PrivateKey {
+            return bg.privateKey;
         }
 
         private initRouter() {
@@ -68,11 +46,7 @@ module Admin {
             });
 
             Path.map("#/key/view").to(() => {
-                if ( this.key ) {
-                    this.loadArticle('privateKeyView');
-                } else {
-                    this.loadPage('key/missing.html');
-                }
+                this.loadArticle('privateKeyView');
             });
 
             Path.map("#/key/remove").to(() => {
@@ -85,60 +59,6 @@ module Admin {
 
             Path.map("#/pub/list").to(() => {
                 this.loadArticle('publicKeyList');
-            });
-        }
-
-        registerArticle(article: Article) {
-            if ( !article.articleId )
-                throw "Article articleId is missing";
-
-            if ( !article.filename )
-                throw "Article filename is missing";
-
-            if ( this.articles[article.articleId] )
-                throw "Article ID " + article.articleId + " is already taken";
-
-            this.articles[article.articleId] = article;
-        }
-
-        // Loads a page from the template folder
-        loadPage(filename: string, callback?: Interfaces.Callback): void {
-            var fullpath: string = this.path + "/" + filename;
-
-            // Clear error and info when pages change
-            this.notify.clear();
-
-            this.element.load(fullpath, (res, status, xhr) => {
-
-                // Error
-                if ( status == "error" ) {
-                    this.notify.error = "Can not load " + fullpath;
-                    return;
-                }
-
-                if (callback) callback();
-            });
-        }
-
-        // Loads a page and binds it to a controller
-        loadArticle(articleId: string, onBindArgs?: Object): void {
-            var article: Article = this.articles[articleId];
-
-            if (article == null) {
-                this.notify.error = "Article " + articleId + " is not initialized";
-                return;
-            }
-
-            this.currentArticle = article;
-
-            // Remove previous binding
-            if ( this.binding != null ) {
-                this.binding.unbind();
-            }
-
-            this.loadPage(article.filename, () => {
-                this.binding = rivets.bind(this.element, article);
-                if ( article.onBind ) article.onBind(onBindArgs);
             });
         }
 
@@ -158,24 +78,18 @@ module Admin {
                     this.call(app.currentArticle, event, binding.view.models)
                 }
             });
-            rivets.bind($('body'), this);
+            rivets.bind(document.body, this);
 
             // App
-            this.element = $('article');
-            this.privateKeyStore.get((key) => {
-                this.key = key
-                Path.listen();
-                window.location.hash = "#/key/view";
-            });
+            Path.listen();
+            window.location.hash = "#/key/view";
         }
     }
 
-    var config = new Config();
-    app = window["app"] = new App({
-        config: config,
-        keyStore: new KeyStore.LocalStore(config),
-        privateKeyStore: new PrivateKeyStore.LocalStore(config)
-    });
-
+    window.onload = function() {
+        app = window["app"] = new App({
+            path: "src/templates/admin"
+        });
+    }
 }
 

@@ -1,9 +1,9 @@
 /// <reference path="../main.ts" />
 
 module Admin {
-    class PublicKeyList implements Article {
+    class PublicKeyList implements Application.Article {
 
-        filename = "public/list.html";
+        filename = "pub_list.html";
         articleId = "publicKeyList";
         filter: string;
         foundKeys: KeyStore.PublicKeyArray = [];
@@ -14,7 +14,7 @@ module Admin {
                 return;
             }
 
-            app.keyStore.searchPublicKey(this.filter, (keys) => {
+            bg.keyStore.searchPublicKey(this.filter, (keys) => {
                 this.foundKeys = keys;
             });
         }
