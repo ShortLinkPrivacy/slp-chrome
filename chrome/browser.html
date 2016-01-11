@@ -24,7 +24,7 @@
 
     <div rv-show="hasPrivateKey">
       <div id="password" rv-hide="isDecrypted">
-        <div class="center">
+        <div class="middle">
           <input rv-value="password" rv-on-keyup="enterPassword" type="password" placeholder="private key password">
         </div>
       </div>
@@ -33,8 +33,8 @@
         <div class="menu">
             <div class="logo pull-left">b2b crypt</div>
             <ul id="tabs" class="pull-right">
-              <li><a rv-on-click="lock" href="#"><i class="fa fa-lock"></i> Lock</a></li>
-              <li><a rv-on-click="goSettings" href="#"><i class="fa fa-cog"></i> Settings</a></li>
+              <li><a rv-on-click="lock" href="#"><i class="fa fa-lock"></i> lock</a></li>
+              <li><a rv-on-click="goSettings" href="#"><i class="fa fa-cog"></i> settings</a></li>
             </ul>
         </div>
         <div id="encrypt-tab">
@@ -56,7 +56,7 @@
             </div>
             <div rv-hide="clearText">
               <div class="middle">
-                No entered text or selection detected.
+                No input with text or selection detected.
               </div>
             </div>
           </div>
