@@ -21,27 +21,53 @@
   <body>
     <div class="error" rv-if="error" rv-text="error"></div>
 
-    <div rv-show="initVars.hasPrivateKey">
-      <div id="password" rv-hide="initVars.isDecrypted">
+    <div rv-show="hasPrivateKey">
+      <div id="password" rv-hide="isDecrypted">
         <div class="center">
           <input rv-value="password" rv-on-keyup="enterPassword" type="password" placeholder="private key password">
         </div>
       </div>
 
-      <div id="main" rv-show="initVars.isDecrypted">
+      <div id="main" rv-show="isDecrypted">
         <div class="menu">
             <ul id="tabs">
-              <li><a rel="encrypt" href="#/a">Encrypt</a></li>
-              <li><a rel="myKey"   href="#/b">My Key</a></li>
-              <li><a rel="lock"    href="#/d">Lock</a></li>
+              <li><a rv-on-click="lock" href="#">Lock</a></li>
+              <li><a rv-on-click="goSettings" href="#">Settings</a></li>
+              <li><a rv-on-click="goSettings" href="#">Address Book</a></li>
             </ul>
         </div>
         <article>
+          <div id="encrypt-tab">
+            <div rv-hide="alreadyEncrypted">
+              <div rv-show="clearText">
+                <div class="error" rv-show="error">{ error }</div>
+                <label for="filter">Search address book:</label>
+                <input class="filter" rv-value="filter" rv-on-keyup="doFilter" placeholder="name or email">
+                <ul class="found-keys" rv-show="hasFoundKeys < foundKeys">
+                  <li rv-on-click="addPublicKey" rv-each-key="foundKeys"><span>{ key.getPrimaryUser }</span></li>
+                </ul>
+                <div class="bottom" rv-show="hasSelectedKeys < selectedKeys">
+                  <label>Encrypt for:</label>
+                  <ul class="selected-keys">
+                    <li rv-each-key="selectedKeys"><div class="name">{ key.getPrimaryUser }</div><div class="remove" rv-on-click="removePublicKey">x</div></li>
+                  </ul>
+                  <button rv-on-click="sendMessage">encrypt</button>
+                </div>
+              </div>
+              <div rv-hide="clearText">
+                No entered text or selection detected.
+              </div>
+            </div>
+            <div rv-show="alreadyEncrypted" class="middle">
+              <p>This message has already been encrypted.</p>
+              <button rv-on-click="restoreMessage">Restore original message</button>
+            </div>
+          </div>
         </article>
       </div>
     </div><!-- hasPrivateKey -->
 
-    <div id="no-key" rv-hide="initVars.hasPrivateKey">
+    <div id="no-key" rv-hide="hasPrivateKey">
       <span class="middle">
         <p>You have not created or imported your PGP key yet.</p>
         <button rv-on-click="goSettings">Setup</button>
