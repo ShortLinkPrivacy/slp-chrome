@@ -104,6 +104,13 @@ button {
   font-size: 150%;
 }
 
+.button-small {
+  font-size: 90%;
+  height: 20px;
+  padding: 4px;
+  font-variant: small-caps;
+}
+
 .button-error {
   background: rgb(202, 60, 60); /* this is a maroon */
 }
@@ -200,6 +207,8 @@ article {
 // Address book tab
 #encrypt-tab {
 
+  position: relative;
+
   label {
     font-weight: bold;
     display: block;
@@ -290,6 +299,13 @@ article {
         }
       }
     }
+  }
+
+  .footer {
+    position: absolute;
+    top: @articleHeight - 20;
+    height: 20px;
+    text-align: center;
   }
 }
 

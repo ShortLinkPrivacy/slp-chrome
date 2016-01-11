@@ -39,6 +39,7 @@ class KeyItem {
 */
 
 class EncryptTab implements Application.Article {
+
     filename = "encrypt.html";
     articleId = "encrypt";
     filter: string;
@@ -46,6 +47,8 @@ class EncryptTab implements Application.Article {
     selectedKeys = [];
     clearText: string;
     alreadyEncrypted: boolean;
+    hasSelectedKeys: { (): boolean } = function() { return this.selectedKeys.length > 0 };
+    hasFoundKeys: { (): boolean } = function() { return this.foundKeys.length > 0 };
 
     constructor() {
         this.filter = ""; // TODO - last used
@@ -68,14 +71,6 @@ class EncryptTab implements Application.Article {
         bg.keyStore.searchPublicKey(this.filter, (keys) => {
             this.foundKeys = keys.map( k => { return new KeyItem(k) } );
         });
-    }
-
-    hasSelectedKeys(): boolean {
-        return this.selectedKeys.length > 0;
-    }
-
-    hasFoundKeys(): boolean {
-        return this.foundKeys.length > 0;
     }
 
     // Checks if 'key' is already in the 'selectedKeys' array
@@ -157,6 +152,11 @@ class EncryptTab implements Application.Article {
             }
         })
     }
+
+    goSettings(e: MouseEvent): void {
+        e.preventDefault();
+        app.goSettings(e);
+    }
 }
 
 class MyKeyTab implements Application.Article {
@@ -197,11 +197,6 @@ class MyKeyTab implements Application.Article {
     }
 }
 
-class ControlTab implements Application.Article {
-    filename = "control.html";
-    articleId = "control";
-}
-
 class LockTab implements Application.Article {
     filename = "lock.html";
     articleId = "lock";
@@ -236,7 +231,6 @@ class App extends Application.Main {
         // Articles
         this.registerArticle( new EncryptTab() );
         this.registerArticle( new MyKeyTab() );
-        this.registerArticle( new ControlTab() );
         this.registerArticle( new LockTab() );
 
         // Router
