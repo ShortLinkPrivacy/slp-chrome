@@ -28,7 +28,8 @@ class Config {
     // Message storage types
     messageStore = {
         localHost: {
-            url: 'http://mamr.com',
+            //url: 'http://mamr.com',
+            url: 'http://localhost:5000',
             path: '/x'
         }
     };

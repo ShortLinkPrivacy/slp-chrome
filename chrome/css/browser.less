@@ -7,29 +7,26 @@
 @pwdBoxWidth: 300px;
 @pwdBoxHeight: 125px;
 
+
 // Main
-@base: #EFECCA;
-@tabBg: #A7A37E;
-@tabFg: #333;
-@tabHover: #fff;
-@activeTabBg: @base;
-@activeTabFg: #333;
+@mainBg: #EFECCA;
+@mainWidth: 360px;
+@mainHeight: 300px;
 
 // Logo
 @logoBg: #8e2800;
 @logoFg: #fff;
-//@logoBorder: 6px solid #8F7000;
 @logoBorder: 6px solid #DBAC00;
 
-@mainWidth: 360px;
-@mainHeight: 300px;
+// Menu
 @menuHeight: 20px;
+@menuBg: #A7A37E;
+@menuFg: #333;
+@menuHover: #fff;
 
-@borderSize: 2px;
-//@border: @borderSize solid #73603D;
-@border: none;
+// Article
 @articlePadding: 10px;
-@articleHeight: @mainHeight - @menuHeight - @articlePadding * 2 - @borderSize;
+@articleHeight: @mainHeight - @menuHeight - @articlePadding;
 
 // Select
 @selectBg: #73603D;
@@ -59,6 +56,12 @@ textarea:focus, input:focus, a:focus {
     outline: none;
 }
 
+input, textarea {
+  background-color: rgba(0, 0, 0, 0.1);
+  color: #002F2F;
+  border: 1px solid #aaa;
+}
+
 // General error
 .error {
   position: absolute;
@@ -85,9 +88,7 @@ textarea:focus, input:focus, a:focus {
     font-family: inherit;
     font-size: 120%;
     padding: 0.5em 1em;
-    color: rgba(0, 0, 0, 0.80);
     border: none rgba(0, 0, 0, 0);
-    background-color: #E6E6E6;
     text-decoration: none;
     border-radius: 2px;
     &:hover,
@@ -167,7 +168,7 @@ textarea:focus, input:focus, a:focus {
   width: @mainWidth;
   height: @mainHeight;
   display: block;
-  background-color: @base;
+  background-color: @mainBg;
 
   .logo {
     text-decoration: none;
@@ -180,7 +181,7 @@ textarea:focus, input:focus, a:focus {
   .menu {
     height: @menuHeight;
     line-height: @menuHeight;
-    background-color: @tabBg;
+    background-color: @menuBg;
     ul {
       margin: 0;
       padding: 0;
@@ -194,13 +195,12 @@ textarea:focus, input:focus, a:focus {
       a {
         display: block;
         text-decoration: none;
-        color: @tabFg;
-        background-color: @tabBg;
+        color: @menuFg;
         padding: 0 5px;
         margin-right: 3px;
 
         &:hover {
-          color: @tabHover;
+          color: @menuHover;
         }
       }
     }
@@ -208,9 +208,8 @@ textarea:focus, input:focus, a:focus {
 }
 
 // Address book tab
-#encrypt-tab {
+article {
   padding: @articlePadding;
-  border: @border;
   height: @articleHeight;
 
   label {
@@ -224,8 +223,6 @@ textarea:focus, input:focus, a:focus {
       width: 98%;
       height: 45px;
       resize: none;
-      background-color: rgba(0,0,0,0.1);
-      border: 1px solid #aaa;
     }
     margin-bottom: 5px;
   }
@@ -233,10 +230,7 @@ textarea:focus, input:focus, a:focus {
   .encrypt-for {
     input {
       width: 98%;
-      padding: 2px;
-      color: #002F2F;
-      background-color: rgba(0,0,0,0.1);
-      border: 1px solid #aaa;
+      padding: 1px;
     }
   }
 
