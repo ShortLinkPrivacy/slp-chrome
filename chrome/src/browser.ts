@@ -166,6 +166,8 @@ class App {
         if ( this.isSelected(item) == false ) {
             this.selectedKeys.push(item);
         }
+        this.filter = "";
+        this.foundKeys = [];
     }
 
     //---------------------------------------------------------------------------

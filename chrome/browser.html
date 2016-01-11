@@ -30,12 +30,12 @@
 
       <div id="main" rv-show="isDecrypted">
         <div class="menu">
-            <div class="logo pull-left">b2b crypt</div>
-            <ul id="tabs" class="pull-right">
-              <li><a rv-on-click="lock" href="#"><i class="fa fa-lock"></i> lock</a></li>
-              <li><a rv-on-click="goSettings" href="#"><i class="fa fa-cog"></i> settings</a></li>
-            </ul>
-        </div>
+          <div class="logo pull-left">b2b crypt</div>
+          <ul id="tabs" class="pull-right">
+            <li><a rv-on-click="lock" href="#"><i class="fa fa-lock"></i> lock</a></li>
+            <li><a rv-on-click="goSettings" href="#"><i class="fa fa-cog"></i> settings</a></li>
+          </ul>
+        </div><!-- .menu -->
         <div id="encrypt-tab">
           <div rv-hide="alreadyEncrypted">
             <div>
@@ -59,13 +59,13 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div><!-- !alreadyEncrypted -->
           <div rv-show="alreadyEncrypted" class="middle">
             <p>This message has already been encrypted.</p>
             <button rv-on-click="restoreMessage">Restore original message</button>
-          </div>
-        </div>
-      </div>
+          </div><!-- alreadyEncrypted -->
+        </div><!-- #encrypted-tab -->
+      </div><!-- #main -->
     </div><!-- hasPrivateKey -->
 
     <div id="no-key" rv-hide="hasPrivateKey">
@@ -73,8 +73,7 @@
         <p>You have not created or imported your PGP key yet.</p>
         <button rv-on-click="goSettings">Setup</button>
       </span>
-
-    </div><!-- not hasPrivateKey -->
+    </div><!-- !hasPrivateKey -->
 
   </body>
 </html>
