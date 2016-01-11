@@ -5,6 +5,7 @@
     <title>Pretty Good Plugin (Menu)</title>
 
     <!-- Local CSS -->
+    <link rel="stylesheet" href="css/font-awesome.min.css">
     <link rel="stylesheet/less" type="text/css" href="css/browser.less">
 
     <!-- Vendors JS -->
@@ -30,41 +31,40 @@
 
       <div id="main" rv-show="isDecrypted">
         <div class="menu">
-            <ul id="tabs">
-              <li><a rv-on-click="lock" href="#">Lock</a></li>
-              <li><a rv-on-click="goSettings" href="#">Settings</a></li>
+            <div class="logo pull-left">b2b crypt</div>
+            <ul id="tabs" class="pull-right">
+              <li><a rv-on-click="lock" href="#"><i class="fa fa-lock"></i> Lock</a></li>
+              <li><a rv-on-click="goSettings" href="#"><i class="fa fa-cog"></i> Settings</a></li>
             </ul>
         </div>
-        <article>
-          <div id="encrypt-tab">
-            <div rv-hide="alreadyEncrypted">
-              <div rv-show="clearText">
-                <div class="error" rv-show="error">{ error }</div>
-                <label for="filter">Search address book:</label>
-                <input class="filter" rv-value="filter" rv-on-keyup="doFilter" placeholder="name or email">
-                <ul class="found-keys" rv-show="hasFoundKeys < foundKeys">
-                  <li rv-on-click="addPublicKey" rv-each-key="foundKeys"><span>{ key.getPrimaryUser }</span></li>
+        <div id="encrypt-tab">
+          <div rv-hide="alreadyEncrypted">
+            <div rv-show="clearText">
+              <div class="error" rv-show="error">{ error }</div>
+              <label for="filter">Search address book:</label>
+              <input class="filter" rv-value="filter" rv-on-keyup="doFilter" placeholder="name or email">
+              <ul class="found-keys" rv-show="hasFoundKeys < foundKeys">
+                <li rv-on-click="addPublicKey" rv-each-key="foundKeys"><span>{ key.getPrimaryUser }</span></li>
+              </ul>
+              <div class="bottom" rv-show="hasSelectedKeys < selectedKeys">
+                <label>Encrypt for:</label>
+                <ul class="selected-keys">
+                  <li rv-each-key="selectedKeys"><div class="name">{ key.getPrimaryUser }</div><div class="remove" rv-on-click="removePublicKey">x</div></li>
                 </ul>
-                <div class="bottom" rv-show="hasSelectedKeys < selectedKeys">
-                  <label>Encrypt for:</label>
-                  <ul class="selected-keys">
-                    <li rv-each-key="selectedKeys"><div class="name">{ key.getPrimaryUser }</div><div class="remove" rv-on-click="removePublicKey">x</div></li>
-                  </ul>
-                  <button rv-on-click="sendMessage">encrypt</button>
-                </div>
-              </div>
-              <div rv-hide="clearText">
-                <div class="middle">
-                  No entered text or selection detected.
-                </div>
+                <button rv-on-click="sendMessage">encrypt</button>
               </div>
             </div>
-            <div rv-show="alreadyEncrypted" class="middle">
-              <p>This message has already been encrypted.</p>
-              <button rv-on-click="restoreMessage">Restore original message</button>
+            <div rv-hide="clearText">
+              <div class="middle">
+                No entered text or selection detected.
+              </div>
             </div>
           </div>
-        </article>
+          <div rv-show="alreadyEncrypted" class="middle">
+            <p>This message has already been encrypted.</p>
+            <button rv-on-click="restoreMessage">Restore original message</button>
+          </div>
+        </div>
       </div>
     </div><!-- hasPrivateKey -->
 
