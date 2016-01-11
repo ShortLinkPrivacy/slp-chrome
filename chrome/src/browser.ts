@@ -146,6 +146,13 @@ class App {
         });
     }
 
+    focusFilter(e: MouseEvent): void {
+        e.preventDefault();
+        e.stopPropagation();
+        var el = <HTMLInputElement>document.getElementById('ftr');
+        el.focus();
+    }
+
     // Checks if 'key' is already in the 'selectedKeys' array
     private isSelected(item): boolean {
         var i: number;

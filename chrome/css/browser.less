@@ -26,25 +26,27 @@
 
 // Article
 @articlePadding: 10px;
-@articleHeight: @mainHeight - @menuHeight - @articlePadding;
+@articleHeight: @mainHeight - @menuHeight - @articlePadding * 2;
 
 // Select
-@selectBg: #73603D;
+@selectBg: #0078e7;
 @selectFg: #fff;
 
 // Beads
-@beadBg: rgba(0,0,0,.1);
+@beadBg: #eee;
 @beadFg: #000;
-@beadBorder: none;
+@beadBorder: 1px solid #999;
+@beadShadow: 1px 1px #fff;
+@beadBoxShadow: 1px 1px 2px #999;
 @beadWidth: 130px;
 @beadHeight: 15px;
 @beadPadding: 2px;
-@beadRadius: 0px;
+@beadRadius: 3px;
 
 // Bead remove
 @beadRemoveWidth: 15px;
-@beadRemoveBg: rgba(0,0,0,.1);
-@beadRemoveFg: #666;
+@beadRemoveBg: #999;
+@beadRemoveFg: #fff;
 
 
 html,body {
@@ -56,7 +58,7 @@ textarea:focus, input:focus, a:focus {
     outline: none;
 }
 
-input, textarea {
+.input {
   background-color: rgba(0, 0, 0, 0.1);
   color: #002F2F;
   border: 1px solid #aaa;
@@ -212,6 +214,8 @@ nav {
 
 // Address book tab
 article {
+  position: relative;
+
   padding: @articlePadding;
   height: @articleHeight;
 
@@ -223,18 +227,12 @@ article {
 
   .clear-text {
     textarea {
+      .input;
       width: 98%;
       height: 45px;
       resize: none;
     }
     margin-bottom: 5px;
-  }
-
-  .encrypt-for {
-    input {
-      width: 98%;
-      padding: 1px;
-    }
   }
 
   ul {
@@ -265,18 +263,30 @@ article {
   }
 
   .bottom {
-    margin-top: 10px;
+    position: absolute;
+    top: @articleHeight - 30;
   }
 
   ul.selected-keys {
-    margin-bottom: 20px;
-    max-height: @articleHeight / 5;
+    .input;
+    padding: 2px;
+    max-height: @beadHeight * 3 + 8; // XXX
     overflow-y: auto;
+    cursor: text;
+
     li {
       position: relative;
       float: left;
       padding: 2px;
       margin-right: 4px;
+    }
+
+    .filter {
+      background-color: rgba(0,0,0,0);
+      border: none;
+    }
+
+    .bead {
       width: @beadWidth;
       height: @beadHeight;
       line-height: @beadHeight;
@@ -284,6 +294,7 @@ article {
       background-color: @beadBg;
       border: @beadBorder;
       border-radius: @beadRadius;
+      box-shadow: @beadBoxShadow;
       .name {
         padding: @beadPadding;
         line-height: @beadHeight - 2 * @beadPadding;
@@ -292,6 +303,7 @@ article {
         text-overflow: clip;
         font-variant: small-caps;
         text-transform: lowercase;
+        text-shadow: @beadShadow;
       }
       .remove {
         position: absolute;
