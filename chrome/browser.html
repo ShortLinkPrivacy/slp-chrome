@@ -33,7 +33,6 @@
             <ul id="tabs">
               <li><a rv-on-click="lock" href="#">Lock</a></li>
               <li><a rv-on-click="goSettings" href="#">Settings</a></li>
-              <li><a rv-on-click="goSettings" href="#">Address Book</a></li>
             </ul>
         </div>
         <article>
@@ -55,7 +54,9 @@
                 </div>
               </div>
               <div rv-hide="clearText">
-                No entered text or selection detected.
+                <div class="middle">
+                  No entered text or selection detected.
+                </div>
               </div>
             </div>
             <div rv-show="alreadyEncrypted" class="middle">
