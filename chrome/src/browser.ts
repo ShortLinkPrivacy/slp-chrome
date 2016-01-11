@@ -95,12 +95,13 @@ class App {
     isDecrypted: BoolFunc;
     hasSelectedKeys: BoolFunc;
     hasFoundKeys: BoolFunc;
+    alreadyEncrypted: boolean;
+    isTextarea: boolean;
 
     filter: string;
     foundKeys = [];
     selectedKeys = [];
     clearText: string;
-    alreadyEncrypted: boolean;
 
     constructor() {
         this.filter = ""; // TODO - last used
@@ -125,7 +126,8 @@ class App {
             var re = new RegExp(bg.messageStore.getReStr());
             if ( el ) {
                 this.alreadyEncrypted = re.exec(el.value) ? true : false;
-                if ( el.tagName == 'TEXTAREA' ) this.clearText = el.value;
+                this.isTextarea = el.tagName == 'TEXTAREA';
+                this.clearText = el.value;
             }
         });
     }

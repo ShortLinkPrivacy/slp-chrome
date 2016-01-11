@@ -2,14 +2,13 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Pretty Good Plugin (Menu)</title>
+    <title>Browser-2-Browser Crypt</title>
 
     <!-- Local CSS -->
     <link rel="stylesheet" href="css/font-awesome.min.css">
     <link rel="stylesheet/less" type="text/css" href="css/browser.less">
 
     <!-- Vendors JS -->
-    <script src="./bower_components/pathjs/path.min.js"></script>
     <script src="./bower_components/sightglass/index.js"></script>
     <script src="./bower_components/rivets/dist/rivets.js"></script>
     <script src="./bower_components/openpgp/dist/openpgp.min.js"></script>
@@ -39,24 +38,25 @@
         </div>
         <div id="encrypt-tab">
           <div rv-hide="alreadyEncrypted">
-            <div rv-show="clearText">
-              <div class="error" rv-show="error">{ error }</div>
-              <label for="filter">Search address book:</label>
-              <input class="filter" rv-value="filter" rv-on-keyup="doFilter" placeholder="name or email">
-              <ul class="found-keys" rv-show="hasFoundKeys < foundKeys">
-                <li rv-on-click="addPublicKey" rv-each-key="foundKeys"><span>{ key.getPrimaryUser }</span></li>
-              </ul>
-              <div class="bottom" rv-show="hasSelectedKeys < selectedKeys">
-                <label>Encrypt for:</label>
-                <ul class="selected-keys">
-                  <li rv-each-key="selectedKeys"><div class="name">{ key.getPrimaryUser }</div><div class="remove" rv-on-click="removePublicKey">x</div></li>
-                </ul>
-                <button rv-on-click="sendMessage">encrypt</button>
+            <div>
+              <div class="clear-text">
+                <label>Text</label>
+                <textarea rv-value="clearText"></textarea>
               </div>
-            </div>
-            <div rv-hide="clearText">
-              <div class="middle">
-                No input with text or selection detected.
+              <div rv-show="clearText">
+                <div class="encrypt-for">
+                  <label for="filter">Encrypt for</label>
+                  <input rv-value="filter" rv-on-keyup="doFilter" placeholder="search address book">
+                </div>
+                <ul class="found-keys" rv-show="hasFoundKeys < foundKeys">
+                  <li rv-on-click="addPublicKey" rv-each-key="foundKeys"><span>{ key.getPrimaryUser }</span></li>
+                </ul>
+                <div class="bottom" rv-show="hasSelectedKeys < selectedKeys">
+                  <ul class="selected-keys">
+                    <li rv-each-key="selectedKeys"><div class="name">{ key.getPrimaryUser }</div><div class="remove" rv-on-click="removePublicKey"><i class="fa fa-times"></i></div></li>
+                  </ul>
+                  <button class="button" rv-on-click="sendMessage">generate link</button>
+                </div>
               </div>
             </div>
           </div>

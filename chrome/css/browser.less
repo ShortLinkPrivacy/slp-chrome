@@ -36,18 +36,18 @@
 @selectFg: #fff;
 
 // Beads
-@beadBg: #AADDDD;
+@beadBg: rgba(0,0,0,.1);
 @beadFg: #000;
-@beadBorder: 1px solid #666;
-@beadWidth: 100px;
+@beadBorder: none;
+@beadWidth: 130px;
 @beadHeight: 15px;
 @beadPadding: 2px;
-@beadRadius: 5px;
+@beadRadius: 0px;
 
 // Bead remove
 @beadRemoveWidth: 15px;
-@beadRemoveBg: #619090;
-@beadRemoveFg: #fff;
+@beadRemoveBg: rgba(0,0,0,.1);
+@beadRemoveFg: #666;
 
 
 html,body {
@@ -81,7 +81,7 @@ textarea:focus, input:focus, a:focus {
 }
 
 // General button
-button {
+.button {
     font-family: inherit;
     font-size: 120%;
     padding: 0.5em 1em;
@@ -213,22 +213,31 @@ button {
   border: @border;
   height: @articleHeight;
 
-  position: relative;
-
   label {
     font-weight: bold;
+    margin-right: 2px;
     display: block;
-    margin-bottom: 2px;
   }
 
-  .filter {
-    width: 98%;
-    padding: 2px;
-    font-size: 120%;
-    margin-bottom: 0px;
-    color: #002F2F;
-    font-weight: bold;
-    border: 1px solid #666;
+  .clear-text {
+    textarea {
+      width: 98%;
+      height: 45px;
+      resize: none;
+      background-color: rgba(0,0,0,0.1);
+      border: 1px solid #aaa;
+    }
+    margin-bottom: 5px;
+  }
+
+  .encrypt-for {
+    input {
+      width: 98%;
+      padding: 2px;
+      color: #002F2F;
+      background-color: rgba(0,0,0,0.1);
+      border: 1px solid #aaa;
+    }
   }
 
   ul {
@@ -242,7 +251,7 @@ button {
   }
 
   ul.found-keys {
-    background: #fff;
+    background: rgba(255,255,240,0.1);
     border: 1px solid #666;
     max-height: @articleHeight / 3;
     input[type="checkbox"] {
@@ -269,7 +278,7 @@ button {
     li {
       position: relative;
       float: left;
-      padding: 0;
+      padding: 2px;
       margin-right: 4px;
       width: @beadWidth;
       height: @beadHeight;
@@ -290,8 +299,9 @@ button {
       .remove {
         position: absolute;
         top: 0;
-        left: @beadWidth - @beadRemoveWidth;
+        left: @beadWidth - @beadRemoveWidth + 4;
         width: @beadRemoveWidth;
+        height: @beadHeight + 4;
         font-weight: bold;
         cursor: pointer;
         text-align: center;
@@ -305,13 +315,6 @@ button {
         }
       }
     }
-  }
-
-  .footer {
-    position: absolute;
-    top: @articleHeight - 20;
-    height: 20px;
-    text-align: center;
   }
 }
 
