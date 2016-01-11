@@ -170,6 +170,14 @@ input, textarea {
   display: block;
   background-color: @mainBg;
 
+}
+
+// Menu
+nav {
+  height: @menuHeight;
+  line-height: @menuHeight;
+  background-color: @menuBg;
+
   .logo {
     text-decoration: none;
     color: @logoFg;
@@ -178,30 +186,25 @@ input, textarea {
     border-right: @logoBorder;
   }
 
-  .menu {
-    height: @menuHeight;
-    line-height: @menuHeight;
-    background-color: @menuBg;
-    ul {
-      margin: 0;
-      padding: 0;
+  ul {
+    margin: 0;
+    padding: 0;
 
-      li {
-        font-size: 115%;
-        list-style-type: none;
-        float: right;
-      }
+    li {
+      font-size: 115%;
+      list-style-type: none;
+      float: right;
+    }
 
-      a {
-        display: block;
-        text-decoration: none;
-        color: @menuFg;
-        padding: 0 5px;
-        margin-right: 3px;
+    a {
+      display: block;
+      text-decoration: none;
+      color: @menuFg;
+      padding: 0 5px;
+      margin-right: 3px;
 
-        &:hover {
-          color: @menuHover;
-        }
+      &:hover {
+        color: @menuHover;
       }
     }
   }
