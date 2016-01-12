@@ -18,9 +18,8 @@ browser
 content
 ==================================
 - Provide a key shortcut to auto-encrypt current text with the last public key (or combination of public keys).
-- Unify the way [PGP MESSAGE:1234] is displayed. Maybe move it in a method in messageStore
 - Recognize public key links and transform them into a clickable item. When clicked, import into the address book and show an info notif.
-- Once the password is locked, restore all tabs' decrypted texts back to links
+- If no textarea is selected, when pasting a URL, find a textarea and use it.
 
 background
 ==================================
