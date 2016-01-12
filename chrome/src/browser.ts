@@ -16,9 +16,9 @@ function sendMessageToContent(msg: any, callback?: Interfaces.ResultCallback): v
 }
 
 //---------------------------------------------------------------------------
-// Encrypt own private key and create a crypted url
+// Encrypt own public key and create a crypted url
 //---------------------------------------------------------------------------
-function encryptPrivateKey(callback: Interfaces.SuccessCallback): void {
+function encryptPublicKey(callback: Interfaces.SuccessCallback): void {
     var armoredText: string;
 
     // TODO: cache this link in the settings
@@ -263,8 +263,8 @@ class App {
     //---------------------------------------------------------------------------
     // Encrypt own private key and pastes the url to the textarea
     //---------------------------------------------------------------------------
-    sendPrivateKey(): void {
-        encryptPrivateKey((result) => {
+    sendPublicKey(): void {
+        encryptPublicKey((result) => {
             if ( result.success ) {
                 sendMessageToContent({ setElement: result.value });
                 window.close();

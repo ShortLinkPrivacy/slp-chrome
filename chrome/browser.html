@@ -38,25 +38,26 @@
         </nav>
         <article>
           <div rv-hide="alreadyEncrypted">
-            <div>
-              <div class="clear-text">
-                <label>Text:</label>
-                <textarea rv-value="clearText"></textarea>
-              </div>
-              <div rv-show="clearText">
-                <label for="filter">Recepients:</label>
-                <ul class="selected-keys" rv-on-click="focusFilter">
-                  <li class="bead" rv-each-key="selectedKeys"><div class="name">{ key.getPrimaryUser }</div><div class="remove" rv-on-click="removePublicKey"><i class="fa fa-times"></i></div></li>
-                  <li><input id="ftr" class="filter" rv-value="filter" rv-on-keyup="doFilter"></li>
-                </ul>
-                <ul class="found-keys" rv-show="hasFoundKeys < foundKeys">
-                  <li rv-on-click="addPublicKey" rv-each-key="foundKeys"><span>{ key.getPrimaryUser }</span></li>
-                </ul>
-                <div class="bottom" rv-show="hasSelectedKeys < selectedKeys">
-                  <button class="button" rv-on-click="sendMessage">Encrypt Message</button>
-                </div>
-              </div>
+            <div class="clear-text">
+              <label>Text:</label>
+              <textarea rv-value="clearText"></textarea>
             </div>
+            <div rv-show="clearText">
+              <label for="filter">Recepients:</label>
+              <ul class="selected-keys" rv-on-click="focusFilter">
+                <li class="bead" rv-each-key="selectedKeys"><div class="name">{ key.getPrimaryUser }</div><div class="remove" rv-on-click="removePublicKey"><i class="fa fa-times"></i></div></li>
+                <li><input id="ftr" class="filter" rv-value="filter" rv-on-keyup="doFilter"></li>
+              </ul>
+              <ul class="found-keys" rv-show="hasFoundKeys < foundKeys">
+                <li rv-on-click="addPublicKey" rv-each-key="foundKeys"><span>{ key.getPrimaryUser }</span></li>
+              </ul>
+            </div><!-- clearText -->
+            <div class="bottom">
+              <span rv-show="clearText">
+                <button rv-show="hasSelectedKeys < selectedKeys" class="button" rv-on-click="sendMessage">Encrypt Message</button>
+              </span>
+              <button rv-hide="clearText" rv-on-click="sendPublicKey" class="button">Send My Public Key</button>
+            </div><!-- .bottom -->
           </div><!-- !alreadyEncrypted -->
           <div rv-show="alreadyEncrypted" class="middle">
             <p>This message has already been encrypted.</p>
