@@ -32,11 +32,23 @@ function decodeText(codedText: string, callback: { (decodedText): void }): void 
         if ( result.success ) {
             codedText = codedText.replace(url, result.value);
         } else {
-            codedText = codedText.replace(url, "[PGP MESSAGE:" + messageId + "]"); // TODO: add link
+            codedText = "Error decrypting"
         }
         decodeText(codedText, callback);
     });
 };
+
+// Takes an element, searches for containing elements with a special class name
+// and transforms them to public key hotlinks
+function hotlinkPublicKeys(el: HTMLElement): void {
+    var els = el.getElementsByClassName('__pgp_pk'),
+        i: number;
+
+    for (i = 0; i < els.length; i++) {
+        
+    }
+
+}
 
 function decodeNode(node: Node): void {
     decodeText( node.nodeValue, (newValue) => {
@@ -54,6 +66,9 @@ function decodeNode(node: Node): void {
 
             // Set the new value
             parentEl.innerHTML = newValue;
+
+            // Create public key hotlinks
+            hotlinkPublicKeys(parentEl);
         }
     });
 }

@@ -33,11 +33,11 @@
 @selectFg: #fff;
 
 // Beads
-@beadBg: #eee;
+@beadBg: #A5EAEC;
 @beadFg: #000;
-@beadBorder: 1px solid #999;
-@beadShadow: 1px 1px #fff;
-@beadBoxShadow: 1px 1px 2px #999;
+@beadBorder: 1px solid #4C6C6D;
+@beadShadow: none; //1px 1px #000;
+@beadBoxShadow: none; //1px 1px 2px #c7c7ce;
 @beadWidth: 130px;
 @beadHeight: 15px;
 @beadPadding: 2px;
@@ -45,8 +45,8 @@
 
 // Bead remove
 @beadRemoveWidth: 15px;
-@beadRemoveBg: #999;
-@beadRemoveFg: #fff;
+@beadRemoveBg: #4C6C6D;
+@beadRemoveFg: #eee;
 
 
 html,body {
@@ -87,35 +87,24 @@ textarea:focus, input:focus, a:focus {
 
 // General button
 .button {
-    font-family: inherit;
-    font-size: 120%;
-    padding: 0.5em 1em;
-    border: none rgba(0, 0, 0, 0);
+    display: inline-block;
+    position: relative;
+    margin: 10px;
+    padding: 0 20px;
+    text-align: center;
     text-decoration: none;
-    border-radius: 2px;
+    text-shadow: 1px 1px 2px #fff;
+    font: bold 12px/25px Arial, sans-serif;
+    border-radius: 10px;
+    transition: all 0.15s ease;
+    border: 1px solid #999;
     &:hover,
     &:focus {
       background-image: linear-gradient(transparent, rgba(0,0,0, 0.05) 40%, rgba(0,0,0, 0.10));
     }
-
-    &::focus {
-      outline: 0;
-    }
-
-    background-color: rgb(0, 120, 231);
-    color: #fff;
-
     cursor: pointer;
-
-    &[disabled] {
-      border: none;
-      background-image: none;
-      filter: alpha(opacity=40);
-      opacity: 0.40;
-      cursor: not-allowed;
-      box-shadow: none;
-    }
 }
+
 
 .button-large {
   font-size: 150%;

@@ -45,7 +45,7 @@
             <div rv-show="clearText">
               <label for="filter">Recepients:</label>
               <ul class="selected-keys" rv-on-click="focusFilter">
-                <li class="bead" rv-each-key="selectedKeys"><div class="name">{ key.getPrimaryUser }</div><div class="remove" rv-on-click="removePublicKey"><i class="fa fa-times"></i></div></li>
+                <li class="bead" rv-each-key="selectedKeys"><div class="name">{ key.getPrimaryUser }</div><div class="remove" rv-on-click="removePublicKey">✖</div></li>
                 <li><input id="ftr" class="filter" rv-value="filter" rv-on-keyup="doFilter"></li>
               </ul>
               <ul class="found-keys" rv-show="hasFoundKeys < foundKeys">

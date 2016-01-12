@@ -116,7 +116,7 @@ function decryptLink(request: any, sender: chrome.runtime.MessageSender, sendRes
         }
 
         var armorType = getArmorType(result.armor);
-        if ( armorType == ArmorType.Signed || armorType == ArmorType.Message ) { // TODO, other types
+        if ( armorType == ArmorType.Signed || armorType == ArmorType.Message ) {
             var message = openpgp.message.readArmored(result.armor);
 
             openpgp.decryptMessage( privateKey.key, message )
@@ -126,6 +126,12 @@ function decryptLink(request: any, sender: chrome.runtime.MessageSender, sendRes
                .catch((error) => {
                    sendResponse({ success: false, error: 'decode', value: messageId });
                });
+        } else if ( armorType == ArmorType.PublicKey ) {
+            var key = new Keys.PublicKey(result.armor);
+            sendResponse({
+                success: true,
+                value: "<span class='__pgp_pk' rel='" + messageId + "'>" + key.getPrimaryUser() + "</span>"
+            });
         }
     });
 }

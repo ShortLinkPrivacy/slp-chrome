@@ -135,7 +135,14 @@ class App {
     //---------------------------------------------------------------------------
     // Execute the search for public keys
     //---------------------------------------------------------------------------
-    doFilter(): void {
+    doFilter(e: KeyboardEvent): void {
+
+        // Backspace removes the last added key if the filter is empty
+        if ( e.keyCode == 8 && !this.filter ) {
+            this.selectedKeys.pop();
+            return;
+        }
+
         if ( !this.filter ) {
             this.foundKeys = [];
             return;
