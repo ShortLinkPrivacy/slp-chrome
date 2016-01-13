@@ -90,6 +90,7 @@ class App {
 
     error: string;
     password: string;
+    wait: boolean;
 
     hasPrivateKey: BoolFunc;
     isDecrypted: BoolFunc;
@@ -205,7 +206,9 @@ class App {
         // Also push our own key, so we can read our own message
         keyList.push(bg.privateKey.key.toPublic());
 
+        this.wait = true;
         encryptMessage(this.clearText, keyList, (result) => {
+            this.wait = false;
             if ( result.success ) {
                 sendMessageToContent({ setElement: result.value });
                 window.close();
@@ -238,6 +241,7 @@ class App {
         }
 
         if ( this.password ) {
+            this.wait = true;
             if ( bg.privateKey.decrypt(this.password) ) {
                 chrome.tabs.query({currentWindow: true}, (tabs) => {
                     tabs.forEach((tab) => {
@@ -249,6 +253,7 @@ class App {
             } else {
                 this.error = "Wrong password";
             }
+            this.wait = false;
         }
     }
 

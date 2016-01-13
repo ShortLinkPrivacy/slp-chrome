@@ -54,7 +54,7 @@
             </div><!-- clearText -->
             <div class="bottom">
               <span rv-show="clearText">
-                <button rv-show="hasSelectedKeys < selectedKeys" class="button" rv-on-click="sendMessage">Encrypt Message</button>
+                <button rv-show="hasSelectedKeys < selectedKeys" class="button" rv-disabled="wait" rv-on-click="sendMessage">Encrypt Message <span rv-show="wait"><i class="fa fa-cog fa-spin"></i></span></button>
               </span>
               <button rv-hide="clearText" rv-on-click="sendPublicKey" class="button">Share My Public Key</button>
             </div><!-- .bottom -->
