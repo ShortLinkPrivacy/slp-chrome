@@ -45,9 +45,8 @@ function hotlinkPublicKeys(el: HTMLElement): void {
         i: number;
 
     for (i = 0; i < els.length; i++) {
-        
+        // XXX TODO       
     }
-
 }
 
 function decodeNode(node: Node): void {
@@ -150,6 +149,15 @@ function listenToMessages() {
     // ------------------------------------------------------------
     var setElement = function(msg, sendResponse) {
         var el = <HTMLTextAreaElement>document.activeElement;
+
+        // If the active element is not a textarea, then find one
+        if ( el.tagName !== 'TEXTAREA' ) {
+            var els = document.getElementsByTagName('textarea');
+            if ( els.length > 0 ) {
+                // Get the last textarea found
+                el = <HTMLTextAreaElement>els[els.length - 1];
+            }
+        }
 
         if ( el.tagName == 'TEXTAREA' ) {
             // Save the original value of the element so it can be restored

@@ -33,20 +33,20 @@
 @selectFg: #fff;
 
 // Beads
-@beadBg: #A5EAEC;
-@beadFg: #000;
-@beadBorder: 1px solid #4C6C6D;
+@beadBg: #ADC6FF;
+@beadFg: #002270;
+@beadBorder: 1px solid #002C91;
 @beadShadow: none; //1px 1px #000;
 @beadBoxShadow: none; //1px 1px 2px #c7c7ce;
-@beadWidth: 130px;
+@beadWidth: 100px;
 @beadHeight: 15px;
 @beadPadding: 2px;
 @beadRadius: 3px;
 
 // Bead remove
 @beadRemoveWidth: 15px;
-@beadRemoveBg: #4C6C6D;
-@beadRemoveFg: #eee;
+@beadRemoveBg: #002C91;
+@beadRemoveFg: #7FA6FF;
 
 
 html,body {
@@ -284,6 +284,7 @@ article {
       border: @beadBorder;
       border-radius: @beadRadius;
       box-shadow: @beadBoxShadow;
+      margin-bottom: 2px;
       .name {
         padding: @beadPadding;
         line-height: @beadHeight - 2 * @beadPadding;
@@ -293,6 +294,7 @@ article {
         font-variant: small-caps;
         text-transform: lowercase;
         text-shadow: @beadShadow;
+        cursor: default;
       }
       .remove {
         position: absolute;

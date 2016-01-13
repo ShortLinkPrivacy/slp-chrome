@@ -19,7 +19,7 @@ content
 ==================================
 - Provide a key shortcut to auto-encrypt current text with the last public key (or combination of public keys).
 - Recognize public key links and transform them into a clickable item. When clicked, import into the address book and show an info notif.
-- If no textarea is selected, when pasting a URL, find a textarea and use it.
+- Expand to other elements, not just TEXTAREA (gmail)
 
 background
 ==================================
