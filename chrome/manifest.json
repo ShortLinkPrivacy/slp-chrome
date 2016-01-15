@@ -1,9 +1,9 @@
 {
   "manifest_version": 2,
 
-  "name": "Pretty Good Plugin",
-  "short_name": "PGPlugin",
-  "description": "End to end PGP encryption for most types of online conversations.",
+  "name": "Short Link Privacy",
+  "short_name": "SLP",
+  "description": "Browser to browser PGP encryption via short links.",
   "version": "1.0",
   "options_page": "settings.html",
 
