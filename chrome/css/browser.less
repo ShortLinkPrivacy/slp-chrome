@@ -2,8 +2,6 @@
 // Password
 @pwdBg: #002F2F;
 @pwdInputBorder: #000;
-@pwdErrorBg: #8E2800;
-@pwdErrorFg: #FFF0A5;
 @pwdBoxWidth: 300px;
 @pwdBoxHeight: 125px;
 
@@ -64,17 +62,25 @@ textarea:focus, input:focus, a:focus {
   border: 1px solid #aaa;
 }
 
-// General error
-.error {
+// General error and info
+.error, .info {
   position: absolute;
   width: 100%;
   top: 0px;
   left: 0px;
-  background-color: @pwdErrorBg;
-  color: @pwdErrorFg;
   padding: 3px;
   font-weight: bold;
   text-align: center;
+}
+
+.error {
+  background-color: #8E2800;
+  color: #FFF0A5;
+}
+
+.info {
+  background-color: #003F3F;
+  color: #fff;
 }
 
 .pull-left {
