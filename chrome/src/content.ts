@@ -39,13 +39,26 @@ function decodeText(codedText: string, callback: { (decodedText): void }): void 
 };
 
 // Takes an element, searches for containing elements with a special class name
-// and transforms them to public key hotlinks
+// and attach onClick bindings so they can be imported into the user's address
+// book
 function hotlinkPublicKeys(el: HTMLElement): void {
     var els = el.getElementsByClassName('__pgp_pk'),
         i: number;
 
+    var bindOnClick = function(el: HTMLElement) {
+        return function(e: MouseEvent): void {
+            e.preventDefault();
+            e.stopPropagation();
+            chrome.runtime.sendMessage({ command: 'addPublicKey', id: el.attributes["rel"] }, (result) => {
+                if ( result.success ) {
+                    el.classList.add('__pgp_pk_added');
+                }
+            })
+        }
+    }
+
     for (i = 0; i < els.length; i++) {
-        // XXX TODO       
+        el.addEventListener('click', bindOnClick(el[0]));
     }
 }
 
