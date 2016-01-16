@@ -61,7 +61,7 @@
           </div><!-- !alreadyEncrypted -->
           <div rv-show="alreadyEncrypted" class="middle">
             <p>This message has already been encrypted.</p>
-            <button rv-on-click="restoreMessage">Restore original message</button>
+            <button class="button" rv-on-click="restoreMessage">Restore original message</button>
           </div><!-- alreadyEncrypted -->
         </article><!-- #encrypted-tab -->
       </div><!-- #main -->
@@ -70,7 +70,7 @@
     <div id="no-key" rv-hide="hasPrivateKey">
       <span class="middle">
         <p>You have not created or imported your PGP key yet.</p>
-        <button rv-on-click="goSettings">Setup</button>
+        <button class="button" rv-on-click="goSettings">Setup</button>
       </span>
     </div><!-- !hasPrivateKey -->
 
