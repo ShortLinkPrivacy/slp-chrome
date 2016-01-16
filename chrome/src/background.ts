@@ -143,8 +143,32 @@ function needPassword(request: any, sender: chrome.runtime.MessageSender, sendRe
     chrome.browserAction.setBadgeText({text: '*'});
 }
 
+/*
+ * addPublicKey
+ * Called by the content script when the user clicks a button with public key url in it
+ * The request contains the messageId of the message url containing the armored text of the public key
+ */
 function addPublicKey(request: any, sender: chrome.runtime.MessageSender, sendResponse: Interfaces.SuccessCallback): void {
-    sendResponse({ success: true });
+    var key: Keys.PublicKey,
+        messageId: string = request.messageId;
+
+    messageStore.load( messageId, (result) => {
+        if ( !result.success ) {
+           sendResponse({ success: false, error: 'decode', value: messageId });
+           return;
+        }
+
+        try {
+            key = new Keys.PublicKey(result.armor);
+        } catch (err) {
+            sendResponse({ success: false, error: err });
+            return;
+        }
+
+        keyStore.storePublicKey(key, () => {
+            sendResponse({ success: true });
+        });
+    });
 }
 
 //############################################################################

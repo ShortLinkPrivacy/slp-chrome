@@ -34,3 +34,5 @@ bower_components
 *.js
 
 chrome/src/*.d.ts
+chrome/css/browser.css
+chrome/css/content.css
