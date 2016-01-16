@@ -303,6 +303,10 @@ class App {
             }
         });
         rivets.bind(document.body, this);
+
+        if (this.isDecrypted() == false) {
+            document.getElementById('pwd').focus();
+        }
     }
 }
 

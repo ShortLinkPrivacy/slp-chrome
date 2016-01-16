@@ -1,9 +1,7 @@
 
 // Password
-@pwdBg: #002F2F;
-@pwdInputBorder: #000;
-@pwdBoxWidth: 300px;
-@pwdBoxHeight: 125px;
+@screenWidth: 300px;
+@screenHeight: 125px;
 
 
 // Main
@@ -134,29 +132,21 @@ textarea:focus, input:focus, a:focus {
   vertical-align: middle;
 }
 
-// No key setup yet screen
-#no-key {
-  width: @pwdBoxWidth;
-  height: 80px;
-}
-
-// Password screen
-#password {
-  background-color: @pwdBg;
-  width: @pwdBoxWidth;
-  height: @pwdBoxHeight;
+// Password and no-key screens
+.screen {
+  background-color: @mainBg;
+  width: @screenWidth;
+  height: @screenHeight;
   text-align: center;
 
   input {
     font-size: 150%;
     padding: 5px;
-    border: 2px solid @pwdInputBorder;
-    width: ;
   }
 
   .middle {
-    width: @pwdBoxWidth;
-    height: @pwdBoxHeight;
+    width: @screenWidth;
+    height: @screenHeight;
   }
 }
 

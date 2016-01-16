@@ -20,22 +20,29 @@
   </head>
   <body>
     <div class="error" rv-if="error" rv-text="error"></div>
+    <nav>
+      <div class="logo pull-left">short link pgp</div>
+      <ul id="tabs" class="pull-right">
+        <li rv-show="isDecrypted"><a rv-on-click="lock" href="#"><i class="fa fa-lock"></i> lock</a></li>
+        <li><a rv-on-click="goSettings" href="#"><i class="fa fa-cog"></i> settings</a></li>
+      </ul>
+    </nav>
+
+    <div class="screen" rv-hide="hasPrivateKey">
+      <span class="middle">
+        <p>You have not created or imported your PGP key yet.</p>
+        <button class="button" rv-on-click="goSettings">Setup</button>
+      </span>
+    </div><!-- !hasPrivateKey -->
 
     <div rv-show="hasPrivateKey">
-      <div id="password" rv-hide="isDecrypted">
+      <div class="screen" rv-hide="isDecrypted">
         <div class="middle">
-          <input rv-value="password" rv-on-keyup="enterPassword" type="password" placeholder="private key password">
+          <input id="pwd" rv-value="password" rv-on-keyup="enterPassword" type="password" placeholder="private key password">
         </div>
       </div>
 
       <div id="main" rv-show="isDecrypted">
-        <nav>
-          <div class="logo pull-left">b2b crypt</div>
-          <ul id="tabs" class="pull-right">
-            <li><a rv-on-click="lock" href="#"><i class="fa fa-lock"></i> lock</a></li>
-            <li><a rv-on-click="goSettings" href="#"><i class="fa fa-cog"></i> settings</a></li>
-          </ul>
-        </nav>
         <article>
           <div rv-hide="alreadyEncrypted">
             <div class="clear-text">
@@ -66,13 +73,5 @@
         </article><!-- #encrypted-tab -->
       </div><!-- #main -->
     </div><!-- hasPrivateKey -->
-
-    <div id="no-key" rv-hide="hasPrivateKey">
-      <span class="middle">
-        <p>You have not created or imported your PGP key yet.</p>
-        <button class="button" rv-on-click="goSettings">Setup</button>
-      </span>
-    </div><!-- !hasPrivateKey -->
-
   </body>
 </html>
