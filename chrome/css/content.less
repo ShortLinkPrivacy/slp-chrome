@@ -1,0 +1,35 @@
+// Private key
+.__pgp_pk {
+  display: inline-block;
+  position: relative;
+  margin: 10px;
+  padding: 0 20px 0 25px;
+  text-align: center;
+  text-decoration: none;
+  text-shadow: 1px 1px 2px #fff;
+  font: bold 12px/25px Arial, sans-serif;
+  border-radius: 10px;
+  transition: all 0.15s ease;
+  border: 1px solid #999;
+  &:hover,
+  &:focus {
+    background-image: linear-gradient(transparent, rgba(0,0,0, 0.05) 40%, rgba(0,0,0, 0.10));
+  }
+  cursor: pointer;
+
+  img {
+    position: absolute;
+    left: 4px;
+    top: 5px;
+  }
+}
+
+.__pgp_pk_added, &:hover, &:focus {
+  cursor: not-allowed;
+  background-image: none;
+  opacity: 0.4;
+  box-shadow: none;
+  &:after {
+    content: '✓'
+  }
+}

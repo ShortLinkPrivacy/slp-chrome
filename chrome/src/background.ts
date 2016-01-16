@@ -18,7 +18,8 @@ interface DispatchCall {
 var dispatcher: DispatchCall = {
     init: initVars,
     decryptLink: decryptLink,
-    needPassword: needPassword
+    needPassword: needPassword,
+    addPublicKey: addPublicKey
 };
 
 //############################################################################
@@ -128,9 +129,11 @@ function decryptLink(request: any, sender: chrome.runtime.MessageSender, sendRes
                });
         } else if ( armorType == ArmorType.PublicKey ) {
             var key = new Keys.PublicKey(result.armor);
+            var text = key.getPrimaryUser();
+            var icon = '<img src="' + chrome.runtime.getURL('/images/id16.png') + '">'
             sendResponse({
                 success: true,
-                value: "<span class='__pgp_pk' rel='" + messageId + "'>" + key.getPrimaryUser() + "</span>"
+                value: "<span class='__pgp_pk' rel='" + messageId + "'>" + icon + text + "</span>"
             });
         }
     });
@@ -138,6 +141,10 @@ function decryptLink(request: any, sender: chrome.runtime.MessageSender, sendRes
 
 function needPassword(request: any, sender: chrome.runtime.MessageSender, sendResponse: Interfaces.SuccessCallback): void {
     chrome.browserAction.setBadgeText({text: '*'});
+}
+
+function addPublicKey(request: any, sender: chrome.runtime.MessageSender, sendResponse: Interfaces.SuccessCallback): void {
+    sendResponse({ success: true });
 }
 
 //############################################################################

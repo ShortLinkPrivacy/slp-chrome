@@ -49,16 +49,17 @@ function hotlinkPublicKeys(el: HTMLElement): void {
         return function(e: MouseEvent): void {
             e.preventDefault();
             e.stopPropagation();
-            chrome.runtime.sendMessage({ command: 'addPublicKey', id: el.attributes["rel"] }, (result) => {
+            chrome.runtime.sendMessage({ command: 'addPublicKey', id: el.getAttribute('rel') }, (result) => {
                 if ( result.success ) {
                     el.classList.add('__pgp_pk_added');
+                    el.removeEventListener('click', bindOnClick(el));
                 }
             })
         }
     }
 
     for (i = 0; i < els.length; i++) {
-        el.addEventListener('click', bindOnClick(el[0]));
+        el.addEventListener('click', bindOnClick(<HTMLElement>els[i]));
     }
 }
 

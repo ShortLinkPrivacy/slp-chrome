@@ -9,6 +9,7 @@ help:
 	@echo "browser                 compile all browser files"
 	@echo "content                 compile all content files"
 	@echo "background              compile all background files"
+	@echo "less                    compile all less files"
 	@echo "build                   build all"
 
 #------------------------------------------------------------------
@@ -51,6 +52,10 @@ content:
 
 background:
 	tsc --out src/background.js src/background.ts
+
+less:
+	lessc css/browser.less css/browser.css
+	lessc css/content.less css/content.css
 
 build: modules coffee admin browser content background
 
