@@ -9,7 +9,9 @@ var observer: MutationObserver;
 
 // Classes and attributes to add to decrypted nodes
 var pgpClassName = '__pgp',         // The class name to add to dectypted nodes
-    pgpData = '__pgp_data';         // Propery to add to nodes with the original content
+    pgpData = '__pgp_data',         // Propery to add to nodes with the original content
+    pgpPK = '__pgp_pk',             // Class name to add to public key links
+    pgpPKAdded = '__pgp_pk_added';  // Class name for public keys that have been added to the address book
 
 // Regular expression for the url
 var urlRe: RegExp;
@@ -39,10 +41,10 @@ function decodeText(codedText: string, callback: { (decodedText): void }): void 
 };
 
 // Takes an element, searches for containing elements with a special class name
-// and attach onClick bindings so they can be imported into the user's address
+// and attaches onClick bindings so they can be imported into the user's address
 // book
-function hotlinkPublicKeys(el: HTMLElement): void {
-    var els = el.getElementsByClassName('__pgp_pk'),
+function hotlinkPublicKeys(element: HTMLElement): void {
+    var els = element.getElementsByClassName(pgpPK),
         i: number;
 
     var bindOnClick = function(el: HTMLElement) {
@@ -51,7 +53,7 @@ function hotlinkPublicKeys(el: HTMLElement): void {
             e.stopPropagation();
             chrome.runtime.sendMessage({ command: 'addPublicKey', messageId: el.getAttribute('rel') }, (result) => {
                 if ( result.success ) {
-                    el.classList.add('__pgp_pk_added');
+                    el.classList.add(pgpPKAdded);
                     el.removeEventListener('click', bindOnClick(el));
                 }
             })
@@ -59,7 +61,9 @@ function hotlinkPublicKeys(el: HTMLElement): void {
     }
 
     for (i = 0; i < els.length; i++) {
-        el.addEventListener('click', bindOnClick(<HTMLElement>els[i]));
+        var el = els[i];
+        if (el.classList.contains(pgpPKAdded)) continue;
+        element.addEventListener('click', bindOnClick(<HTMLElement>el));
     }
 }
 
