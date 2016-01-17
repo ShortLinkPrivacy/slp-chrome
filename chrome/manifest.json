@@ -17,7 +17,7 @@
   },
 
   "browser_action": {
-    "default_icon": "images/padlock.png",
+    "default_icon": "images/mail.png",
     "default_popup": "browser.html"
   },
 

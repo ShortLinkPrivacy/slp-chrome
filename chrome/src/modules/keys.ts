@@ -18,12 +18,37 @@ module Keys {
     export class Key {
         key: openpgp.key.Key;
 
+        fingerprint: { (): string };
+        userIds: { (): Array<string> };
+        getPrimaryUser: { (): string };
+        armored: { (): string };
+        openpgpKey: { (): openpgp.key.Key };
+
         constructor(armoredText: string) {
             if (!armoredText) {
                 throw new KeyError('missing');
             }
 
             this.key = this.fromArmored(armoredText);
+
+            // All of these must be bound to the object, so Rivets
+            // can add its magic to them.
+
+            this.fingerprint = function(): string {
+                return this.key.primaryKey.getFingerprint();
+            };
+            this.userIds = function(): Array<string> {
+                return this.key.getUserIds();
+            };
+            this.getPrimaryUser = function(): string {
+                return this.userIds()[0];
+            };
+            this.armored = function(): string {
+                return this.key.armor();
+            };
+            this.openpgpKey = function(): openpgp.key.Key {
+                return this.key;
+            }
         }
 
         fromArmored(armoredText: string): openpgp.key.Key {
@@ -40,26 +65,6 @@ module Keys {
             }
 
             return result.keys[0];
-        }
-
-        fingerprint(): string {
-            return this.key.primaryKey.getFingerprint();
-        }
-
-        userIds(): Array<string> {
-            return this.key.getUserIds();
-        }
-
-        getPrimaryUser(): string {
-            return this.userIds()[0];
-        }
-
-        armored(): string {
-            return this.key.armor();
-        }
-
-        openpgpKey(): openpgp.key.Key {
-            return this.key;
         }
 
     }
