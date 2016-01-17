@@ -87,6 +87,7 @@ function initialize(): Interfaces.InitVars {
     result.linkRe = messageStore.getReStr();
     result.hasPrivateKey = privateKey ? true : false;
     result.isDecrypted = privateKey ? privateKey.isDecrypted() : false;
+    result.config = config;
 
     return result;
 }
@@ -97,21 +98,20 @@ function initVars(request: any, sender: chrome.runtime.MessageSender, sendRespon
     sendResponse({ success: true, value: initialize() });
 }
 
-/*
- * Creates a HTML snippet with a button to replace a public key armored message
- */
+// Creates a HTML snippet with a button to replace a public key armored message
 function makePublicKeyText(armor: string, messageId: string, callback: Interfaces.ResultCallback): void {
     var key = new Keys.PublicKey(armor),
         username = key.getPrimaryUser(),
-        classList: string = '__pgp_pk',
+        classList: Array<string>,
         icon: string,
         html: string;
 
     icon = '<img src="' + chrome.runtime.getURL('/images/id16.png') + '">';
+    classList = [config.pgpPK];
 
     keyStore.searchPublicKey(username, (keys) => {
-        if ( keys.length ) classList += " __pgp_pk_added";
-        html = "<span class='" + classList + "' rel='" + messageId + "'>" + icon + username + "</span>";
+        if ( keys.length ) classList.push(config.pgpPKAdded);
+        html = "<span class='" + classList.join(' ') + "' rel='" + messageId + "'>" + icon + username + "</span>";
         callback(html);
     });
 }

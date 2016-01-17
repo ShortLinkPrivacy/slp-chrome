@@ -25,6 +25,7 @@ module Interfaces {
         linkRe?: string;
         isDecrypted?: boolean;
         hasPrivateKey?: boolean;
+        config?: Config;
     }
 
     export interface BackgroundPage extends Window {
@@ -35,5 +36,4 @@ module Interfaces {
         privateKey: Keys.PrivateKey;
         initialize: { (): InitVars };
     }
-
 }

@@ -7,17 +7,10 @@ var init: Interfaces.InitVars;
 // Observer for newly created elements
 var observer: MutationObserver;
 
-// Classes and attributes to add to decrypted nodes
-var pgpClassName = '__pgp',         // The class name to add to dectypted nodes
-    pgpData = '__pgp_data',         // Propery to add to nodes with the original content
-    pgpPK = '__pgp_pk',             // Class name to add to public key links
-    pgpPKAdded = '__pgp_pk_added';  // Class name for public keys that have been added to the address book
-
 // Regular expression for the url
 var urlRe: RegExp;
 
 function decodeText(codedText: string, callback: { (decodedText): void }): void {
-    //var re = new RegExp(init.linkRe),
      var   match = urlRe.exec(codedText),
         messageId: string,
         url: string;
@@ -40,30 +33,32 @@ function decodeText(codedText: string, callback: { (decodedText): void }): void 
     });
 };
 
-// Takes an element, searches for containing elements with a special class name
+// This closure is used by 'hotlinkPublicKeys'. It returns a 'click' binder
+// which is attached to public key buttons.
+function _bindOnClick(el: HTMLElement) {
+    return function(e: MouseEvent): void {
+        e.preventDefault();
+        e.stopPropagation();
+        chrome.runtime.sendMessage({ command: 'addPublicKey', messageId: el.getAttribute('rel') }, (result) => {
+            if ( result.success ) {
+                el.classList.add(init.config.pgpPKAdded);
+                el.removeEventListener('click', _bindOnClick(el));
+            }
+        })
+    }
+}
+
+// Takes a parent element, searches for elements with a spcific class name
 // and attaches onClick bindings so they can be imported into the user's address
 // book
-function hotlinkPublicKeys(element: HTMLElement): void {
-    var els = element.getElementsByClassName(pgpPK),
+function hotlinkPublicKeys(parentEl: HTMLElement): void {
+    var list = parentEl.getElementsByClassName(init.config.pgpPK),
         i: number;
 
-    var bindOnClick = function(el: HTMLElement) {
-        return function(e: MouseEvent): void {
-            e.preventDefault();
-            e.stopPropagation();
-            chrome.runtime.sendMessage({ command: 'addPublicKey', messageId: el.getAttribute('rel') }, (result) => {
-                if ( result.success ) {
-                    el.classList.add(pgpPKAdded);
-                    el.removeEventListener('click', bindOnClick(el));
-                }
-            })
-        }
-    }
-
-    for (i = 0; i < els.length; i++) {
-        var el = els[i];
-        if (el.classList.contains(pgpPKAdded)) continue;
-        element.addEventListener('click', bindOnClick(<HTMLElement>el));
+    for (i = 0; i < list.length; i++) {
+        var el = list[i];
+        if (el.classList.contains(init.config.pgpPKAdded)) continue;
+        el.addEventListener('click', _bindOnClick(<HTMLElement>el));
     }
 }
 
@@ -78,8 +73,8 @@ function decodeNode(node: Node): void {
             }
 
             // Save the current value of the element and give it a new class
-            $data(parentEl, pgpData, parentEl.innerHTML)
-            parentEl.classList.add(pgpClassName);
+            $data(parentEl, init.config.pgpData, parentEl.innerHTML)
+            parentEl.classList.add(init.config.pgpClassName);
 
             // Set the new value
             parentEl.innerHTML = newValue;
@@ -205,7 +200,7 @@ function listenToMessages() {
     // Return all decrypted nodes to their original values
     // ------------------------------------------------------------
     var lock = function(msg, sendResponse) {
-        var els = document.getElementsByClassName(pgpClassName),
+        var els = document.getElementsByClassName(init.config.pgpClassName),
             i: number,
             parentEl: HTMLElement,
             orgValue: string;
@@ -217,10 +212,10 @@ function listenToMessages() {
             // remove the class names in reverse
             for (i = els.length - 1; i >= 0; i--) {
                 parentEl = <HTMLElement>els[i];
-                parentEl.classList.remove(pgpClassName);
-                if ( orgValue = $data(parentEl, pgpData) ) {
+                parentEl.classList.remove(init.config.pgpClassName);
+                if ( orgValue = $data(parentEl, init.config.pgpData) ) {
                     parentEl.innerHTML = orgValue;
-                    $data(parentEl, pgpData, null);
+                    $data(parentEl, init.config.pgpData, null);
                 }
             }
             observer.observe(document, { childList: true, subtree: true });
