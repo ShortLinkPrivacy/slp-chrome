@@ -36,3 +36,5 @@ bower_components
 chrome/src/*.d.ts
 chrome/css/browser.css
 chrome/css/content.css
+chrome/css/admin.css
+

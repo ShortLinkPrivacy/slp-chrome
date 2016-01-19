@@ -56,6 +56,7 @@ background:
 less:
 	lessc css/browser.less css/browser.css
 	lessc css/content.less css/content.css
+	lessc css/admin.less css/admin.css
 
 build: modules coffee admin browser content background less
 

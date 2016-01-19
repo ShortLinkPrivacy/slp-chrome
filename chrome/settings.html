@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="css/font-awesome.min.css">
 
     <!-- Local CSS -->
-    <link rel="stylesheet/less" type="text/css" href="css/style.less">
+    <link rel="stylesheet/less" type="text/css" href="css/admin.less">
 
     <!-- Vendors JS -->
     <script src="./bower_components/pathjs/path.min.js"></script>
@@ -23,6 +23,7 @@
   </head>
   <body>
     <div id="container" >
+      <!--
       <nav class="pure-menu pure-menu-horizontal">
           <ul class="pure-menu-list">
             <li class="pure-menu-item"><a href="#/key/generate" class="pure-menu-link"> Generate</a></li>
@@ -33,6 +34,7 @@
             <li class="pure-menu-item"><a href="#/pub/list" class="pure-menu-link"> PubList</a></li>
           </ul>
       </nav>
+      -->
       <div id="notify" rv-on-click="notify.clear">
         <div class="warning" rv-if="notify.error">{ notify.error }</div>
         <div class="info" rv-if="notify.info">{ notify.info }</div>
