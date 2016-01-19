@@ -1,11 +1,12 @@
 
 module Admin {
+
     export class PublicKeyList implements Application.Article {
 
         filename = "pub_list.html";
         articleId = "publicKeyList";
         filter: string;
-        foundKeys: KeyStore.PublicKeyArray = [];
+        foundKeys: Array<Keys.KeyItem> = [];
 
         doFilter(): void {
             if ( this.filter == "" || this.filter == null ) {
@@ -14,7 +15,7 @@ module Admin {
             }
 
             bg.keyStore.searchPublicKey(this.filter, (keys) => {
-                this.foundKeys = keys;
+                this.foundKeys = keys.map((k) => { return new Keys.KeyItem(k) })
             });
         }
 

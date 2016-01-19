@@ -107,6 +107,26 @@ module Keys {
         }
     }
 
+    // Rivets bindings requre an abstraction layer to properly
+    // bind and display complex structures. We use this one
+    // in a couple of places where we need to display a list of
+    // keys.
+    export class KeyItem {
+        key: Key;
+        getPrimaryUser: { (): string };
+        fingerprint: { (): string };
+
+        constructor(k: Key) {
+            this.key = k;
+            this.getPrimaryUser = function() {
+                return this.key.getPrimaryUser();
+            }
+            this.fingerprint = function() {
+                return this.key.fingerprint();
+            }
+        }
+    }
+
     if ( typeof window == "undefined" ) {
         exports["Keys"] = Keys;
     }

@@ -66,18 +66,6 @@ function encryptMessage(text: string, keyList: Array<openpgp.key.Key>, callback:
 
 
 /*
- * Address Book tab controller
- */
-
-function KeyItem(k) {
-  this.key = k;
-  this.getPrimaryUser = function() {
-    return this.key.getPrimaryUser()
-  }
-}
-
-
-/*
  * The main application handles all articles, bit it itself
  * also handles the private key password entry screen.
  */
@@ -100,8 +88,8 @@ class App {
     isTextarea: boolean;
 
     filter: string;
-    foundKeys = [];
-    selectedKeys = [];
+    foundKeys: Array<Keys.KeyItem> = [];
+    selectedKeys: Array<Keys.KeyItem> = [];
     clearText: string;
 
     constructor() {
@@ -150,7 +138,7 @@ class App {
         }
 
         bg.keyStore.searchPublicKey(this.filter, (keys) => {
-            this.foundKeys = keys.map( k => { return new KeyItem(k) } );
+            this.foundKeys = keys.map( k => { return new Keys.KeyItem(k) } );
         });
     }
 
@@ -162,7 +150,7 @@ class App {
     }
 
     // Checks if 'key' is already in the 'selectedKeys' array
-    private isSelected(item): boolean {
+    private isSelected(item: Keys.KeyItem): boolean {
         var i: number;
         for (i = 0; i < this.selectedKeys.length; i++) {
             var testItem = this.selectedKeys[i];
