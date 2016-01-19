@@ -1,24 +1,10 @@
 browser
 ==================================
-[Public Keys]
 - Order keys by most used and show the last ones used.
-
-[Private Key]
-- Send private key as a link. Save the link in localStore, so it can be reused next time.
-
-[My Key]
-- Disable if no text area is active
-- Add more text
-
-[Encrypt]
-- Add images to the "you can not encrypt now" texts
-
-
 
 content
 ==================================
 - Provide a key shortcut to auto-encrypt current text with the last public key (or combination of public keys).
-- Recognize public key links and transform them into a clickable item. When clicked, import into the address book and show an info notif.
 - Expand to other elements, not just TEXTAREA (gmail)
 
 background
@@ -36,7 +22,6 @@ installation
 
 API
 ====================================
-- Remove dependency on mongoskin, so you can use the latest mongo driver
 - Reject payload bigger than X bytes (so idiots don't overload your storage)
 
 
