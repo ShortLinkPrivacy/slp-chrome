@@ -11,10 +11,12 @@
   border-radius: 10px;
   transition: all 0.15s ease;
   border: 1px solid #999;
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAaVJREFUOI3N1DtrlEEUxvHfvLlo0CAIgqASC0EsVIigWAgiRPCCXb6AhZWibQrdpFCwslAEIbHRwkJQ0QQ/gIXgKlhYSAplRfESUYgG3SQzFrsvvJF1d7NpfODAMBz+58x5Zob/XaHB3hqcwiH04Dmu430nBQYwjfRXfMfBToBPG8DymMH65cD2N4HlcbYVJCusd7ZRdFerhO7C+mcbwFnYfvl+/6+53gNB/PHWsyfGxmKeUHR5Iypqzv5LR7aUJmeCNBWybEN9r5x64+HKyPFvLD3yR1xsApvCY4wHFiInknQGg6rhfJ5UBA7jCkYsPX7EBIb33Cj3ZFnYLWS33pWOPqyUjl2LMb4MMezNk/MZbsNtvMZJtYu8D714gS9YmPkwu1pGCmk+BwRZNRW8yGd4FacLXZXrMY8dmN5UmrrUHdKQEG6m6IEudyEsxlFIXdloZbHvTg58g61N5jcxUJp8JAv3muSYi339GVa1gC1LmdoLaOcOtg2s4pyamytW7s44XuEChtDVoPRvMX1t2t3aamr0H67DIDbXwZ/U/sTPHbe9Ev0BTqOAsMh+8Z8AAAAASUVORK5CYII=) no-repeat 5% 50%;
   &:hover,
   &:focus {
-    background-image: linear-gradient(transparent, rgba(0,0,0, 0.05) 40%, rgba(0,0,0, 0.10));
+    color: #00c;
   }
+
   cursor: pointer;
 
   img {
@@ -26,7 +28,6 @@
 
 .__pgp_pk_added, .__pgp_pk_added:hover, .__pgp_pk_added:focus {
   cursor: not-allowed;
-  background-image: none;
   opacity: 0.4;
   box-shadow: none;
   &:after {

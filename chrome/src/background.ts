@@ -106,12 +106,12 @@ function makePublicKeyText(armor: string, messageId: string, callback: Interface
         icon: string,
         html: string;
 
-    icon = '<img src="' + chrome.runtime.getURL('/images/id16.png') + '">';
+    //icon = '<img src="' + chrome.runtime.getURL('/images/pubkey.png') + '">';
     classList = [config.pgpPK];
 
     keyStore.searchPublicKey(username, (keys) => {
         if ( keys.length ) classList.push(config.pgpPKAdded);
-        html = "<span class='" + classList.join(' ') + "' rel='" + messageId + "'>" + icon + username + "</span>";
+        html = "<span class='" + classList.join(' ') + "' rel='" + messageId + "'>" + username + "</span>";
         callback(html);
     });
 }
