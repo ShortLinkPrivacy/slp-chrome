@@ -90,7 +90,9 @@ module Admin {
 
             // App
             Path.listen();
-            window.location.hash = "#/key/view";
+            if ( !window.location.hash ) {
+                window.location.hash = "#/key/view";
+            }
         }
     }
 
