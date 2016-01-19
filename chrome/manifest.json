@@ -19,7 +19,8 @@
   "browser_action": {
     "default_icon": {
         "19": "images/browser24.png",
-        "38": "images/browser48.png"
+        "38": "images/browser48.png",
+        "128": "images/browser128.png"
     },
     "default_popup": "browser.html"
   },
