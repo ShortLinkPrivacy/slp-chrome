@@ -7,12 +7,14 @@
       <tr>
         <th>User ID</th>
         <th>Fingerprint</th>
+        <th>x</th>
       </tr>
     </thead>
     <tbody>
       <tr rv-each-key="foundKeys">
         <td>{ key.getPrimaryUser }</td>
         <td>{ key.fingerprint }</td>
+        <td><i class="fa fa-trash" rv-on-click="remove"></i></td>
       </tr>
     </tbody>
   </table>
