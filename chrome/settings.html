@@ -23,18 +23,13 @@
   </head>
   <body>
     <div id="container" >
-      <!--
       <nav class="pure-menu pure-menu-horizontal">
+          <span href="#" class="pure-menu-heading"><b>slp</b></span>
           <ul class="pure-menu-list">
-            <li class="pure-menu-item"><a href="#/key/generate" class="pure-menu-link"> Generate</a></li>
-            <li class="pure-menu-item"><a href="#/key/import" class="pure-menu-link"> Import</a></li>
-            <li class="pure-menu-item"><a href="#/key/view" class="pure-menu-link"> View</a></li>
-            <li class="pure-menu-item"><a href="#/key/remove" class="pure-menu-link"> Remove</a></li>
-            <li class="pure-menu-item"><a href="#/pub/import" class="pure-menu-link"> PubImport</a></li>
-            <li class="pure-menu-item"><a href="#/pub/list" class="pure-menu-link"> PubList</a></li>
+            <li class="pure-menu-item"><a href="#/key/view" class="pure-menu-link"><i class="fa fa-key"></i> My Key</a></li>
+            <li class="pure-menu-item"><a href="#/pub/list" class="pure-menu-link"><i class="fa fa-globe"></i> Address Book</a></li>
           </ul>
       </nav>
-      -->
       <div id="notify" rv-on-click="notify.clear">
         <div class="warning" rv-if="notify.error">{ notify.error }</div>
         <div class="info" rv-if="notify.info">{ notify.info }</div>

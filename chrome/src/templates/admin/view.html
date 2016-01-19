@@ -1,10 +1,17 @@
+<h1>My public key</h1>
 <div rv-hide="hasPrivateKey">
-  <h1>No personal PGP key found</h1>
-  <a href="#/key/generate" class="pure-button">Create a new PGP key</a>
-  <a href="#/key/import" class="pure-button">Import an existing PGP key</a>
+  <p>You have not created or imported a private PGP key. Please choose the options below:</p>
+  <div class="tools">
+    <a href="#/key/generate" class="pure-button pure-button-primary button-xlarge">Create a new private key</a>
+    .. or ..
+    <a href="#/key/import" class="pure-button button-secondary button-xlarge">Import a private key</a>
+  </div>
 </div>
 
 <div rv-show="hasPrivateKey">
-  <h1>Your PGP key</h1>
+  <div class="tools">
+    <a href="" class="pure-button">Copy to clipboard</a>
+    <a href="#/key/remove" class="pure-button button-error button-small pull-right">Delete</a>
+  </div>
   <pre rv-text="armored"></pre>
 </div>

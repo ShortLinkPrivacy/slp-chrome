@@ -28,7 +28,7 @@ module Admin {
 
             var options = {
                 numBits: bg.config.defaultBits,
-                userId: '"' + this.name + '" <' + this.email + '>',
+                userId: this.name + ' <' + this.email + '>',
                 passphrase: this.passphrase
             };
 

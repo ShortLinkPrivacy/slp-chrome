@@ -70,6 +70,11 @@ module Admin {
             });
         }
 
+        loadArticle(articleId: string, onBindArgs?: any): void {
+            this.notify.clear();
+            super.loadArticle(articleId, onBindArgs);
+        }
+
         log(...args): void {
             console.log(args);
         }

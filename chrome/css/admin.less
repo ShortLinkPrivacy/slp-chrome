@@ -1,32 +1,102 @@
-@navBg: #000;
-@navFg: #ccc;
-@navHoverBg: #368;
+@navBg: #b5b5b5;
+@navFg: #000;
+@navHoverBg: #046380;
 @navHoverFg: #fff;
 
+h1 {
+  font-size: 1.5em;
+}
+
+pre {
+  background-color: #ffe;
+  padding: 10px;
+  border: 1px dotted #aaa;
+}
+
 #container {
+  margin-top: 10px;
   width: 600px;
   margin-left: auto;
   margin-right: auto;
 }
 
 nav {
-  color: @navFg;
-  background: @navBg;
+  border-bottom: 2px solid @navBg;
+  background: url(/images/browser24.png) no-repeat 1% 50%;
 }
 
 article {
   padding: 5px;
 }
 
+.pure-menu-heading {
+  margin-right: 10px;
+  b {
+    padding-left: 20px;
+    color: #8e2800;
+  }
+}
+
 .pure-menu-link, .pure-menu-link:visited  {
-  color: @navFg !important;
+  color: @navFg;
   background: @navBg;
   font-size: 1.2em;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
   &:hover {
     background: @navHoverBg;
     color: @navHoverFg;
   }
+}
 
+.tools {
+  margin-bottom: 20px;
+}
+
+.pull-right {
+  float: right;
+}
+
+.button-xsmall {
+		font-size: 70%;
+}
+
+.button-small {
+		font-size: 85%;
+}
+
+.button-large {
+		font-size: 110%;
+}
+
+.button-xlarge {
+		font-size: 125%;
+    font-weight: bold;
+}
+
+.button-success,
+.button-error,
+.button-warning,
+.button-secondary {
+    color: white;
+    border-radius: 4px;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+.button-success {
+    background: rgb(28, 184, 65); /* this is a green */
+}
+
+.button-error {
+    background: rgb(202, 60, 60); /* this is a maroon */
+}
+
+.button-warning {
+    background: rgb(223, 117, 20); /* this is an orange */
+}
+
+.button-secondary {
+    background: rgb(66, 184, 221); /* this is a light blue */
 }
 
 .pure-form {
@@ -54,45 +124,9 @@ article {
   background: #dfd;
 }
 
-//--------------------------------------------------------
-// Key Info
-//--------------------------------------------------------
-.key-info {
-  padding: 0 7px;
-
-  td {
-    padding: 4px;
-  }
-
-  .hd {
-    font-weight: bold;
-    text-align: right;
-  }
-
-  .armor {
-    pre {
-      overflow: auto;
-      background: #efe;
-      padding: 3px;
-      min-height: 200px;
-      //max-height: 300px;
-      margin: 0;
-    }
-
-    .private {
-      background: #fee;
-    }
-
-    a {
-      color: blue;
-      text-decoration: none;
-      display: block;
-      text-align: right;
-      font-size: 0.7em;
-      margin: 0;
-      padding: 0;
-    }
-  }
+.footnote {
+  width: 100%;
+  text-align: center;
 }
 
 // Import

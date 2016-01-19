@@ -1,5 +1,10 @@
-<div>
-  <h1>Remove PGP key!</h1>
-  <button class="pure-button" rv-on-click="doRemove">Remove your key</button>
+<h1>Confirm private key removal</h1>
+<p><b>Warning!</b> Removing your key is irreversible. You will not be able to
+recreate it, even if you used the same passphrase. You will not be able to read
+any messages encrypted for this key. If you made a backup of this key, then you
+will be able to import it later.</p>
+<div class="tools">
+  <button class="pure-button button-error button-xlarge" rv-on-click="doRemove">Remove</button>
+  <a class="pure-button pull-right" href="#/key/view">Cancel</a>
 </div>
 

@@ -7,6 +7,13 @@ module Admin {
         articleId = "publicKeyList";
         filter: string;
         foundKeys: Array<Keys.KeyItem> = [];
+        hasFoundKeys: { (): boolean };
+
+        constructor() {
+            this.hasFoundKeys = function(): boolean {
+                return this.foundKeys.length > 0;
+            };
+        }
 
         doFilter(): void {
             if ( this.filter == "" || this.filter == null ) {

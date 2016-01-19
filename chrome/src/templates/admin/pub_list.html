@@ -1,23 +1,29 @@
-<div>
-  <form class="pure-form">
-    <input rv-value="filter" rv-on-keyup="doFilter" placeholder="filer">
-  </form>
-  <table class="pure-table">
-    <thead>
-      <tr>
-        <th>User ID</th>
-        <th>Fingerprint</th>
-        <th>x</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr rv-each-key="foundKeys">
-        <td>{ key.getPrimaryUser }</td>
-        <td>{ key.fingerprint }</td>
-        <td><i class="fa fa-trash" rv-on-click="remove"></i></td>
-      </tr>
-    </tbody>
-  </table>
+<h1>Address Book</h1>
+<div class="tools">
+  <a href="#/pub/import" class="pure-button">Import a key</a>
+  <div class="pull-right">
+    <form class="pure-form">
+      <input rv-value="filter" rv-on-keyup="doFilter" placeholder="filer">
+    </form>
+  </div>
 </div>
-
-
+<table rv-show="hasFoundKeys < foundKeys" class="pure-table" width="100%">
+  <thead>
+    <tr>
+      <th>User ID</th>
+      <th>Fingerprint</th>
+      <th>&nbsp;</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr rv-each-key="foundKeys">
+      <td>{ key.getPrimaryUser }</td>
+      <td>{ key.fingerprint }</td>
+      <td><i class="fa fa-trash" rv-on-click="remove"></i></td>
+    </tr>
+  </tbody>
+</table>
+<div rv-hide="hasFoundKeys < foundKeys" class="footnote">
+  No public keys found. Please use the filter box above to search your address
+  book.
+</div>
