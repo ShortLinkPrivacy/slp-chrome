@@ -11,6 +11,7 @@ help:
 	@echo "background              compile all background files"
 	@echo "less                    compile all less files"
 	@echo "build                   build all"
+	@echo "dist                    make a distribution"
 
 #------------------------------------------------------------------
 
@@ -60,3 +61,16 @@ less:
 
 build: modules coffee admin browser content background less
 
+dist:
+	mkdir -pv dist/{src,css,fonts,lib}
+	cp src/*.js dist/src
+	cp css/*.css dist/css
+	cp settings.html dist/
+	cp browser.html dist/
+	cp -r fonts dist/
+	cp -r images dist/
+	cp manifest.js dist/
+	cp bower_components/pathjs/path.min.js dist/lib
+	cp bower_components/rivets/dist/rivets.bundled.min.js dist/lib
+	cp bower_components/openpgp/dist/openpgp.min.js dist/lib
+	
