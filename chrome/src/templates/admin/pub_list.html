@@ -1,10 +1,16 @@
 <h1>Address Book</h1>
-<div class="tools">
-  <a href="#/pub/import" class="pure-button">Import a key</a>
-  <div class="pull-right">
+<p>
+  Use the filter to search for addresses in your address book.
+</p>
+<div class="pure-g well">
+  <div class="pure-u-1-3">
     <form class="pure-form">
-      <input rv-value="filter" rv-on-keyup="doFilter" placeholder="filer">
+      <input rv-value="filter" rv-on-keyup="doFilter" placeholder="filter">
+      <i rv-show="wait" class="icon-spin5"></i>
     </form>
+  </div>
+  <div class="pure-u-2-3">
+    <a href="#/pub/import" class="pure-button pull-right">Import a key</a>
   </div>
 </div>
 <table rv-show="hasFoundKeys < foundKeys" class="pure-table" width="100%">
@@ -12,18 +18,12 @@
     <tr>
       <th>User ID</th>
       <th>Fingerprint</th>
-      <th>&nbsp;</th>
     </tr>
   </thead>
   <tbody>
     <tr rv-each-key="foundKeys">
       <td>{ key.getPrimaryUser }</td>
       <td>{ key.fingerprint }</td>
-      <td><i class="fa fa-trash remove" rv-on-click="remove"></i></td>
     </tr>
   </tbody>
 </table>
-<div rv-hide="hasFoundKeys < foundKeys" class="footnote">
-  No public keys found. Please use the filter box above to search your address
-  book.
-</div>

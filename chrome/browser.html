@@ -5,7 +5,7 @@
     <title>Browser-2-Browser Crypt</title>
 
     <!-- Local CSS -->
-    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/slp.css">
     <link rel="stylesheet" type="text/css" href="css/browser.css">
 
     <!-- Vendors JS -->
@@ -21,8 +21,8 @@
     <nav>
       <div class="logo pull-left">short link pgp</div>
       <ul id="tabs" class="pull-right">
-        <li rv-show="isDecrypted"><a rv-on-click="lock" href="#"><i class="fa fa-lock"></i> lock</a></li>
-        <li><a rv-on-click="goSettings" href="#"><i class="fa fa-cog"></i> settings</a></li>
+        <li rv-show="isDecrypted"><a rv-on-click="lock" href="#"><i class="icon-lock"></i> lock</a></li>
+        <li><a rv-on-click="goSettings" href="#"><i class="icon-cog"></i> settings</a></li>
       </ul>
     </nav>
 
@@ -59,7 +59,7 @@
             </div><!-- clearText -->
             <div class="bottom">
               <span rv-show="clearText">
-                <button rv-show="hasSelectedKeys < selectedKeys" class="button" rv-disabled="wait" rv-on-click="sendMessage">Encrypt Message <span rv-show="wait"><i class="fa fa-cog fa-spin"></i></span></button>
+                <button rv-show="hasSelectedKeys < selectedKeys" class="button" rv-disabled="wait" rv-on-click="sendMessage">Encrypt Message <span rv-show="wait"><i class="icon-spin5"></i></span></button>
               </span>
               <button rv-hide="clearText" rv-on-click="sendPublicKey" class="button">Share My Public Key</button>
             </div><!-- .bottom -->

@@ -8,6 +8,7 @@ module Admin {
         filter: string;
         foundKeys: Array<Keys.KeyItem> = [];
         hasFoundKeys: { (): boolean };
+        wait: boolean;
 
         constructor() {
             this.hasFoundKeys = function(): boolean {
@@ -21,8 +22,10 @@ module Admin {
                 return;
             }
 
+            this.wait = true;
             bg.keyStore.searchPublicKey(this.filter, (keys) => {
                 this.foundKeys = keys.map((k) => { return new Keys.KeyItem(k) })
+                this.wait = false;
             });
         }
 

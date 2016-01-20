@@ -1,4 +1,4 @@
-<h1>Import someone's public key into your address book</h1>
+<h1>Import a public key into your address book</h1>
 <form name="importKeysForm" rv-on-submit="submit" class="pure-form pure-form-stacked">
   <fieldset>
     <div class="pure-g" rv-show="error">
@@ -7,11 +7,11 @@
     <div class="pure-control-group">
       <div class="pure-control-group">
         <label>Public key:</label>
-        <textarea rv-value="key" required="yes"></textarea>
+        <textarea rv-value="key" required="yes" spellcheck="false"></textarea>
       </div>
       <div class="pure-control-group">
         <button type="submit" class="pure-button pure-button-primary">Import</button>
-        <span rv-show="spinner"><i class="fa fa-cog fa-spin"></i></span>
+        <span rv-show="spinner"><i class="icon-spin5"></i></span>
       </div>
   </fieldset>
 </form>

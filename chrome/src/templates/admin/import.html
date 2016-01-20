@@ -1,16 +1,21 @@
-<div>
-  <form name="importKeysForm" rv-on-submit="submit" class="pure-form pure-form-stacked">
-    <fieldset>
-      <legend>Import a PGP key</legend>
+<h1>Import a secret key</h1>
+<p>If you already have a secret key, perhaps because you use OpenPGP or GNU
+Privacy Guard, you can import it here.  </p>
+<form name="importKeysForm" rv-on-submit="submit" class="pure-form pure-form-stacked">
+  <fieldset>
+    <div class="pure-control-group">
       <div class="pure-control-group">
-        <div class="pure-control-group">
-          <label>Private key:</label>
-          <textarea rv-value="key" required="yes"></textarea>
-        </div>
-        <div class="pure-control-group">
-          <button type="submit" class="pure-button pure-button-primary">Import</button>
-          <span rv-show="spinner"><i class="fa fa-cog fa-spin"></i></span>
-        </div>
-    </fieldset>
-  </form>
-</div>
+        <p>Armored (ASCII text) secret key:</p>
+        <textarea rv-value="key" required="yes" spellcheck="false"></textarea>
+      </div>
+      <div class="pure-control-group">
+        <button type="submit" class="pure-button pure-button-primary">Import</button>
+        <span rv-show="spinner"><i class="icon-spin5 spin"></i></span>
+      </div>
+  </fieldset>
+</form>
+
+<p>
+<b>Hint:</b> To get the armored text of your secret key in GNU Privacy Guard (GPG), use the following command in the terminal shell:
+<pre>gpg2 --export-secret-keys -a "your_name_here"</pre>
+</p>

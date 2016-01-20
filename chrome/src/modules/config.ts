@@ -8,7 +8,7 @@ class Config {
     //######################################################
 
     // Default private key bits
-    defaultBits = 2048;
+    defaultBits = 1024;
 
     //######################################################
     // Class and property names
