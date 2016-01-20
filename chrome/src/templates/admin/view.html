@@ -9,9 +9,16 @@
 </div>
 
 <div rv-show="hasPrivateKey">
+  <p>You are ready to receive encrypted messages. This is your public key. You
+  can copy it and send it to your friends.  <b>Note!</b> You can also send your
+  public key using the button in the browser action widget.  </p>
   <div class="tools">
-    <a href="" class="pure-button">Copy to clipboard</a>
+    <button class="pure-button" rv-on-click="copyToClipboard">Copy to clipboard</button>
     <a href="#/key/remove" class="pure-button button-error button-small pull-right">Delete</a>
   </div>
   <pre rv-text="armored"></pre>
+</div>
+
+<div>
+  What is PGP? Read the Wikipedia article on <a href="https://en.wikipedia.org/wiki/Pretty_Good_Privacy">Pretty Good Privacy</a>.
 </div>

@@ -21,5 +21,9 @@ module Admin {
                 this.armored = pub.armored();
             }
         }
+
+        copyToClipboard() {
+            app.notify.info = "Use your mouse to select the text, then press Ctrl-C (or Command-C if you're using Apple)";
+        }
     }
 }

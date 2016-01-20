@@ -81,14 +81,13 @@ module KeyStore {
 
         searchPublicKey(userId: string, callback: PublicKeySearchCallback): void {
             var result: PublicKeyArray = [],
-                re = new RegExp(userId),
                 getter: Array<string> = [];
 
             this.initialize(() => {
                 Object.keys(this.directory).forEach((p) => {
                     var userIds = this.directory[p];
-                    userIds.forEach(id => {
-                        if (id.match(re)) getter.push(p);
+                    userIds.forEach((id:string) => {
+                        if (id.toLowerCase().search(userId.toLowerCase()) > 0) getter.push(p);
                     });
                 })
 

@@ -196,7 +196,12 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     return true;
 });
 
-//----------------------------------------------------------------------------
+chrome.runtime.onInstalled.addListener((reason) => {
+    if (!privateKey)
+        chrome.runtime.openOptionsPage();
+})
+
+//############################################################################
 
 privateKeyStore.get((pk) => {
     if ( pk ) {
