@@ -85,7 +85,6 @@ class App {
     hasSelectedKeys: BoolFunc;
     hasFoundKeys: BoolFunc;
     alreadyEncrypted: boolean;
-    isTextarea: boolean;
 
     filter: string;
     foundKeys: Array<Keys.KeyItem> = [];
@@ -111,11 +110,10 @@ class App {
             return this.foundKeys.length > 0
         };
 
-        sendMessageToContent({ getElement: true }, (el) => {
+        sendMessageToContent({ getElementText: true }, (el) => {
             var re = new RegExp(bg.messageStore.getReStr());
             if ( el ) {
                 this.alreadyEncrypted = re.exec(el.value) ? true : false;
-                this.isTextarea = el.tagName == 'TEXTAREA';
                 this.clearText = el.value;
             }
         });
@@ -198,7 +196,7 @@ class App {
         encryptMessage(this.clearText, keyList, (result) => {
             this.wait = false;
             if ( result.success ) {
-                sendMessageToContent({ setElement: result.value });
+                sendMessageToContent({ setElementText: result.value });
                 window.close();
             } else {
                 this.error = result.error;
@@ -210,7 +208,7 @@ class App {
     // Restore the original message back in the textarea
     //---------------------------------------------------------------------------
     restoreMessage(e: Event) {
-        sendMessageToContent({ restore: true }, (result) => {
+        sendMessageToContent({ restoreElementText: true }, (result) => {
             if ( result.success ) {
                 window.close();
             } else {
@@ -266,7 +264,7 @@ class App {
     sendPublicKey(): void {
         encryptPublicKey((result) => {
             if ( result.success ) {
-                sendMessageToContent({ setElement: result.value });
+                sendMessageToContent({ setElementText: result.value });
                 window.close();
             } else {
                 this.error = result.error;

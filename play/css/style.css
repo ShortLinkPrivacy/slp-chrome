@@ -8,6 +8,9 @@
     text-decoration: underline;
 }
 
-textarea {
+textarea, [contenteditable=true] {
     clear: both;
+    width: 90%;
+    height: 100px;
+    border: 1px solid #333;
 }

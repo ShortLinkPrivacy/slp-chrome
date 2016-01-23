@@ -15,25 +15,54 @@
   </head>
   <body>
     <div id="content">
-      <div class="row">
 
-        <div class="col c5">
+      <div class="row">
+        <div class="col c3">
           <div class="row">
-            <textarea rv-value="message" style="height: 200px; width: 95%"></textarea>
+            <textarea rv-value="message"></textarea>
           </div>
           <div class="row">
             <button rv-on-click="submit" class="btn btn-b btn-sm smooth"> Enter </button>
           </div>
         </div>
 
-        <div class="col c7">
+        <div class="col c3">
+          <div class="row">
+            <textarea rv-value="message2"></textarea>
+          </div>
+          <div class="row">
+            <button rv-on-click="submit2" class="btn btn-b btn-sm smooth"> Enter </button>
+          </div>
+        </div>
+
+        <div class="col c3">
+          <div class="row">
+            <div contenteditable="true" rv-textcontent="message3"></div>
+          </div>
+          <div class="row">
+            <button rv-on-click="submit3" class="btn btn-b btn-sm smooth"> Enter </button>
+          </div>
+        </div>
+
+        <div class="col c3">
+          <div class="row">
+            <div contenteditable="true" rv-textcontent="message4"></div>
+          </div>
+          <div class="row">
+            <button rv-on-click="submit4" class="btn btn-b btn-sm smooth"> Enter </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col c12">
           <div class="row">
             <span rv-on-click="deleteAll" class="link"> Delete All </span>
           </div>
           <p rv-each-item="items"> { item } </p>
         </div>
-
       </div>
+
     </div>
   </body>
 </html>

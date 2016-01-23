@@ -30,6 +30,14 @@ class Config {
     // address book The css should define this class as disabled.
     pgpPKAdded = '__pgp_pk_added';
 
+    // Attribute we add to the encrypted editable with
+    // the contents of the original message, in case
+    // the user wants to reverse the encryption.  The
+    // name of the flag that we will use in the text
+    // area element to signal that it has been
+    // encrypted.
+    pgpElAttr = '__pgp_crypted';
+
     //######################################################
     // Storages
     //######################################################

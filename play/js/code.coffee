@@ -12,6 +12,27 @@ class Play
         localStorage.setItem(key, store)
         @message = ""
 
+    submit2: =>
+        return unless @message2?
+        @items.push @message2
+        store = JSON.stringify(@items)
+        localStorage.setItem(key, store)
+        @message2 = ""
+
+    submit3: =>
+        return unless @message3?
+        @items.push @message3
+        store = JSON.stringify(@items)
+        localStorage.setItem(key, store)
+        @message3 = ""
+
+    submit4: =>
+        return unless @message4?
+        @items.push @message4
+        store = JSON.stringify(@items)
+        localStorage.setItem(key, store)
+        @message4 = ""
+
     deleteAll: =>
         @items = []
         localStorage.removeItem(key)

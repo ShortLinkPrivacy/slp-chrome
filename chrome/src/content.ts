@@ -10,6 +10,10 @@ var observer: MutationObserver;
 // Regular expression for the url
 var urlRe: RegExp;
 
+// The last active (events 'input' and 'click') element. It is going to be
+// requested by the browser script.
+var activeElement: HTMLElement = null;
+
 function decodeText(codedText: string, callback: { (decodedText): void }): void {
      var   match = urlRe.exec(codedText),
         messageId: string,
@@ -140,56 +144,64 @@ function $data(el: HTMLElement, name: string, value?: any): string {
 // Listen for messages from the extension
 function listenToMessages() {
 
-    // The name of the flag that we will use in the text area element to
-    // signal that it has been encrypted.
-    var _crypted = '__pgp_crypted';
-
-    // Set the textarea value and fire the change events
-    var setElementValue = function(el: HTMLTextAreaElement, value: string): void {
-        el.value = value;
+    // Private function that sets an editable element's value.
+    // Used in setElementText and restoreElementText
+    function setElementValue(el: HTMLElement, value: string): void {
+        if ( el.contentEditable == "true" ) {
+            el.textContent = value;
+        } else if ( el.tagName == "TEXTAREA" ) {
+            (<HTMLTextAreaElement>el).value = value;
+        }
         el.dispatchEvent(new Event('input'));
         el.focus();
     }
 
     // Get the active element and its value
     // ------------------------------------------------------------
-    var getElement = function(msg, sendResponse) {
-        var el = <HTMLTextAreaElement>document.activeElement;
-        sendResponse({ tagName: el.tagName, value: el.value });
+    var getElementText = function(msg, sendResponse) {
+        var value: string = null;
+        if ( activeElement ) {
+            value = activeElement.tagName == "TEXTAREA" 
+                ? (<HTMLTextAreaElement>activeElement).value 
+                : activeElement.textContent;
+        }        
+        sendResponse({ value: value });
     }
 
     // Set the active element and mark it as encrypted
     // ------------------------------------------------------------
-    var setElement = function(msg, sendResponse) {
-        var el = <HTMLTextAreaElement>document.activeElement;
+    var setElementText = function(msg, sendResponse) {
 
-        // If the active element is not a textarea, then find one
-        if ( el.tagName !== 'TEXTAREA' ) {
-            var els = document.getElementsByTagName('textarea');
-            if ( els.length > 0 ) {
-                // Get the last textarea found
-                el = <HTMLTextAreaElement>els[els.length - 1];
-            }
+        // If there is no activeElement, then try to fine one
+        if ( !activeElement ) {
+            activeElement = 
+                <HTMLElement>document.querySelector("[contentEditable=true]") ||
+                <HTMLElement>document.querySelector("textarea");
         }
 
-        if ( el.tagName == 'TEXTAREA' ) {
-            // Save the original value of the element so it can be restored
-            $data(el, _crypted, el.value);
+        // Still nothin found? Oh, well.
+        if ( !activeElement ) return;
 
-            // Set new value (encrypted url)
-            setElementValue(el, msg.setElement);
-        }
+        // Save the original value of the element so it can be restored and set
+        // the new value (encrypted url). Note that in order to get the value
+        // of the element, we're using the already established getElementText
+        // call, do we don't have to repeat code or resort to too much
+        // abstraction.
+        getElementText(null, (value) => {
+            $data(activeElement, init.config.pgpElAttr, value);
+            setElementValue(activeElement, msg.setElement);
+        });
     }
 
     // Restore the original text of the textarea
     // ------------------------------------------------------------
-    var restoreElement = function(msg, sendResponse) {
+    var restoreElementText = function(msg, sendResponse) {
         var el = <HTMLTextAreaElement>document.activeElement,
             orgValue: string;
 
-        orgValue = $data(el, _crypted);
+        orgValue = $data(el, init.config.pgpElAttr);
         if ( typeof orgValue != "undefined" && orgValue != null ) {
-            $data(el, _crypted, null);
+            $data(el, init.config.pgpElAttr, null);
             setElementValue(el, orgValue);
             sendResponse({ success: true })
         } else {
@@ -231,21 +243,49 @@ function listenToMessages() {
     // Message listener
     // ============================================================
     chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-        if ( msg.getElement )
-            getElement(msg, sendResponse)
-        else if ( msg.setElement )
-            setElement(msg, sendResponse)
+        if ( msg.getElementText )
+            getElementText(msg, sendResponse)
+        else if ( msg.setElementText)
+            setElementText(msg, sendResponse)
         else if ( msg.traverse )
             traverse(msg, sendResponse)
         else if ( msg.lock )
             lock(msg, sendResponse)
-        else if ( msg.restore )
-            restoreElement(msg, sendResponse)
+        else if ( msg.restoreElementText )
+            restoreElementText(msg, sendResponse)
     });
+}
+
+// Installs listeners for 'input' and 'click' to all editable and textareas and
+// updates the activeElement variable to whichever element was edited last.
+// This is needed by the browser script in order to determine which element to
+// encrypt and decrypt.
+function updateActiveElement() {
+    var editables = document.querySelectorAll("[contentEditable=true]"),
+        textareas = document.getElementsByTagName('textarea');
+
+    function bindListener(element: Element) {
+        return function(e: Event): void {
+            activeElement = <HTMLElement>element;
+        }
+    }
+
+    function doList(list) {
+        var i: number;
+        for (i = 0; i < list.length; i++) {
+            var el = list[i];
+            el.addEventListener('input', bindListener(el));
+            el.addEventListener('click', bindListener(el));
+        }
+    }
+
+    doList(editables);
+    doList(textareas);
 }
 
 // Get variables and bootstrap
 getInitVars(() => {
+    updateActiveElement();
     if ( init.hasPrivateKey ) {
         traverseNodes(document.body);
         eventObserver();
