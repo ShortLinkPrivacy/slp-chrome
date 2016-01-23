@@ -29,7 +29,6 @@ class ActiveElement {
     private bindElement(el: HTMLElement) {
         return function(e: Event): void {
             this.element = el;
-            console.log(this.element);
         }.bind(this);
     }
 
