@@ -28,3 +28,4 @@ API
 
 Development
 ====================================
+- The background page reports an error when there is a public key in the DOM
