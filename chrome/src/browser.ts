@@ -235,7 +235,7 @@ class App {
                     });
                 });
                 chrome.browserAction.setBadgeText({text: ""});
-                window.close();
+                //window.close();
             } else {
                 this.error = "Wrong password";
             }

@@ -107,6 +107,23 @@ function traverseNodes(root: HTMLElement): void {
     }
 }
 
+// Traverse nodes for the creation of new editable elements
+function findNewEditables(root: HTMLElement): void {
+    var walk: TreeWalker,
+        node: Node;
+
+    // Create a walker from the root element, searching only for element nodes
+    walk = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
+
+    while (node = walk.nextNode()) {
+        var el = <HTMLElement>node;
+        if ( el.contentEditable  == "true" || el.tagName == "TEXTAREA" ) {
+            el.addEventListener('input', bindListener(el));
+            el.addEventListener('click', bindListener(el));
+        }
+    }
+}
+
 // Observe for new nodes
 function eventObserver(): void {
     observer = new MutationObserver((mutationArray) => {
@@ -114,6 +131,7 @@ function eventObserver(): void {
             for (var i = 0; i < mutation.addedNodes.length; i++) {
                 var node = mutation.addedNodes[i];
                 traverseNodes(<HTMLElement>node);
+                findNewEditables(<HTMLElement>node);
             }
         });
     });
@@ -187,22 +205,24 @@ function listenToMessages() {
         // of the element, we're using the already established getElementText
         // call, do we don't have to repeat code or resort to too much
         // abstraction.
-        getElementText(null, (value) => {
-            $data(activeElement, init.config.pgpElAttr, value);
-            setElementValue(activeElement, msg.setElement);
+        getElementText(null, (result) => {
+            $data(activeElement, init.config.pgpElAttr, result.value);
+            setElementValue(activeElement, msg.setElementText);
         });
     }
 
     // Restore the original text of the textarea
     // ------------------------------------------------------------
     var restoreElementText = function(msg, sendResponse) {
-        var el = <HTMLTextAreaElement>document.activeElement,
-            orgValue: string;
+        var orgValue: string;
 
-        orgValue = $data(el, init.config.pgpElAttr);
+        // TODO: search for the element
+        if (!activeElement) return;
+
+        orgValue = $data(activeElement, init.config.pgpElAttr);
         if ( typeof orgValue != "undefined" && orgValue != null ) {
-            $data(el, init.config.pgpElAttr, null);
-            setElementValue(el, orgValue);
+            $data(activeElement, init.config.pgpElAttr, null);
+            setElementValue(activeElement, orgValue);
             sendResponse({ success: true })
         } else {
             sendResponse({ success: false });
@@ -260,15 +280,16 @@ function listenToMessages() {
 // updates the activeElement variable to whichever element was edited last.
 // This is needed by the browser script in order to determine which element to
 // encrypt and decrypt.
+
+function bindListener(element: Element) {
+    return function(e: Event): void {
+        activeElement = <HTMLElement>element;
+    }
+}
+
 function updateActiveElement() {
     var editables = document.querySelectorAll("[contentEditable=true]"),
         textareas = document.getElementsByTagName('textarea');
-
-    function bindListener(element: Element) {
-        return function(e: Event): void {
-            activeElement = <HTMLElement>element;
-        }
-    }
 
     function doList(list) {
         var i: number;
