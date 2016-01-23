@@ -12,117 +12,214 @@ var urlRe: RegExp;
 
 // The last active (events 'input' and 'click') element. It is going to be
 // requested by the browser script.
-var activeElement: HTMLElement = null;
+var activeElement: ActiveElement;
 
-function decodeText(codedText: string, callback: { (decodedText): void }): void {
-     var   match = urlRe.exec(codedText),
-        messageId: string,
-        url: string;
+// Installs listeners for 'input' and 'click' to all editable and textareas and
+// updates the activeElement variable to whichever element was edited last.
+// This is needed by the browser script in order to determine which element to
+// encrypt and decrypt.
+class ActiveElement {
+    element: HTMLElement = null;
+    saveAttr: string = init.config.pgpElAttr;
 
-    if (!match) {
-        callback(codedText);
-        return;
+    constructor() {
+        this.bindEditables(document.body);
     }
 
-    url = match[0];
-    messageId = match[1];
+    private bindElement(el: HTMLElement) {
+        return function(e: Event): void {
+            this.element = el;
+            console.log(this.element);
+        }.bind(this);
+    }
 
-    chrome.runtime.sendMessage({ command: "decryptLink", url: url }, (result) => {
-        if ( result.success ) {
-            codedText = codedText.replace(url, result.value);
-        } else {
-            codedText = "Error decrypting"
+    // Save original value in $data
+    private saveValue(): void {
+        var saved = this.getSavedValue();
+        if ( !saved ) {
+            $data(this.element, this.saveAttr, this.getText());
         }
-        decodeText(codedText, callback);
-    });
-};
+    }
 
-// This closure is used by 'hotlinkPublicKeys'. It returns a 'click' binder
-// which is attached to public key buttons.
-function _bindOnClick(el: HTMLElement) {
-    return function(e: MouseEvent): void {
-        e.preventDefault();
-        e.stopPropagation();
-        chrome.runtime.sendMessage({ command: 'addPublicKey', messageId: el.getAttribute('rel') }, (result) => {
-            if ( result.success ) {
-                el.classList.add(init.config.pgpPKAdded);
-                el.removeEventListener('click', _bindOnClick(el));
+    private getSavedValue(): string {
+        return $data(this.element, this.saveAttr);
+    }
+
+    private clearSavedValue(): void {
+        $data(this.element, this.saveAttr, null);
+    }
+
+    // Traverse nodes looking for editable elements and attaches listeners to
+    // them that set the current active element
+    bindEditables(root: HTMLElement): void {
+        var walk: TreeWalker,
+            node: Node;
+
+        // Create a walker from the root element, searching only for element nodes
+        walk = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
+
+        while (node = walk.nextNode()) {
+            var el = <HTMLElement>node;
+            if ( el.contentEditable  == "true" || el.tagName == "TEXTAREA" ) {
+                el.addEventListener('input', this.bindElement(el));
+                el.addEventListener('click', this.bindElement(el));
             }
-        })
+        }
+    }
+
+    // Get the text value of the editable
+    getText(): string {
+        if ( !this.element ) return;
+        return this.element.tagName == "TEXTAREA" 
+            ? (<HTMLTextAreaElement>this.element).value 
+            : this.element.textContent;
+    }
+
+    // Set a new text value in the editable element while saving the original
+    // value of the element so it can be restored
+    setText(text: string, noSave?: boolean): void {
+        if ( !this.element ) return;
+
+        // Save original value in $data
+        if (!noSave) this.saveValue();
+
+        // Set new value
+        if ( this.element.contentEditable == "true" ) {
+            this.element.textContent = text;
+        } else if ( this.element.tagName == "TEXTAREA" ) {
+            (<HTMLTextAreaElement>this.element).value = text;
+        }
+
+        // Dispatch events and focus
+        this.element.dispatchEvent(new Event('input'));
+        this.element.focus();
+    }
+
+
+    // Restore the saved value of the element
+    restoreText(): boolean {
+        var orgValue: string;
+
+        if ( !this.element ) return;
+
+        orgValue = this.getSavedValue();
+        if ( typeof orgValue != "undefined" && orgValue != null ) {
+            this.clearSavedValue();
+            this.setText(orgValue, true);
+            return true;
+        }
+
+        return false;
+    }
+
+    // Attempt to locate an editable element
+    find(): void {
+        this.element = 
+            <HTMLElement>document.querySelector("[contentEditable=true]") ||
+            <HTMLElement>document.querySelector("textarea");
     }
 }
 
 // Takes a parent element, searches for elements with a spcific class name
 // and attaches onClick bindings so they can be imported into the user's address
 // book
-function hotlinkPublicKeys(parentEl: HTMLElement): void {
-    var list = parentEl.getElementsByClassName(init.config.pgpPK),
-        i: number;
+var hotlinkPublicKeys = (function() {
 
-    for (i = 0; i < list.length; i++) {
-        var el = list[i];
-        if (el.classList.contains(init.config.pgpPKAdded)) continue;
-        el.addEventListener('click', _bindOnClick(<HTMLElement>el));
-    }
-}
-
-function decodeNode(node: Node): void {
-    decodeText( node.nodeValue, (newValue) => {
-        if ( newValue != node.nodeValue ) {
-            var parentEl = node.parentElement;
-
-            // Remove links (some sites hotlink URLs)
-            if ( parentEl.tagName == 'A' ) {
-                parentEl = parentEl.parentElement;
-            }
-
-            // Save the current value of the element and give it a new class
-            $data(parentEl, init.config.pgpData, parentEl.innerHTML)
-            parentEl.classList.add(init.config.pgpClassName);
-
-            // Set the new value
-            parentEl.innerHTML = newValue;
-
-            // Create public key hotlinks
-            hotlinkPublicKeys(parentEl);
+    function _bindOnClick(el: HTMLElement) {
+        return function(e: MouseEvent): void {
+            e.preventDefault();
+            e.stopPropagation();
+            chrome.runtime.sendMessage({ command: 'addPublicKey', messageId: el.getAttribute('rel') }, (result) => {
+                if ( result.success ) {
+                    el.classList.add(init.config.pgpPKAdded);
+                    el.removeEventListener('click', _bindOnClick(el));
+                }
+            })
         }
-    });
-}
+    }
 
-function traverseNodes(root: HTMLElement): void {
-    var walk: TreeWalker,
-        node: Node;
+    function hotlinkPublicKeys(parentEl: HTMLElement): void {
+        var list = parentEl.getElementsByClassName(init.config.pgpPK),
+            i: number;
 
-    // Create a walker from the root element, searching only for text nodes
-    walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+        for (i = 0; i < list.length; i++) {
+            var el = list[i];
+            if (el.classList.contains(init.config.pgpPKAdded)) continue;
+            el.addEventListener('click', _bindOnClick(<HTMLElement>el));
+        }
+    }
 
-    while (node = walk.nextNode()) {
-        if (node.nodeValue.match(urlRe)) {
-            if ( init.isDecrypted ) {
-                decodeNode(node);
+    return hotlinkPublicKeys;
+})();
+
+var traverseNodes = (function(){
+
+    function decodeText(codedText: string, callback: { (decodedText): void }): void {
+         var   match = urlRe.exec(codedText),
+            messageId: string,
+            url: string;
+
+        if (!match) {
+            callback(codedText);
+            return;
+        }
+
+        url = match[0];
+        messageId = match[1];
+
+        chrome.runtime.sendMessage({ command: "decryptLink", url: url }, (result) => {
+            if ( result.success ) {
+                codedText = codedText.replace(url, result.value);
             } else {
-                chrome.runtime.sendMessage({ command: 'needPassword' });
+                codedText = "Error decrypting"
+            }
+            decodeText(codedText, callback);
+        });
+    };
+
+    function decodeNode(node: Node): void {
+        decodeText( node.nodeValue, (newValue) => {
+            if ( newValue != node.nodeValue ) {
+                var parentEl = node.parentElement;
+
+                // Remove links (some sites hotlink URLs)
+                if ( parentEl.tagName == 'A' ) {
+                    parentEl = parentEl.parentElement;
+                }
+
+                // Save the current value of the element and give it a new class
+                $data(parentEl, init.config.pgpData, parentEl.innerHTML)
+                parentEl.classList.add(init.config.pgpClassName);
+
+                // Set the new value
+                parentEl.innerHTML = newValue;
+
+                // Create public key hotlinks
+                hotlinkPublicKeys(parentEl);
+            }
+        });
+    }
+
+    function traverseNodes(root: HTMLElement): void {
+        var walk: TreeWalker,
+            node: Node;
+
+        // Create a walker from the root element, searching only for text nodes
+        walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+
+        while (node = walk.nextNode()) {
+            if (node.nodeValue.match(urlRe)) {
+                if ( init.isDecrypted ) {
+                    decodeNode(node);
+                } else {
+                    chrome.runtime.sendMessage({ command: 'needPassword' });
+                }
             }
         }
     }
-}
 
-// Traverse nodes for the creation of new editable elements
-function findNewEditables(root: HTMLElement): void {
-    var walk: TreeWalker,
-        node: Node;
-
-    // Create a walker from the root element, searching only for element nodes
-    walk = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
-
-    while (node = walk.nextNode()) {
-        var el = <HTMLElement>node;
-        if ( el.contentEditable  == "true" || el.tagName == "TEXTAREA" ) {
-            el.addEventListener('input', bindListener(el));
-            el.addEventListener('click', bindListener(el));
-        }
-    }
-}
+    return traverseNodes;
+})();
 
 // Observe for new nodes
 function eventObserver(): void {
@@ -131,7 +228,7 @@ function eventObserver(): void {
             for (var i = 0; i < mutation.addedNodes.length; i++) {
                 var node = mutation.addedNodes[i];
                 traverseNodes(<HTMLElement>node);
-                findNewEditables(<HTMLElement>node);
+                activeElement.bindEditables(<HTMLElement>node);
             }
         });
     });
@@ -162,71 +259,24 @@ function $data(el: HTMLElement, name: string, value?: any): string {
 // Listen for messages from the extension
 function listenToMessages() {
 
-    // Private function that sets an editable element's value.
-    // Used in setElementText and restoreElementText
-    function setElementValue(el: HTMLElement, value: string): void {
-        if ( el.contentEditable == "true" ) {
-            el.textContent = value;
-        } else if ( el.tagName == "TEXTAREA" ) {
-            (<HTMLTextAreaElement>el).value = value;
-        }
-        el.dispatchEvent(new Event('input'));
-        el.focus();
-    }
-
     // Get the active element and its value
     // ------------------------------------------------------------
     var getElementText = function(msg, sendResponse) {
-        var value: string = null;
-        if ( activeElement ) {
-            value = activeElement.tagName == "TEXTAREA" 
-                ? (<HTMLTextAreaElement>activeElement).value 
-                : activeElement.textContent;
-        }        
-        sendResponse({ value: value });
+        sendResponse({ value: activeElement.getText() });
     }
 
     // Set the active element and mark it as encrypted
     // ------------------------------------------------------------
     var setElementText = function(msg, sendResponse) {
-
-        // If there is no activeElement, then try to fine one
-        if ( !activeElement ) {
-            activeElement = 
-                <HTMLElement>document.querySelector("[contentEditable=true]") ||
-                <HTMLElement>document.querySelector("textarea");
-        }
-
-        // Still nothin found? Oh, well.
-        if ( !activeElement ) return;
-
-        // Save the original value of the element so it can be restored and set
-        // the new value (encrypted url). Note that in order to get the value
-        // of the element, we're using the already established getElementText
-        // call, do we don't have to repeat code or resort to too much
-        // abstraction.
-        getElementText(null, (result) => {
-            $data(activeElement, init.config.pgpElAttr, result.value);
-            setElementValue(activeElement, msg.setElementText);
-        });
+        if ( !activeElement.element ) activeElement.find();
+        activeElement.setText(msg.setElementText);
     }
 
     // Restore the original text of the textarea
     // ------------------------------------------------------------
     var restoreElementText = function(msg, sendResponse) {
-        var orgValue: string;
-
-        // TODO: search for the element
-        if (!activeElement) return;
-
-        orgValue = $data(activeElement, init.config.pgpElAttr);
-        if ( typeof orgValue != "undefined" && orgValue != null ) {
-            $data(activeElement, init.config.pgpElAttr, null);
-            setElementValue(activeElement, orgValue);
-            sendResponse({ success: true })
-        } else {
-            sendResponse({ success: false });
-        }
+        var result = activeElement.restoreText();
+        sendResponse({ success: result });
     }
 
     // Return all decrypted nodes to their original values
@@ -276,37 +326,9 @@ function listenToMessages() {
     });
 }
 
-// Installs listeners for 'input' and 'click' to all editable and textareas and
-// updates the activeElement variable to whichever element was edited last.
-// This is needed by the browser script in order to determine which element to
-// encrypt and decrypt.
-
-function bindListener(element: Element) {
-    return function(e: Event): void {
-        activeElement = <HTMLElement>element;
-    }
-}
-
-function updateActiveElement() {
-    var editables = document.querySelectorAll("[contentEditable=true]"),
-        textareas = document.getElementsByTagName('textarea');
-
-    function doList(list) {
-        var i: number;
-        for (i = 0; i < list.length; i++) {
-            var el = list[i];
-            el.addEventListener('input', bindListener(el));
-            el.addEventListener('click', bindListener(el));
-        }
-    }
-
-    doList(editables);
-    doList(textareas);
-}
-
 // Get variables and bootstrap
 getInitVars(() => {
-    updateActiveElement();
+    activeElement = new ActiveElement();
     if ( init.hasPrivateKey ) {
         traverseNodes(document.body);
         eventObserver();
