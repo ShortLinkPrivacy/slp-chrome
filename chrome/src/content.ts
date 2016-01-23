@@ -14,6 +14,8 @@ var urlRe: RegExp;
 // requested by the browser script.
 var activeElement: ActiveElement;
 
+var port: chrome.runtime.Port;
+
 // Installs listeners for 'input' and 'click' to all editable and textareas and
 // updates the activeElement variable to whichever element was edited last.
 // This is needed by the browser script in order to determine which element to
@@ -325,12 +327,16 @@ function listenToMessages() {
     });
 }
 
+
 // Get variables and bootstrap
-getInitVars(() => {
-    activeElement = new ActiveElement();
-    if ( init.hasPrivateKey ) {
-        traverseNodes(document.body);
-        eventObserver();
-        listenToMessages();
-    }
-})
+if ( window.top == window ) {
+    getInitVars(() => {
+        port = chrome.runtime.connect({ name: "content" });
+        activeElement = new ActiveElement();
+        if ( init.hasPrivateKey ) {
+            traverseNodes(document.body);
+            eventObserver();
+            listenToMessages();
+        }
+    })
+}
