@@ -30,3 +30,4 @@ Development
 ====================================
 - The background page reports an error when there is a public key in the DOM
 - Use port to communicate from content to background (should be faster). At least to decrypt the links;
+- Use chrome.i18n to implement i18n
