@@ -329,14 +329,12 @@ function listenToMessages() {
 
 
 // Get variables and bootstrap
-if ( window.top == window ) {
-    getInitVars(() => {
-        port = chrome.runtime.connect({ name: "content" });
-        activeElement = new ActiveElement();
-        if ( init.hasPrivateKey ) {
-            traverseNodes(document.body);
-            eventObserver();
-            listenToMessages();
-        }
-    })
-}
+getInitVars(() => {
+    port = chrome.runtime.connect({ name: "content" });
+    activeElement = new ActiveElement();
+    if ( init.hasPrivateKey ) {
+        traverseNodes(document.body);
+        eventObserver();
+        listenToMessages();
+    }
+})
