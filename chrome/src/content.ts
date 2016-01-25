@@ -138,6 +138,13 @@ var traverseNodes = (function(){
     }
 
     function decodeNode(node: Node, url: string): void {
+
+        // If the private key has not been unlocked, then add a notification
+        if ( !init.isDecrypted ) {
+            chrome.runtime.sendMessage({ command: 'needPassword' });
+            return;
+        }
+
         decodeURL(url, (newValue) => {
             var parentEl = node.parentElement;
 
@@ -169,11 +176,7 @@ var traverseNodes = (function(){
         while (node = walk.nextNode()) {
             if ( node.nodeType == Node.TEXT_NODE ) {
                 if ( match = urlRe.exec(node.nodeValue) ) {
-                    if ( init.isDecrypted ) {
-                        decodeNode(node, match[0]);
-                    } else {
-                        chrome.runtime.sendMessage({ command: 'needPassword' });
-                    }
+                    decodeNode(node, match[0]);
                 }
             } else if ( node.nodeType == Node.ELEMENT_NODE ) {
                 var el = <HTMLElement>node;
@@ -185,9 +188,8 @@ var traverseNodes = (function(){
                 // Is it a link? Then get the href, place it in the textContent of the link,
                 // then traverse this node only to decode 
                 } else if ( el.tagName == "A" && (match = urlRe.exec(el.getAttribute('href'))) ) {
-                    node.textContent = el.getAttribute('href');
-                    traverseNodes(el);
-                    walk.nextNode();  // Skip the contents of the A tag
+                    decodeNode(node, match[0]);
+                    walk.nextNode();    // Skip next node (it's the text inside the A)
                 }
             }
         }
