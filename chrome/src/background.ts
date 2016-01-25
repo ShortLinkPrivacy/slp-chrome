@@ -9,6 +9,9 @@ var config = new Config(),
 // Private key
 var privateKey: Keys.PrivateKey;
 
+// Active elements for each tab
+var elementLocatorDict: Interfaces.ElementLocatorDict = {};
+
 //############################################################################
 
 interface DispatchCall {
@@ -19,7 +22,8 @@ var dispatcher: DispatchCall = {
     init: initVars,
     decryptLink: decryptLink,
     needPassword: needPassword,
-    addPublicKey: addPublicKey
+    addPublicKey: addPublicKey,
+    activeElement: setActiveElement
 };
 
 //############################################################################
@@ -183,6 +187,16 @@ function addPublicKey(request: any, sender: chrome.runtime.MessageSender, sendRe
         keyStore.storePublicKey(key, () => {
             sendResponse({ success: true });
         });
+    });
+}
+
+function setActiveElement(request: any, sender: chrome.runtime.MessageSender, sendResponse: Interfaces.SuccessCallback): void {
+    chrome.tabs.query({ active: true }, (tabs) => {
+        var tabId = tabs[0].id;
+        elementLocatorDict[tabId] = {
+            frameId: request.frameId,
+            elementId: request.elementId
+        };
     });
 }
 

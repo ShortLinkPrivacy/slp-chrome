@@ -28,6 +28,16 @@ module Interfaces {
         config?: Config;
     }
 
+    export interface ElementLocator {
+        command?: string;
+        frameId: string;
+        elementId: string;
+    }
+
+    export interface ElementLocatorDict {
+        [tabId: number]: ElementLocator;
+    }
+
     export interface BackgroundPage extends Window {
         config: Config;
         privateKeyStore: PrivateKeyStore.Interface;
@@ -35,5 +45,6 @@ module Interfaces {
         keyStore: KeyStore.Interface;
         privateKey: Keys.PrivateKey;
         initialize: { (): InitVars };
+        elementLocatorDict: ElementLocatorDict;
     }
 }

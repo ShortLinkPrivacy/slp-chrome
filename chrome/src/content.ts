@@ -10,62 +10,47 @@ var observer: MutationObserver;
 // Regular expression for the url
 var urlRe: RegExp;
 
-// The last active (events 'input' and 'click') element. It is going to be
-// requested by the browser script.
-var activeElement: ActiveElement;
-
+// Connection port for messages to background
 var port: chrome.runtime.Port;
 
-// Installs listeners for 'input' and 'click' to all editable and textareas and
-// updates the activeElement variable to whichever element was edited last.
-// This is needed by the browser script in order to determine which element to
-// encrypt and decrypt.
-class ActiveElement {
+// Generator of element IDs
+var idGenerator = (function() {
+    var counter = 1000;
+    return function(prefix?: string): string {
+        if (!prefix) prefix = "element";
+        return ['slp', prefix, counter++].join("-");
+    }
+})();
+
+// Installs listeners for 'input' and 'click' to all editable and textareas
+class Editable {
     element: HTMLElement = null;
-    saveAttr: string = init.config.pgpElAttr;
+    frameId: string;
+    savedValue: string;
 
-    constructor() {
-        this.bindEditables(document.body);
-    }
-
-    private bindElement(el: HTMLElement) {
-        return function(e: Event): void {
-            this.element = el;
-        }.bind(this);
-    }
-
-    // Save original value in $data
-    private saveValue(): void {
-        var saved = this.getSavedValue();
-        if ( !saved ) {
-            $data(this.element, this.saveAttr, this.getText());
+    constructor(el: HTMLElement) {
+        // If the element has no id, then assign one to it
+        if ( el.id == "" ) {
+            el.id = idGenerator('editable');
         }
+
+        this.element = el;
+        this.frameId = window.frameElement ? window.frameElement.id : null;
+        this.bindEvents();
+
+        // Save the new instance in an attribute on the element
+        $data(this.element, init.config.pgpElAttr, this);
     }
 
-    private getSavedValue(): string {
-        return $data(this.element, this.saveAttr);
-    }
-
-    private clearSavedValue(): void {
-        $data(this.element, this.saveAttr, null);
-    }
-
-    // Traverse nodes looking for editable elements and attaches listeners to
-    // them that set the current active element
-    bindEditables(root: HTMLElement): void {
-        var walk: TreeWalker,
-            node: Node;
-
-        // Create a walker from the root element, searching only for element nodes
-        walk = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
-
-        while (node = walk.nextNode()) {
-            var el = <HTMLElement>node;
-            if ( el.contentEditable  == "true" || el.tagName == "TEXTAREA" ) {
-                el.addEventListener('input', this.bindElement(el));
-                el.addEventListener('click', this.bindElement(el));
-            }
-        }
+    private bindEvents(): void {
+        var message: Interfaces.ElementLocator = {
+            command: 'activeElement',
+            frameId: this.frameId,
+            elementId: this.element.id
+        };
+        this.element.addEventListener('focus', function() {
+            chrome.runtime.sendMessage(message);
+        }.bind(this));
     }
 
     // Get the text value of the editable
@@ -81,8 +66,10 @@ class ActiveElement {
     setText(text: string, noSave?: boolean): void {
         if ( !this.element ) return;
 
-        // Save original value in $data
-        if (!noSave) this.saveValue();
+        // Save original value
+        if (!noSave) {
+            this.savedValue = this.getText();
+        }
 
         // Set new value
         if ( this.element.contentEditable == "true" ) {
@@ -99,25 +86,14 @@ class ActiveElement {
 
     // Restore the saved value of the element
     restoreText(): boolean {
-        var orgValue: string;
-
         if ( !this.element ) return;
-
-        orgValue = this.getSavedValue();
-        if ( typeof orgValue != "undefined" && orgValue != null ) {
-            this.clearSavedValue();
-            this.setText(orgValue, true);
+        if ( typeof this.savedValue != "undefined" && this.savedValue != null ) {
+            this.setText(this.savedValue, true);
+            this.savedValue = null;
             return true;
         }
 
         return false;
-    }
-
-    // Attempt to locate an editable element
-    find(): void {
-        this.element = 
-            <HTMLElement>document.querySelector("[contentEditable=true]") ||
-            <HTMLElement>document.querySelector("textarea");
     }
 }
 
@@ -156,7 +132,7 @@ var hotlinkPublicKeys = (function() {
 var traverseNodes = (function(){
 
     function decodeText(codedText: string, callback: { (decodedText): void }): void {
-         var   match = urlRe.exec(codedText),
+        var match = urlRe.exec(codedText),
             messageId: string,
             url: string;
 
@@ -206,14 +182,21 @@ var traverseNodes = (function(){
             node: Node;
 
         // Create a walker from the root element, searching only for text nodes
-        walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+        walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT);
 
         while (node = walk.nextNode()) {
-            if (node.nodeValue.match(urlRe)) {
-                if ( init.isDecrypted ) {
-                    decodeNode(node);
-                } else {
-                    chrome.runtime.sendMessage({ command: 'needPassword' });
+            if ( node.nodeType == Node.TEXT_NODE ) {
+                if (node.nodeValue.match(urlRe)) {
+                    if ( init.isDecrypted ) {
+                        decodeNode(node);
+                    } else {
+                        chrome.runtime.sendMessage({ command: 'needPassword' });
+                    }
+                }
+            } else if ( node.nodeType == Node.ELEMENT_NODE ) {
+                var el = <HTMLElement>node;
+                if ( el.contentEditable  == "true" || el.tagName == "TEXTAREA" ) {
+                    new Editable(el);
                 }
             }
         }
@@ -229,7 +212,6 @@ function eventObserver(): void {
             for (var i = 0; i < mutation.addedNodes.length; i++) {
                 var node = mutation.addedNodes[i];
                 traverseNodes(<HTMLElement>node);
-                activeElement.bindEditables(<HTMLElement>node);
             }
         });
     });
@@ -246,7 +228,7 @@ function getInitVars(callback: Interfaces.Callback): void {
     });
 }
 
-function $data(el: HTMLElement, name: string, value?: any): string {
+function $data(el: HTMLElement, name: string, value?: any): any {
     if ( typeof value != "undefined" ) {
         if ( value == null )
             delete el.attributes[name]
@@ -260,23 +242,27 @@ function $data(el: HTMLElement, name: string, value?: any): string {
 // Listen for messages from the extension
 function listenToMessages() {
 
+    var editable: Editable;
+
     // Get the active element and its value
     // ------------------------------------------------------------
     var getElementText = function(msg, sendResponse) {
-        sendResponse({ value: activeElement.getText() });
+        if (!editable) return;
+        sendResponse({ value: editable.getText() });
     }
 
     // Set the active element and mark it as encrypted
     // ------------------------------------------------------------
     var setElementText = function(msg, sendResponse) {
-        if ( !activeElement.element ) activeElement.find();
-        activeElement.setText(msg.setElementText);
+        if (!editable) return;
+        editable.setText(msg.setElementText);
     }
 
     // Restore the original text of the textarea
     // ------------------------------------------------------------
     var restoreElementText = function(msg, sendResponse) {
-        var result = activeElement.restoreText();
+        if (!editable) return;
+        var result = editable.restoreText();
         sendResponse({ success: result });
     }
 
@@ -314,6 +300,20 @@ function listenToMessages() {
     // Message listener
     // ============================================================
     chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+        var eloc: Interfaces.ElementLocator, 
+            element: HTMLElement;
+
+        if ( eloc = msg.elementLocator ) {
+            if ( window.frameElement && window.frameElement.id != eloc.frameId )
+                return;
+            if ( !window.frameElement && eloc.frameId != null )
+                return;
+            element = document.getElementById(eloc.elementId);
+            editable = $data(element, init.config.pgpElAttr);
+        } else {
+            editable = null;
+        }
+
         if ( msg.getElementText )
             getElementText(msg, sendResponse)
         else if ( msg.setElementText)
@@ -327,11 +327,15 @@ function listenToMessages() {
     });
 }
 
-
-// Get variables and bootstrap
+// Bootstrap
 getInitVars(() => {
-    port = chrome.runtime.connect({ name: "content" });
-    activeElement = new ActiveElement();
+
+    // If we are in a frame and the frame has no id attribute, 
+    // then assign one to it
+    if ( window.frameElement && !window.frameElement.id ) {
+        window.frameElement.id = idGenerator('frame');
+    }
+
     if ( init.hasPrivateKey ) {
         traverseNodes(document.body);
         eventObserver();

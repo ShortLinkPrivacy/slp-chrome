@@ -4,15 +4,23 @@
 /// <reference path="modules.d.ts" />
 
 var app: App,
-    bg: Interfaces.BackgroundPage = <Interfaces.BackgroundPage>chrome.extension.getBackgroundPage();
+    bg: Interfaces.BackgroundPage = <Interfaces.BackgroundPage>chrome.extension.getBackgroundPage(),
+    tab: chrome.tabs.Tab;   // current open tab
+
+
+interface ElementMessage {
+    elementLocator?: Interfaces.ElementLocator;
+    getElementText?: boolean;
+    setElementText?: string;
+    restoreElementText?: boolean;
+}
 
 //---------------------------------------------------------------------------
-// Sends messages to the content script of the current tab
+// Sends messages to the active element in the content script of the current tab
 //---------------------------------------------------------------------------
-function sendMessageToContent(msg: any, callback?: Interfaces.ResultCallback): void {
-    chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-        chrome.tabs.sendMessage(tabs[0].id, msg, callback);
-    });
+function sendElementMessage(msg: ElementMessage, callback?: Interfaces.ResultCallback): void {
+    msg.elementLocator = bg.elementLocatorDict[tab.id];
+    chrome.tabs.sendMessage(tab.id, msg, callback);
 }
 
 //---------------------------------------------------------------------------
@@ -110,13 +118,16 @@ class App {
             return this.foundKeys.length > 0
         };
 
-        sendMessageToContent({ getElementText: true }, (el) => {
-            var re = new RegExp(bg.messageStore.getReStr());
-            if ( el ) {
-                this.alreadyEncrypted = re.exec(el.value) ? true : false;
-                this.clearText = el.value;
-            }
-        });
+        chrome.tabs.query({ active: true }, (tabs) => {
+            tab = tabs[0];
+            sendElementMessage({ getElementText: true }, (el) => {
+                var re = new RegExp(bg.messageStore.getReStr());
+                if ( el ) {
+                    this.alreadyEncrypted = re.exec(el.value) ? true : false;
+                    this.clearText = el.value;
+                }
+            });
+        })
     }
 
     //---------------------------------------------------------------------------
@@ -196,7 +207,7 @@ class App {
         encryptMessage(this.clearText, keyList, (result) => {
             this.wait = false;
             if ( result.success ) {
-                sendMessageToContent({ setElementText: result.value });
+                sendElementMessage({ setElementText: result.value });
                 window.close();
             } else {
                 this.error = result.error;
@@ -208,7 +219,7 @@ class App {
     // Restore the original message back in the textarea
     //---------------------------------------------------------------------------
     restoreMessage(e: Event) {
-        sendMessageToContent({ restoreElementText: true }, (result) => {
+        sendElementMessage({ restoreElementText: true }, (result) => {
             if ( result.success ) {
                 window.close();
             } else {
@@ -264,7 +275,7 @@ class App {
     sendPublicKey(): void {
         encryptPublicKey((result) => {
             if ( result.success ) {
-                sendMessageToContent({ setElementText: result.value });
+                sendElementMessage({ setElementText: result.value });
                 window.close();
             } else {
                 this.error = result.error;
