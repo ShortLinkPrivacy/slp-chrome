@@ -131,72 +131,63 @@ var hotlinkPublicKeys = (function() {
 
 var traverseNodes = (function(){
 
-    function decodeText(codedText: string, callback: { (decodedText): void }): void {
-        var match = urlRe.exec(codedText),
-            messageId: string,
-            url: string;
-
-        if (!match) {
-            callback(codedText);
-            return;
-        }
-
-        url = match[0];
-        messageId = match[1];
-
+    function decodeURL(url: string, callback: { (decodedText): void }): void {
         chrome.runtime.sendMessage({ command: "decryptLink", url: url }, (result) => {
-            if ( result.success ) {
-                codedText = codedText.replace(url, result.value);
-            } else {
-                codedText = "Error decrypting"
-            }
-            decodeText(codedText, callback);
+            callback( result.success ? result.value : "Error decrypting" );
         });
-    };
+    }
 
-    function decodeNode(node: Node): void {
-        decodeText( node.nodeValue, (newValue) => {
-            if ( newValue != node.nodeValue ) {
-                var parentEl = node.parentElement;
+    function decodeNode(node: Node, url: string): void {
+        decodeURL(url, (newValue) => {
+            var parentEl = node.parentElement;
 
-                // Remove links (some sites hotlink URLs)
-                if ( parentEl.tagName == 'A' ) {
-                    parentEl = parentEl.parentElement;
-                }
-
-                // Save the current value of the element and give it a new class
-                $data(parentEl, init.config.pgpData, parentEl.innerHTML)
-                parentEl.classList.add(init.config.pgpClassName);
-
-                // Set the new value
-                parentEl.innerHTML = newValue;
-
-                // Create public key hotlinks
-                hotlinkPublicKeys(parentEl);
+            // Remove links (some sites hotlink URLs)
+            if ( parentEl.tagName == 'A' ) {
+                parentEl = parentEl.parentElement;
             }
+
+            // Save the current value of the element and give it a new class
+            $data(parentEl, init.config.pgpData, parentEl.innerHTML)
+            parentEl.classList.add(init.config.pgpClassName);
+
+            // Set the new value
+            parentEl.innerHTML = newValue;
+
+            // Create public key hotlinks
+            hotlinkPublicKeys(parentEl);
         });
     }
 
     function traverseNodes(root: HTMLElement): void {
         var walk: TreeWalker,
-            node: Node;
+            node: Node,
+            match;
 
         // Create a walker from the root element, searching only for text nodes
         walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT);
 
         while (node = walk.nextNode()) {
             if ( node.nodeType == Node.TEXT_NODE ) {
-                if (node.nodeValue.match(urlRe)) {
+                if ( match = urlRe.exec(node.nodeValue) ) {
                     if ( init.isDecrypted ) {
-                        decodeNode(node);
+                        decodeNode(node, match[0]);
                     } else {
                         chrome.runtime.sendMessage({ command: 'needPassword' });
                     }
                 }
             } else if ( node.nodeType == Node.ELEMENT_NODE ) {
                 var el = <HTMLElement>node;
+
+                // Is it editable? Then make it work.
                 if ( el.contentEditable  == "true" || el.tagName == "TEXTAREA" ) {
                     new Editable(el);
+
+                // Is it a link? Then get the href, place it in the textContent of the link,
+                // then traverse this node only to decode 
+                } else if ( el.tagName == "A" && (match = urlRe.exec(el.getAttribute('href'))) ) {
+                    node.textContent = el.getAttribute('href');
+                    traverseNodes(el);
+                    walk.nextNode();  // Skip the contents of the A tag
                 }
             }
         }
