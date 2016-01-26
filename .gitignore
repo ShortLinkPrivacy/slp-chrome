@@ -39,3 +39,6 @@ chrome/css/content.css
 chrome/css/admin.css
 
 dist
+
+*.pem
+*.crx
