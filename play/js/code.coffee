@@ -19,19 +19,10 @@ class Play
         localStorage.setItem(key, store)
         @message2 = ""
 
-    submit3: =>
-        return unless @message3?
-        @items.push @message3
-        store = JSON.stringify(@items)
-        localStorage.setItem(key, store)
-        @message3 = ""
-
-    submit4: =>
-        return unless @message4?
-        @items.push @message4
-        store = JSON.stringify(@items)
-        localStorage.setItem(key, store)
-        @message4 = ""
+    iframe: =>
+        frame = document.createElement 'iframe'
+        frame.src = "iframe.html"
+        document.body.appendChild(frame)
 
     deleteAll: =>
         @items = []

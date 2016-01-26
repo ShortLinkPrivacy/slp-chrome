@@ -10,8 +10,7 @@
 
     function Play() {
       this.deleteAll = __bind(this.deleteAll, this);
-      this.submit4 = __bind(this.submit4, this);
-      this.submit3 = __bind(this.submit3, this);
+      this.iframe = __bind(this.iframe, this);
       this.submit2 = __bind(this.submit2, this);
       this.submit = __bind(this.submit, this);
       var store;
@@ -41,26 +40,11 @@
       return this.message2 = "";
     };
 
-    Play.prototype.submit3 = function() {
-      var store;
-      if (this.message3 == null) {
-        return;
-      }
-      this.items.push(this.message3);
-      store = JSON.stringify(this.items);
-      localStorage.setItem(key, store);
-      return this.message3 = "";
-    };
-
-    Play.prototype.submit4 = function() {
-      var store;
-      if (this.message4 == null) {
-        return;
-      }
-      this.items.push(this.message4);
-      store = JSON.stringify(this.items);
-      localStorage.setItem(key, store);
-      return this.message4 = "";
+    Play.prototype.iframe = function() {
+      var frame;
+      frame = document.createElement('iframe');
+      frame.src = "iframe.html";
+      return document.body.appendChild(frame);
     };
 
     Play.prototype.deleteAll = function() {
