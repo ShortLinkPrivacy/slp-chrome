@@ -15,6 +15,7 @@ settings
 ====================================
 - do not require name when creating a key
 - lock and invalidate private key in bg page when the private key is removed from the settings
+- need to import and export secret key and address book
 
 
 installation
