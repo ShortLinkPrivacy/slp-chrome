@@ -61,7 +61,9 @@
               <span rv-show="clearText">
                 <button rv-show="hasSelectedKeys < selectedKeys" class="button" rv-disabled="wait" rv-on-click="sendMessage">Encrypt Message <span rv-show="wait"><i class="icon-spin5"></i></span></button>
               </span>
-              <button rv-hide="clearText" rv-on-click="sendPublicKey" class="button">Share My Public Key</button>
+              <span rv-hide="clearText">
+                <button rv-on-click="sendPublicKey" rv-disabled="wait" class="button">Share My Public Key <span rv-show="wait"><i class="icon-spin5"></i></span></button>
+              </span>
             </div><!-- .bottom -->
           </div><!-- !alreadyEncrypted -->
           <div rv-show="alreadyEncrypted" class="middle">

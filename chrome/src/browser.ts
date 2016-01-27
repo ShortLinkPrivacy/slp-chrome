@@ -273,7 +273,9 @@ class App {
     // Encrypt own private key and pastes the url to the textarea
     //---------------------------------------------------------------------------
     sendPublicKey(): void {
+        this.wait = true;
         encryptPublicKey((result) => {
+            this.wait = false;
             if ( result.success ) {
                 sendElementMessage({ setElementText: result.value });
                 window.close();
