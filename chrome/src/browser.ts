@@ -133,7 +133,6 @@ class App {
         re = new RegExp(bg.messageStore.getReStr());
 
         sendElementMessage({ getElementText: true }, (response) => {
-            bg.console.log(response);
             if ( !response ) return;
 
             text = response.value;
