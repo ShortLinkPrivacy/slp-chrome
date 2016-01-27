@@ -13,6 +13,8 @@ interface ElementMessage {
     getElementText?: boolean;
     setElementText?: string;
     restoreElementText?: boolean;
+
+    lastKeysUsed?: Array<string>;
 }
 
 //---------------------------------------------------------------------------
@@ -120,14 +122,37 @@ class App {
 
         chrome.tabs.query({ active: true }, (tabs) => {
             tab = tabs[0];
-            sendElementMessage({ getElementText: true }, (el) => {
-                var re = new RegExp(bg.messageStore.getReStr());
-                if ( el ) {
-                    this.alreadyEncrypted = re.exec(el.value) ? true : false;
-                    this.clearText = el.value;
-                }
-            });
+            this.getElementText();
         })
+    }
+
+    private getElementText(): void {
+        var re: RegExp, text: string, lastKeysUsed: Array<string>,
+            i: number;
+
+        re = new RegExp(bg.messageStore.getReStr());
+
+        sendElementMessage({ getElementText: true }, (response) => {
+            bg.console.log(response);
+            if ( !response ) return;
+
+            text = response.value;
+            lastKeysUsed = response.lastKeysUsed;
+
+            this.alreadyEncrypted = re.exec(text) ? true : false;
+            this.clearText = text;
+
+            // lastKeysUsed actually contains an array of fingerprints, so we
+            // have to look them up in the address book and translate them into
+            // keys
+            if ( lastKeysUsed.length ) {
+                bg.keyStore.loadPublicKeys(lastKeysUsed, (keys) => {
+                    this.selectedKeys = keys.map( k => { 
+                        return new Keys.KeyItem(k) 
+                    });
+                });
+            }
+        });
     }
 
     //---------------------------------------------------------------------------
@@ -193,12 +218,21 @@ class App {
     // Encrypt the message and paste the url back to the textarea
     //---------------------------------------------------------------------------
     sendMessage(e: Event) {
-        var keyList: Array<openpgp.key.Key>;
+        var keyList: Array<openpgp.key.Key> = [],
+            fingerprintList: Array<string> = [],
+            i: number;
 
         // This should never happen because we don't show the submit button
         if (this.hasSelectedKeys() == false) return;
 
-        keyList = this.selectedKeys.map(item => { return item.key.openpgpKey() })
+        // Collect a list of keys and fingerprints. The keys are used to encrypt
+        // the message, and the fingerprints are saved in the editable so they
+        // can be reused again with a shortcut
+        for (i = 0; i < this.selectedKeys.length; i++) {
+            var item = this.selectedKeys[i];
+            keyList.push(item.key.openpgpKey());
+            fingerprintList.push(item.key.fingerprint());
+        }
 
         // Also push our own key, so we can read our own message
         keyList.push(bg.privateKey.key.toPublic());
@@ -207,7 +241,7 @@ class App {
         encryptMessage(this.clearText, keyList, (result) => {
             this.wait = false;
             if ( result.success ) {
-                sendElementMessage({ setElementText: result.value });
+                sendElementMessage({ setElementText: result.value, lastKeysUsed: fingerprintList });
                 window.close();
             } else {
                 this.error = result.error;

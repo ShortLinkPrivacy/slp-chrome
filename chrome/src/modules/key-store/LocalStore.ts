@@ -71,11 +71,18 @@ module KeyStore {
             })
         }
 
-        loadPublicKey(fingerprint: string, callback: PublicKeyCallback): void {
-            this.config.store.get( fingerprint, (items) => {
+        loadPublicKeys(fingerprints: Array<string>, callback: PublicKeySearchCallback): void {
+            var result: PublicKeyArray = [];
+
+            this.config.store.get( fingerprints, (found) => {
                 this.checkRuntimeError();
-                var key = new Keys.PublicKey(items[fingerprint]);
-                if (callback) callback(key);
+
+                Object.keys(found).forEach((p) => {
+                    var key = new Keys.PublicKey( found[p] );
+                    result.push( key );
+                });
+                
+                if (callback) callback(result);
             });
         }
 

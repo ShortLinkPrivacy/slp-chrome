@@ -16,14 +16,26 @@ var port: chrome.runtime.Port;
 // Generator of element IDs
 var idGenerator = function(prefix: string) {
     if (typeof prefix == "undefined") prefix = "id";
-    return Math.random().toString(36).substr(2.16);
+    return Math.random().toString(36).substr(2, 16);
 };
+
+interface ContentMessage {
+    getElementText?: boolean;
+    setElementText?: string;
+    traverse?: boolean;
+    lock?: boolean;
+    restoreElementText?: boolean;
+
+    elementLocator?: Interfaces.ElementLocator;
+    lastKeysUsed?: Array<string>;
+}
 
 // Installs listeners for 'input' and 'click' to all editable and textareas
 class Editable {
     element: HTMLElement = null;
     frameId: string;
     savedValue: string;
+    lastKeysUsed: Array<string>;
 
     constructor(el: HTMLElement) {
         // If the element has no id, then assign one to it
@@ -241,21 +253,25 @@ function listenToMessages() {
 
     // Get the active element and its value
     // ------------------------------------------------------------
-    var getElementText = function(msg, sendResponse) {
+    var getElementText = function(msg: ContentMessage, sendResponse) {
         if (!editable) return;
-        sendResponse({ value: editable.getText() });
+        sendResponse({ 
+            value: editable.getText(), 
+            lastKeysUsed: editable.lastKeysUsed 
+        });
     }
 
     // Set the active element and mark it as encrypted
     // ------------------------------------------------------------
-    var setElementText = function(msg, sendResponse) {
+    var setElementText = function(msg: ContentMessage, sendResponse) {
         if (!editable) return;
         editable.setText(msg.setElementText);
+        editable.lastKeysUsed = msg.lastKeysUsed;
     }
 
     // Restore the original text of the textarea
     // ------------------------------------------------------------
-    var restoreElementText = function(msg, sendResponse) {
+    var restoreElementText = function(msg: ContentMessage, sendResponse) {
         if (!editable) return;
         var result = editable.restoreText();
         sendResponse({ success: result });
@@ -263,7 +279,7 @@ function listenToMessages() {
 
     // Return all decrypted nodes to their original values
     // ------------------------------------------------------------
-    var lock = function(msg, sendResponse) {
+    var lock = function(msg: ContentMessage, sendResponse) {
         var els = document.getElementsByClassName(init.config.pgpClassName),
             i: number,
             parentEl: HTMLElement,
@@ -288,21 +304,32 @@ function listenToMessages() {
 
     // Decrypt all nodes
     // ------------------------------------------------------------
-    var traverse = function(msg, sendResponse) {
+    var traverse = function(msg: ContentMessage, sendResponse) {
         getInitVars(() => { traverseNodes(document.body) });
     }
 
     // Message listener
     // ============================================================
-    chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+    chrome.runtime.onMessage.addListener((msg: ContentMessage, sender, sendResponse) => {
         var eloc: Interfaces.ElementLocator,
             element: HTMLElement;
 
+        // If element locator element is provided in the message, then we're
+        // dealing with an editable and we need to first locate it.
         if ( eloc = msg.elementLocator ) {
+
+            // If we're in a frame and the id of the frame does not match the
+            // one provided in the locator, then no.
             if ( window.frameElement && window.frameElement.id != eloc.frameId )
                 return;
+
+            // If we're in the top window and the id of the frame in the
+            // locator is not null, then no.
             if ( !window.frameElement && eloc.frameId != null )
                 return;
+
+            // At this point, we have determined that the element and frame ID
+            // provided in the locator match the document we're running in.
             element = document.getElementById(eloc.elementId);
             editable = $data(element, init.config.pgpElAttr);
         } else {
