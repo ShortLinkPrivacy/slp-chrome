@@ -14,13 +14,10 @@ var urlRe: RegExp;
 var port: chrome.runtime.Port;
 
 // Generator of element IDs
-var idGenerator = (function() {
-    var counter = 1000;
-    return function(prefix?: string): string {
-        if (!prefix) prefix = "element";
-        return ['slp', prefix, counter++].join("-");
-    }
-})();
+var idGenerator = function(prefix: string) {
+    if (typeof prefix == "undefined") prefix = "id";
+    return Math.random().toString(36).substr(2.16);
+};
 
 // Installs listeners for 'input' and 'click' to all editable and textareas
 class Editable {
@@ -48,16 +45,21 @@ class Editable {
             frameId: this.frameId,
             elementId: this.element.id
         };
-        this.element.addEventListener('focus', function() {
+
+        var eventHandler = function() {
             chrome.runtime.sendMessage(message);
-        }.bind(this));
+        }.bind(this);
+
+        this.element.addEventListener('focus', eventHandler);
+        this.element.addEventListener('click', eventHandler);
+        this.element.addEventListener('change', eventHandler);
     }
 
     // Get the text value of the editable
     getText(): string {
         if ( !this.element ) return;
-        return this.element.tagName == "TEXTAREA" 
-            ? (<HTMLTextAreaElement>this.element).value 
+        return this.element.tagName == "TEXTAREA"
+            ? (<HTMLTextAreaElement>this.element).value
             : this.element.textContent;
     }
 
@@ -186,7 +188,7 @@ var traverseNodes = (function(){
                     new Editable(el);
 
                 // Is it a link? Then get the href, place it in the textContent of the link,
-                // then traverse this node only to decode 
+                // then traverse this node only to decode
                 } else if ( el.tagName == "A" && (match = urlRe.exec(el.getAttribute('href'))) ) {
                     decodeNode(node, match[0]);
                     walk.nextNode();    // Skip next node (it's the text inside the A)
@@ -293,7 +295,7 @@ function listenToMessages() {
     // Message listener
     // ============================================================
     chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-        var eloc: Interfaces.ElementLocator, 
+        var eloc: Interfaces.ElementLocator,
             element: HTMLElement;
 
         if ( eloc = msg.elementLocator ) {
@@ -323,7 +325,7 @@ function listenToMessages() {
 // Bootstrap
 getInitVars(() => {
 
-    // If we are in a frame and the frame has no id attribute, 
+    // If we are in a frame and the frame has no id attribute,
     // then assign one to it
     if ( window.frameElement && !window.frameElement.id ) {
         window.frameElement.id = idGenerator('frame');

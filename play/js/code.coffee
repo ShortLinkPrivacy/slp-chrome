@@ -21,7 +21,7 @@ class Play
 
     iframe: =>
         frame = document.createElement 'iframe'
-        frame.src = "iframe.html"
+        frame.src = "iframe2.html"
         document.body.appendChild(frame)
 
     deleteAll: =>
