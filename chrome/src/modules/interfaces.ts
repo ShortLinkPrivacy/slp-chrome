@@ -44,7 +44,9 @@ module Interfaces {
         messageStore: MessageStore.Interface;
         keyStore: KeyStore.Interface;
         privateKey: Keys.PrivateKey;
-        initialize: { (): InitVars };
         elementLocatorDict: ElementLocatorDict;
+
+        initialize(): InitVars;
+        encryptMessage(text: string, keyList: Array<openpgp.key.Key>, callback: Interfaces.SuccessCallback): void;
     }
 }

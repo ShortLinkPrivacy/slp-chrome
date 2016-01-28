@@ -49,32 +49,6 @@ function encryptPublicKey(callback: Interfaces.SuccessCallback): void {
     });
 }
 
-function encryptMessage(text: string, keyList: Array<openpgp.key.Key>, callback: Interfaces.SuccessCallback): void {
-    openpgp.encryptMessage( keyList, text )
-        .then((armoredText) => {
-            bg.messageStore.save(armoredText, (result) => {
-                if ( result.success ) {
-                    callback({
-                        success: true,
-                        value: bg.messageStore.getURL(result.id)
-                    });
-                } else {
-                    callback({
-                        success: false,
-                        error: result.error
-                    });
-                }
-            });
-        })
-        .catch((err) => {
-            callback({
-                success: false,
-                error: "OpenPGP Error: " + err
-            });
-        });
-}
-
-
 /*
  * The main application handles all articles, bit it itself
  * also handles the private key password entry screen.
@@ -237,7 +211,7 @@ class App {
         keyList.push(bg.privateKey.key.toPublic());
 
         this.wait = true;
-        encryptMessage(this.clearText, keyList, (result) => {
+        bg.encryptMessage(this.clearText, keyList, (result) => {
             this.wait = false;
             if ( result.success ) {
                 sendElementMessage({ setElementText: result.value, lastKeysUsed: fingerprintList });

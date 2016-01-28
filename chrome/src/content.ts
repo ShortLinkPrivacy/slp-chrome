@@ -53,7 +53,7 @@ class Editable {
 
     private bindEvents(): void {
         var message: Interfaces.ElementLocator = {
-            command: 'activeElement',
+            command: 'setActiveElement',
             frameId: this.frameId,
             elementId: this.element.id
         };
@@ -62,22 +62,30 @@ class Editable {
             chrome.runtime.sendMessage(message);
         }.bind(this);
 
+        // Change listeners
         this.element.addEventListener('focus', eventHandler);
         this.element.addEventListener('click', eventHandler);
         this.element.addEventListener('change', eventHandler);
 
+        // Quick encrypt shortcut
         this.element.addEventListener('keydown', (e: KeyboardEvent) => {
-            if ( e.keyCode == 76 && e.metaKey == true && e.altKey == true ) {
-                this.encrypt();
-            }
+            var trigger: boolean;
+            trigger = e.keyCode == 76 && e.metaKey == true && e.altKey == true;
+            if (trigger == true) this.encrypt();
         })
     }
 
-    private encrypt(callback: Interfaces.Callback): void {
-        var text: string;
-        if ( text = this.getText() ) {
-            // chrome.runtime.sendMessage('')
-        }
+    private encrypt(): void {
+        var text = this.getText(),
+            lastKeysUsed = this.lastKeysUsed;
+
+        if ( !text || !lastKeysUsed || !lastKeysUsed.length) return;
+
+        chrome.runtime.sendMessage({ command: 'encryptLastKeysUsed', text: text, lastKeysUsed: this.lastKeysUsed }, (result) => {
+            if ( result.success ) {
+                this.setText(result.value);
+            }
+        })
     }
 
     // Get the text value of the editable
@@ -241,7 +249,7 @@ function eventObserver(): void {
 // Retrieves variables indicating the status of the background page, such as
 // 'isDecrypted' (the private key) and others.
 function getInitVars(callback: Interfaces.Callback): void {
-    chrome.runtime.sendMessage({command: 'init'}, (result) => {
+    chrome.runtime.sendMessage({command: 'initVars'}, (result) => {
         init = result.value;
         urlRe = new RegExp(init.linkRe);
         callback()

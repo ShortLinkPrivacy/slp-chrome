@@ -14,20 +14,6 @@ var elementLocatorDict: Interfaces.ElementLocatorDict = {};
 
 //############################################################################
 
-interface DispatchCall {
-    [method: string]: (request: any, sender: chrome.runtime.MessageSender, sendResponse: Interfaces.SuccessCallback) => void;
-}
-
-var dispatcher: DispatchCall = {
-    init: initVars,
-    decryptLink: decryptLink,
-    needPassword: needPassword,
-    addPublicKey: addPublicKey,
-    activeElement: setActiveElement
-};
-
-//############################################################################
-
 enum ArmorType { None, MultipartSection, MultipartLast, Signed, Message, PublicKey, PrivateKey };
 
 function getArmorType(text: string): ArmorType {
@@ -82,25 +68,7 @@ function getArmorType(text: string): ArmorType {
   return ArmorType.None;
 }
 
-/*
- * Initialize variables, settings, etc.
- */
-function initialize(): Interfaces.InitVars {
-    var result: Interfaces.InitVars = {};
-
-    result.linkRe = messageStore.getReStr();
-    result.hasPrivateKey = privateKey ? true : false;
-    result.isDecrypted = privateKey ? privateKey.isDecrypted() : false;
-    result.config = config;
-
-    return result;
-}
-
 //############################################################################
-
-function initVars(request: any, sender: chrome.runtime.MessageSender, sendResponse: Interfaces.SuccessCallback): void {
-    sendResponse({ success: true, value: initialize() });
-}
 
 // Creates a HTML snippet with a button to replace a public key armored message
 function makePublicKeyText(armor: string, messageId: string, callback: Interfaces.ResultCallback): void {
@@ -120,93 +88,151 @@ function makePublicKeyText(armor: string, messageId: string, callback: Interface
     });
 }
 
-function decryptLink(request: any, sender: chrome.runtime.MessageSender, sendResponse: Interfaces.SuccessCallback): void {
-    var re: RegExp, match: Array<string>, messageId: string;
-
-    re  = new RegExp(messageStore.getReStr());
-    match = re.exec(request.url)
-
-    if (!match) {
-        sendResponse({ success: false, error: 'match' });
-        return;
-    }
-
-    messageId = match[1];
-
-    messageStore.load( messageId, (result) => {
-        if ( !result.success ) {
-           sendResponse({ success: false, error: 'decode', value: messageId });
-           return;
-        }
-
-        var armorType = getArmorType(result.armor);
-        if ( armorType == ArmorType.Signed || armorType == ArmorType.Message ) {
-            var message = openpgp.message.readArmored(result.armor);
-
-            openpgp.decryptMessage( privateKey.key, message )
-               .then((plainText) => {
-                   sendResponse({ success: true, value: plainText });
-               })
-               .catch((error) => {
-                   sendResponse({ success: false, error: 'decode', value: messageId });
-               });
-        } else if ( armorType == ArmorType.PublicKey ) {
-            makePublicKeyText(result.armor, messageId, (html) => {
-                sendResponse({ success: true, value: html });
+function encryptMessage(text: string, keyList: Array<openpgp.key.Key>, callback: Interfaces.SuccessCallback): void {
+    openpgp.encryptMessage( keyList, text )
+        .then((armoredText) => {
+            messageStore.save(armoredText, (result) => {
+                if ( result.success ) {
+                    callback({ success: true, value: messageStore.getURL(result.id) });
+                } else {
+                    callback({ success: false, error: result.error });
+                }
             });
-        }
-    });
-}
-
-function needPassword(request: any, sender: chrome.runtime.MessageSender, sendResponse: Interfaces.SuccessCallback): void {
-    chrome.browserAction.setBadgeText({text: '*'});
-}
-
-/*
- * addPublicKey
- * Called by the content script when the user clicks a button with public key url in it
- * The request contains the messageId of the message url containing the armored text of the public key
- */
-function addPublicKey(request: any, sender: chrome.runtime.MessageSender, sendResponse: Interfaces.SuccessCallback): void {
-    var key: Keys.PublicKey,
-        messageId: string = request.messageId;
-
-    messageStore.load( messageId, (result) => {
-        if ( !result.success ) {
-           sendResponse({ success: false, error: 'decode', value: messageId });
-           return;
-        }
-
-        try {
-            key = new Keys.PublicKey(result.armor);
-        } catch (err) {
-            sendResponse({ success: false, error: err });
-            return;
-        }
-
-        keyStore.storePublicKey(key, () => {
-            sendResponse({ success: true });
+        })
+        .catch((err) => {
+            callback({ success: false, error: "OpenPGP Error: " + err });
         });
-    });
-}
-
-function setActiveElement(request: any, sender: chrome.runtime.MessageSender, sendResponse: Interfaces.SuccessCallback): void {
-    chrome.tabs.query({ active: true }, (tabs) => {
-        var tabId = tabs[0].id;
-        elementLocatorDict[tabId] = {
-            frameId: request.frameId,
-            elementId: request.elementId
-        };
-    });
 }
 
 //############################################################################
 
-chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-    var func;
-    if ( msg && msg.command && (func = dispatcher[msg.command]) ) {
-        func(msg, sender, sendResponse);
+class Message {
+    private request: any;
+    private sender: chrome.runtime.MessageSender;
+    private sendResponse: Interfaces.SuccessCallback;
+
+    constructor(request: any, sender: chrome.runtime.MessageSender, sendResponse: Interfaces.SuccessCallback) {
+        this.request = request;
+        this.sender = sender;
+        this.sendResponse = sendResponse;
     }
+
+    // Initialize variables, settings etc.
+    initVars(): void {
+        var result: Interfaces.InitVars = {};
+
+        result.linkRe = messageStore.getReStr();
+        result.hasPrivateKey = privateKey ? true : false;
+        result.isDecrypted = privateKey ? privateKey.isDecrypted() : false;
+        result.config = config;
+
+        this.sendResponse({ success: true, value: result });
+    }
+
+    decryptLink(): void {
+        var re: RegExp, match: Array<string>, messageId: string;
+
+        re  = new RegExp(messageStore.getReStr());
+        match = re.exec(this.request.url)
+
+        if (!match) {
+            this.sendResponse({ success: false, error: 'match' });
+            return;
+        }
+
+        messageId = match[1];
+
+        messageStore.load( messageId, (result) => {
+            if ( !result.success ) {
+               this.sendResponse({ success: false, error: 'decode', value: messageId });
+               return;
+            }
+
+            var armorType = getArmorType(result.armor);
+            if ( armorType == ArmorType.Signed || armorType == ArmorType.Message ) {
+                var message = openpgp.message.readArmored(result.armor);
+
+                openpgp.decryptMessage( privateKey.key, message )
+                   .then((plainText) => {
+                       this.sendResponse({ success: true, value: plainText });
+                   })
+                   .catch((error) => {
+                       this.sendResponse({ success: false, error: 'decode', value: messageId });
+                   });
+            } else if ( armorType == ArmorType.PublicKey ) {
+                makePublicKeyText(result.armor, messageId, (html) => {
+                    this.sendResponse({ success: true, value: html });
+                });
+            }
+        });
+    }
+
+    needPassword(): void {
+        chrome.browserAction.setBadgeText({text: '*'});
+    }
+
+    // Called by the content script when the user clicks a button with public
+    // key url in it The request contains the messageId of the message url
+    // containing the armored text of the public key
+    addPublicKey(): void {
+        var key: Keys.PublicKey,
+            messageId: string = this.request.messageId;
+
+        messageStore.load( messageId, (result) => {
+            if ( !result.success ) {
+               this.sendResponse({ success: false, error: 'decode', value: messageId });
+               return;
+            }
+
+            try {
+                key = new Keys.PublicKey(result.armor);
+            } catch (err) {
+                this.sendResponse({ success: false, error: err });
+                return;
+            }
+
+            keyStore.storePublicKey(key, () => {
+                this.sendResponse({ success: true });
+            });
+        });
+    }
+
+    // Remember the active editable element
+    setActiveElement(): void {
+        chrome.tabs.query({ active: true }, (tabs) => {
+            var tabId = tabs[0].id;
+            elementLocatorDict[tabId] = {
+                frameId: this.request.frameId,
+                elementId: this.request.elementId
+            };
+        });
+    }
+
+    // Encrypt text with a set of fingerprints. Used by content to send a quick
+    // encrypt with the last keys command.
+    encryptLastKeysUsed(): void {
+        var lastKeysUsed: Array<string> = this.request.lastKeysUsed,
+            text: string = this.request.text,
+            keyList: Array<openpgp.key.Key> = [];
+        
+            if ( lastKeysUsed.length ) {
+                keyStore.loadPublicKeys(lastKeysUsed, (foundKeys) => {
+                    keyList = foundKeys.map( k => { return k.openpgpKey() });
+                    keyList.push(privateKey.key.toPublic());
+                    encryptMessage(text, keyList, (result) => {
+                        this.sendResponse(result);
+                    })
+                });
+            }
+    }
+
+}
+
+//############################################################################
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse: Interfaces.SuccessCallback) => {
+    var message = new Message(request, sender, sendResponse);
+    message[request.command]();
     return true;
 });
 
