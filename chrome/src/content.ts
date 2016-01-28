@@ -65,6 +65,19 @@ class Editable {
         this.element.addEventListener('focus', eventHandler);
         this.element.addEventListener('click', eventHandler);
         this.element.addEventListener('change', eventHandler);
+
+        this.element.addEventListener('keydown', (e: KeyboardEvent) => {
+            if ( e.keyCode == 76 && e.metaKey == true && e.altKey == true ) {
+                this.encrypt();
+            }
+        })
+    }
+
+    private encrypt(callback: Interfaces.Callback): void {
+        var text: string;
+        if ( text = this.getText() ) {
+            // chrome.runtime.sendMessage('')
+        }
     }
 
     // Get the text value of the editable
