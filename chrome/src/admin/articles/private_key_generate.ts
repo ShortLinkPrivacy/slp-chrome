@@ -39,7 +39,7 @@ module Admin {
                         this.spinner = false;
                         window.location.hash = "#/key/view";
                     })
-               }).catch((error)=>{
+               })["catch"]((error)=>{
                    this.spinner = false;
                    app.notify.error = "Can not create a new key - " + error;
                })

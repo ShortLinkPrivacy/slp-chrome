@@ -1,3 +1,5 @@
+COMPRESS=java -jar yuicompressor-2.4.8.jar
+
 help:
 	@echo "Available targets:"
 	@echo "-----------------------------------------------------"
@@ -65,7 +67,10 @@ build: modules coffee admin browser content background less
 
 dist:
 	mkdir -pv dist/{src,css,fonts,lib}
-	cp src/*.js dist/src
+	$(COMPRESS) src/browser.js -o dist/src/browser.js
+	$(COMPRESS) src/background.js -o dist/src/background.js
+	$(COMPRESS) src/content.js -o dist/src/content.js
+	$(COMPRESS) src/admin.js -o dist/src/admin.js
 	cp css/*.css dist/css
 	cp -r src/templates dist/src
 	cp -r fonts dist

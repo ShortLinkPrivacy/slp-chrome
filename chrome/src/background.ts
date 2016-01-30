@@ -98,8 +98,7 @@ function encryptMessage(text: string, keyList: Array<openpgp.key.Key>, callback:
                     callback({ success: false, error: result.error });
                 }
             });
-        })
-        .catch((err) => {
+        })["catch"]((err) => {
             callback({ success: false, error: "OpenPGP Error: " + err });
         });
 }
@@ -155,8 +154,7 @@ class Message {
                 openpgp.decryptMessage( privateKey.key, message )
                    .then((plainText) => {
                        this.sendResponse({ success: true, value: plainText });
-                   })
-                   .catch((error) => {
+                   })["catch"]((error) => {
                        this.sendResponse({ success: false, error: 'decode', value: messageId });
                    });
             } else if ( armorType == ArmorType.PublicKey ) {
