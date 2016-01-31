@@ -14,7 +14,7 @@ interface ElementMessage {
     setElementText?: string;
     restoreElementText?: boolean;
 
-    lastKeysUsed?: Array<string>;
+    lastKeysUsed?: Array<Interfaces.Fingerprint>;
 }
 
 //---------------------------------------------------------------------------
@@ -29,7 +29,7 @@ function sendElementMessage(msg: ElementMessage, callback?: Interfaces.ResultCal
 // Encrypt own public key and create a crypted url
 //---------------------------------------------------------------------------
 function encryptPublicKey(callback: Interfaces.SuccessCallback): void {
-    var armoredText: string;
+    var armoredText: Interfaces.Armor;
 
     // TODO: cache this link in the settings
     armoredText = bg.privateKey.toPublic().armored();
@@ -119,7 +119,7 @@ class App {
             // have to look them up in the address book and translate them into
             // keys
             if ( lastKeysUsed.length ) {
-                bg.keyStore.loadPublicKeys(lastKeysUsed, (keys) => {
+                bg.keyStore.load(lastKeysUsed, (keys) => {
                     this.selectedKeys = keys.map( k => { 
                         return new Keys.KeyItem(k) 
                     });
@@ -144,7 +144,7 @@ class App {
             return;
         }
 
-        bg.keyStore.searchPublicKey(this.filter, (keys) => {
+        bg.keyStore.search(this.filter, (keys) => {
             this.foundKeys = keys.map( k => { return new Keys.KeyItem(k) } );
         });
     }
@@ -192,7 +192,7 @@ class App {
     //---------------------------------------------------------------------------
     sendMessage(e: Event) {
         var keyList: Array<openpgp.key.Key> = [],
-            fingerprintList: Array<string> = [],
+            fingerprintList: Array<Interfaces.Fingerprint> = [],
             i: number;
 
         // This should never happen because we don't show the submit button

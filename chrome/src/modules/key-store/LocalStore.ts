@@ -14,7 +14,8 @@ module KeyStore {
     }
 
     interface KeyDirectory {
-        [fingerprint: string]: Array<string>;
+        // fingerprint => [ userId, userId, ... ]
+        [fingerprint: string]: Array<Interfaces.UserID>;
     }
 
     export class LocalStore implements Interface {
@@ -48,8 +49,8 @@ module KeyStore {
             });
         }
 
-        storePublicKey(key: Keys.PublicKey, callback: Interfaces.Callback): void {
-            var p = key.fingerprint(),
+        save(key: Keys.PublicKey, callback: Interfaces.Callback): void {
+            var p = <string>key.fingerprint(),
                 k = this.config.directory,
                 setter = {};
 
@@ -71,7 +72,7 @@ module KeyStore {
             })
         }
 
-        loadPublicKeys(fingerprints: Array<string>, callback: PublicKeySearchCallback): void {
+        load(fingerprints: Array<Interfaces.Fingerprint>, callback: PublicKeySearchCallback): void {
             var result: PublicKeyArray = [];
 
             this.config.store.get( fingerprints, (found) => {
@@ -86,7 +87,7 @@ module KeyStore {
             });
         }
 
-        searchPublicKey(userId: string, callback: PublicKeySearchCallback): void {
+        search(userId: Interfaces.UserID, callback: PublicKeySearchCallback): void {
             var result: PublicKeyArray = [],
                 getter: Array<string> = [],
                 userIdLower = userId.toLowerCase();
@@ -116,7 +117,7 @@ module KeyStore {
             })
         }
 
-        deleteAllPublicKeys(callback: Interfaces.Callback): void {
+        deleteAll(callback: Interfaces.Callback): void {
             var deleter: Array<string>;
 
             this.initialize(() => {
@@ -128,6 +129,21 @@ module KeyStore {
                     callback();
                 });
             })
+        }
+
+        exportKeys(callback: ArmorArrayCallback): void {
+            var fingerprints: Array<string>,
+                armors: Array<Interfaces.Armor>;
+
+            this.initialize(() => {
+                fingerprints = Object.keys(this.directory);   
+                this.load(fingerprints, (pubKeyArr) => {
+                    // convert result to array of armors and return it via the callback
+                    armors = pubKeyArr.map((k) => { return k.fingerprint() })
+                    callback(armors);
+                })
+            })
+            
         }
 
     }

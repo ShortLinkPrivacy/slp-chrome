@@ -16,7 +16,7 @@ var elementLocatorDict: Interfaces.ElementLocatorDict = {};
 
 enum ArmorType { None, MultipartSection, MultipartLast, Signed, Message, PublicKey, PrivateKey };
 
-function getArmorType(text: string): ArmorType {
+function getArmorType(text: Interfaces.Armor): ArmorType {
   var reHeader = /^-----BEGIN PGP (MESSAGE, PART \d+\/\d+|MESSAGE, PART \d+|SIGNED MESSAGE|MESSAGE|PUBLIC KEY BLOCK|PRIVATE KEY BLOCK|SIGNATURE)-----/;
 
   var header = text.match(reHeader);
@@ -71,7 +71,7 @@ function getArmorType(text: string): ArmorType {
 //############################################################################
 
 // Creates a HTML snippet with a button to replace a public key armored message
-function makePublicKeyText(armor: string, messageId: string, callback: Interfaces.ResultCallback): void {
+function makePublicKeyText(armor: Interfaces.Armor, messageId: string, callback: Interfaces.ResultCallback): void {
     var key = new Keys.PublicKey(armor),
         username = key.getPrimaryUser(),
         classList: Array<string>,
@@ -81,7 +81,7 @@ function makePublicKeyText(armor: string, messageId: string, callback: Interface
     //icon = '<img src="' + chrome.runtime.getURL('/images/pubkey.png') + '">';
     classList = [config.pgpPK];
 
-    keyStore.searchPublicKey(username, (keys) => {
+    keyStore.search(username, (keys) => {
         if ( keys.length ) classList.push(config.pgpPKAdded);
         html = "<span class='" + classList.join(' ') + "' rel='" + messageId + "'>" + username + "</span>";
         callback(html);
@@ -149,7 +149,7 @@ class Message {
 
             var armorType = getArmorType(result.armor);
             if ( armorType == ArmorType.Signed || armorType == ArmorType.Message ) {
-                var message = openpgp.message.readArmored(result.armor);
+                var message = openpgp.message.readArmored(<string>result.armor);
 
                 openpgp.decryptMessage( privateKey.key, message )
                    .then((plainText) => {
@@ -189,7 +189,7 @@ class Message {
                 return;
             }
 
-            keyStore.storePublicKey(key, () => {
+            keyStore.save(key, () => {
                 this.sendResponse({ success: true });
             });
         });
@@ -209,12 +209,12 @@ class Message {
     // Encrypt text with a set of fingerprints. Used by content to send a quick
     // encrypt with the last keys command.
     encryptLastKeysUsed(): void {
-        var lastKeysUsed: Array<string> = this.request.lastKeysUsed,
+        var lastKeysUsed: Array<Interfaces.Fingerprint> = this.request.lastKeysUsed,
             text: string = this.request.text,
             keyList: Array<openpgp.key.Key> = [];
         
             if ( lastKeysUsed.length ) {
-                keyStore.loadPublicKeys(lastKeysUsed, (foundKeys) => {
+                keyStore.load(lastKeysUsed, (foundKeys) => {
                     keyList = foundKeys.map( k => { return k.openpgpKey() });
                     keyList.push(privateKey.key.toPublic());
                     encryptMessage(text, keyList, (result) => {

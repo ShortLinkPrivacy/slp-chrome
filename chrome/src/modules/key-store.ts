@@ -26,11 +26,16 @@ module KeyStore {
         (result: string): void;
     }
 
+    export interface ArmorArrayCallback {
+        (armorArr: Array<Interfaces.Armor>): void;
+    }
+
     export interface Interface {
-        storePublicKey(key: Keys.PublicKey, callback: Interfaces.Callback): void;
-        loadPublicKeys(fingerprints: Array<string>, callback: PublicKeySearchCallback): void;
-        searchPublicKey(userId: string, callback: PublicKeySearchCallback): void;
-        deleteAllPublicKeys(callback: Interfaces.Callback): void;
+        save(key: Keys.PublicKey, callback: Interfaces.Callback): void;
+        load(fingerprints: Array<Interfaces.Fingerprint>, callback: PublicKeySearchCallback): void;
+        search(userId: Interfaces.UserID, callback: PublicKeySearchCallback): void;
+        deleteAll(callback: Interfaces.Callback): void;
+        exportKeys(callback: ArmorArrayCallback): void;
     }
 
     if ( typeof window == "undefined" ) {

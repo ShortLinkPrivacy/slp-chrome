@@ -6,9 +6,9 @@ module Admin {
         articleId = "privateKeyView";
 
         hasPrivateKey: boolean;
-        fingerprint: string;
-        userIds: Array<string>;
-        armored: string;
+        fingerprint: Interfaces.Fingerprint;
+        userIds: Array<Interfaces.UserID>;
+        armored: Interfaces.Armor;
 
         onBind() {
             var pub: Keys.PublicKey;

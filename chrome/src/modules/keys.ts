@@ -18,13 +18,13 @@ module Keys {
     export class Key {
         key: openpgp.key.Key;
 
-        fingerprint: { (): string };
-        userIds: { (): Array<string> };
-        getPrimaryUser: { (): string };
-        armored: { (): string };
+        fingerprint: { (): Interfaces.Fingerprint };
+        userIds: { (): Array<Interfaces.UserID> };
+        getPrimaryUser: { (): Interfaces.UserID };
+        armored: { (): Interfaces.Armor };
         openpgpKey: { (): openpgp.key.Key };
 
-        constructor(armoredText: string) {
+        constructor(armoredText: Interfaces.Armor) {
             if (!armoredText) {
                 throw new KeyError('missing');
             }
@@ -34,16 +34,16 @@ module Keys {
             // All of these must be bound to the object, so Rivets
             // can add its magic to them.
 
-            this.fingerprint = function(): string {
+            this.fingerprint = function(): Interfaces.Armor {
                 return this.key.primaryKey.getFingerprint();
             };
-            this.userIds = function(): Array<string> {
+            this.userIds = function(): Array<Interfaces.UserID> {
                 return this.key.getUserIds();
             };
-            this.getPrimaryUser = function(): string {
+            this.getPrimaryUser = function(): Interfaces.UserID {
                 return this.userIds()[0];
             };
-            this.armored = function(): string {
+            this.armored = function(): Interfaces.Armor {
                 return this.key.armor();
             };
             this.openpgpKey = function(): openpgp.key.Key {
@@ -51,10 +51,10 @@ module Keys {
             }
         }
 
-        fromArmored(armoredText: string): openpgp.key.Key {
+        fromArmored(armoredText: Interfaces.Armor): openpgp.key.Key {
             var result: openpgp.key.KeyResult;
 
-            result = openpgp.key.readArmored(armoredText);
+            result = openpgp.key.readArmored(<string>armoredText);
 
             if (result.err && result.err.length) {
                 throw new KeyError('error', result.err);
@@ -70,7 +70,7 @@ module Keys {
     }
 
     export class PublicKey extends Key {
-        constructor(armoredText: string) {
+        constructor(armoredText: Interfaces.Armor) {
             super(armoredText);
             if (!this.key.isPublic()) {
                 throw "key.not_public";
@@ -81,7 +81,7 @@ module Keys {
     export class PrivateKey extends Key {
         private _isDecrypted: boolean;
 
-        constructor(armoredText: string) {
+        constructor(armoredText: Interfaces.Armor) {
             super(armoredText);
             if (!this.key.isPrivate()) {
                 throw "key.not_private";
@@ -114,7 +114,7 @@ module Keys {
     export class KeyItem {
         key: Key;
         getPrimaryUser: { (): string };
-        fingerprint: { (): string };
+        fingerprint: { (): Interfaces.Fingerprint };
 
         constructor(k: Key) {
             this.key = k;

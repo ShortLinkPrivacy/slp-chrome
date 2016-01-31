@@ -14,7 +14,7 @@ module MessageStore {
             this.path = config.path;
         }
 
-        save(armor: string, callback: MessageIdCallback): void {
+        save(armor: Interfaces.Armor, callback: MessageIdCallback): void {
             var r: XMLHttpRequest,
                 json: MessageIdStruct;
 
