@@ -36,6 +36,7 @@ module Admin {
             this.registerArticle( new PrivateKeyView() );
             this.registerArticle( new PublicKeyImport() );
             this.registerArticle( new PublicKeyList() );
+            this.registerArticle( new Settings() );
 
             this.initRouter();
         }
@@ -67,6 +68,10 @@ module Admin {
 
             Path.map("#/pub/list").to(() => {
                 this.loadArticle('publicKeyList');
+            });
+
+            Path.map("#/settings").to(() => {
+                this.loadArticle('settings');
             });
         }
 
