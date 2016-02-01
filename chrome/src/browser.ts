@@ -120,8 +120,8 @@ class App {
             // keys
             if ( lastKeysUsed.length ) {
                 bg.keyStore.load(lastKeysUsed, (keys) => {
-                    this.selectedKeys = keys.map( k => { 
-                        return new Keys.KeyItem(k) 
+                    this.selectedKeys = keys.map( k => {
+                        return new Keys.KeyItem(k)
                     });
                 });
             }
@@ -266,13 +266,7 @@ class App {
     //---------------------------------------------------------------------------
     lock(): void {
         bg.privateKey.lock();
-
-        chrome.tabs.query({currentWindow: true}, (tabs) => {
-            tabs.forEach((tab) => {
-                chrome.tabs.sendMessage(tab.id, { lock: true });
-            });
-        });
-
+        bg.lockDown();
         window.close();
     }
 

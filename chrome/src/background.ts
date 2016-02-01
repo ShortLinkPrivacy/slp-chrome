@@ -103,6 +103,16 @@ function encryptMessage(text: string, keyList: Array<openpgp.key.Key>, callback:
         });
 }
 
+function lockDown(callback?: Interfaces.Callback): void {
+    var i: number;
+    chrome.tabs.query({}, (tabs) => {
+        for (i = 0; i < tabs.length; i++) {
+            chrome.tabs.sendMessage(tabs[i].id, { lock: true });
+        }
+        if ( callback ) callback();
+    });
+}
+
 //############################################################################
 
 class Message {
@@ -212,7 +222,7 @@ class Message {
         var lastKeysUsed: Array<Interfaces.Fingerprint> = this.request.lastKeysUsed,
             text: string = this.request.text,
             keyList: Array<openpgp.key.Key> = [];
-        
+
             if ( lastKeysUsed.length ) {
                 keyStore.load(lastKeysUsed, (foundKeys) => {
                     keyList = foundKeys.map( k => { return k.openpgpKey() });

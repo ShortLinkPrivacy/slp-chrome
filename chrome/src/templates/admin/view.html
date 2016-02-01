@@ -23,9 +23,9 @@
     </div>
   </div>
   <div rv-show="showAdvanced">
-    <a href="#" class="pure-button button-small copy" data-clipboard-target="#armored" rv-show="showPublic">copy to clipboard</a>
     <a href="#" class="pure-button button-small" rv-on-click="toggleTypeKey" rv-text="toggleTypeText < showPublic"></a>
-    <a href="#/key/remove" class="pure-button button-small button-error">Remove</a>
+    <a href="#" class="pure-button button-small copy" data-clipboard-target="#armored" rv-show="showPublic">copy to clipboard</a>
+    <a href="#/key/remove" class="pure-button button-small button-error pull-right">Remove</a>
     <pre id="armored" rv-text="armored < showPublic"></pre>
   </div>
 </div>

@@ -1,6 +1,6 @@
 module Interfaces {
 
-    export interface Armor extends String {} 
+    export interface Armor extends String {}
     export interface UserID extends String {}
     export interface Fingerprint extends String {}
 
@@ -53,5 +53,6 @@ module Interfaces {
 
         initialize(): InitVars;
         encryptMessage(text: string, keyList: Array<openpgp.key.Key>, callback: Interfaces.SuccessCallback): void;
+        lockDown(callback?: Callback): void;
     }
 }

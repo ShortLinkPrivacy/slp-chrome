@@ -7,11 +7,18 @@ module Admin {
 
         hasPrivateKey: boolean;
         showPublic: boolean;
-        showAdvanced: boolean = false;
+        showAdvanced: boolean;
 
         onBind() {
             this.hasPrivateKey = bg.privateKey ? true : false;
+
+            // Must flip this twice, because it causes 'armored()' to
+            // re-evaluate in the template. In the rare case of when a key is
+            // deleted, then reimported, the advanced view would show blank.
+            this.showPublic = false;
             this.showPublic = true;
+
+            this.showAdvanced = false;
         }
 
         toggleTypeKey(e: Event) {
