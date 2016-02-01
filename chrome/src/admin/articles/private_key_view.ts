@@ -6,24 +6,26 @@ module Admin {
         articleId = "privateKeyView";
 
         hasPrivateKey: boolean;
-        fingerprint: Interfaces.Fingerprint;
-        userIds: Array<Interfaces.UserID>;
-        armored: Interfaces.Armor;
+        showingPublic: boolean;
 
         onBind() {
-            var pub: Keys.PublicKey;
-
             this.hasPrivateKey = bg.privateKey ? true : false;
-            if ( this.hasPrivateKey == true ) {
-                pub = bg.privateKey.toPublic();
-                this.fingerprint = pub.fingerprint();
-                this.userIds = pub.userIds();
-                this.armored = pub.armored();
-            }
+            this.showingPublic = true;
         }
 
-        copyToClipboard() {
-            app.notify.info = "Use your mouse to select the text, then press Ctrl-C (or Command-C if you're using Apple)";
+        toggle() {
+            this.showingPublic = !this.showingPublic;
+        }
+
+        toggleText(): string {
+            return this.showingPublic ? 'show secret key' : 'show public key';
+        }
+
+        armored(): Interfaces.Armor {
+            if ( !this.hasPrivateKey ) return;
+            return this.showingPublic
+                ? bg.privateKey.toPublic().armored()
+                : bg.privateKey.armored()
         }
     }
 }

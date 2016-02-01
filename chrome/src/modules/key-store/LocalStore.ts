@@ -139,11 +139,15 @@ module KeyStore {
                 fingerprints = Object.keys(this.directory);   
                 this.load(fingerprints, (pubKeyArr) => {
                     // convert result to array of armors and return it via the callback
-                    armors = pubKeyArr.map((k) => { return k.fingerprint() })
+                    armors = pubKeyArr.map((k) => { return k.armored() })
                     callback(armors);
                 })
             })
             
+        }
+
+        importKeys(keys: Array<Interfaces.Armor>, callback: Interfaces.Callback): void {
+
         }
 
     }

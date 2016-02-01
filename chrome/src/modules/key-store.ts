@@ -36,6 +36,7 @@ module KeyStore {
         search(userId: Interfaces.UserID, callback: PublicKeySearchCallback): void;
         deleteAll(callback: Interfaces.Callback): void;
         exportKeys(callback: ArmorArrayCallback): void;
+        importKeys(keys: Array<Interfaces.Armor>, callback: Interfaces.Callback): void;
     }
 
     if ( typeof window == "undefined" ) {

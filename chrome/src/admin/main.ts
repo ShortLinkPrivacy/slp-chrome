@@ -3,6 +3,8 @@
 /// <reference path="../../typings/rivets/rivets.d.ts" />
 /// <reference path="../../typings/pathjs/pathjs.d.ts" />
 
+declare var Clipboard: any;
+
 module Admin {
 
     // Are we running the code in unit tests
@@ -97,6 +99,9 @@ module Admin {
                 }
             });
             rivets.bind(document.body, this);
+
+            // Clipboard
+            new Clipboard('.copy');
 
             // App
             Path.listen();

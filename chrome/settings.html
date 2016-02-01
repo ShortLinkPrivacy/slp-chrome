@@ -14,6 +14,7 @@
     <!-- Vendors JS -->
     <script src="./bower_components/pathjs/path.min.js"></script>
     <script src="./bower_components/rivets/dist/rivets.bundled.min.js"></script>
+    <script src="./bower_components/clipboard/dist/clipboard.min.js"></script>
     <script src="./bower_components/openpgp/dist/openpgp.min.js"></script>
 
     <!-- Code -->
@@ -25,9 +26,9 @@
       <nav class="pure-menu pure-menu-horizontal">
           <span href="#" class="pure-menu-heading"><b>slp</b></span>
           <ul class="pure-menu-list">
-            <li class="pure-menu-item"><a href="#/key/view" class="pure-menu-link"><i class="icon-key"></i> My Key</a></li>
-            <li class="pure-menu-item"><a href="#/pub/list" class="pure-menu-link"><i class="icon-address-book"></i> Address Book</a></li>
-            <li class="pure-menu-item"><a href="#/settings" class="pure-menu-link"><i class="icon-cog"></i> Settings</a></li>
+            <li class="pure-menu-item"><a href="#/key/view" class="pure-menu-link round-link"><i class="icon-key"></i> My Key</a></li>
+            <li class="pure-menu-item"><a href="#/pub/list" class="pure-menu-link round-link"><i class="icon-address-book"></i> Address Book</a></li>
+            <li class="pure-menu-item"><a href="#/settings" class="pure-menu-link round-link"><i class="icon-cog"></i> Settings</a></li>
           </ul>
       </nav>
       <div id="notify" rv-on-click="notify.clear">

@@ -1,10 +1,10 @@
 {
-  "name": "Pretty Good Plugin",
+  "name": "Short Link Privacy",
   "version": "0.0.1",
   "authors": [
-    "Stefan Geneshky <stefanguen@gmail.com>"
+    "Albatros Grigorov <lekacosmetics@gmail.com>"
   ],
-  "description": "PGP",
+  "description": "Browser-to-browser encryption via short links",
   "main": "src/settings.js",
   "license": "MIT",
   "ignore": [
@@ -18,7 +18,8 @@
     "openpgp": "~1.2.0",
     "rivets": "~0.8.1",
     "jquery": "~2.1.4",
-    "pathjs": "*"
+    "pathjs": "*",
+    "clipboard": "~1.5.5"
   },
   "devDependencies": {
     "less": "~2.5.3",
