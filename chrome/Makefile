@@ -72,6 +72,7 @@ dist:
 	$(COMPRESS) src/background.js -o dist/src/background.js
 	$(COMPRESS) src/content.js -o dist/src/content.js
 	$(COMPRESS) src/admin.js -o dist/src/admin.js
+	$(COMPRESS) src/modules.js -o dist/src/modules.js
 	cp css/*.css dist/css
 	cp -r src/templates dist/src
 	cp -r fonts dist
