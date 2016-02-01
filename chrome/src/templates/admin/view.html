@@ -11,20 +11,23 @@
 </div>
 
 <div rv-show="hasPrivateKey">
-  <p>You are ready to receive encrypted messages. This is your public key. You
-  can copy it and send it to your friends. <b>Note!</b> You can also send your
-  public key automatically from the browser action widget.  </p>
-  <div>
-    <img src="images/key_share.png" width="360">
+  <div rv-hide="showAdvanced">
+    <p>You are ready to receive encrypted messages. You can share your public key
+    with your friends via a short link, using the "Share My Public Key" button in
+    the browser popup, as shown below. </p>
+    <div style="text-align: center;">
+      <img src="images/key_share.png">
+    </div>
+    <div class="well">
+      <button href="#" class="pure-button button-small" rv-on-click="toggleShowKey">Advanced key view ...</button>
+    </div>
   </div>
-  <div class="pure-menu pure-menu-horizontal">
-      <ul class="pure-menu-list">
-        <li class="pure-menu-item"><a href="#" class="pure-menu-link pure-button button-small copy" data-clipboard-target="#armored" rv-show="showingPublic">copy to clipboard</a></li>
-        <li class="pure-menu-item"><a href="#" class="pure-menu-link pure-button button-small" rv-on-click="toggle" rv-text="toggleText < showingPublic"></a></li>
-        <li class="pure-menu-item"><a href="#/key/remove" class="pure-menu-link pure-button button-small button-error">Remove</a></li>
-      </ul>
+  <div rv-show="showAdvanced">
+    <a href="#" class="pure-button button-small copy" data-clipboard-target="#armored" rv-show="showPublic">copy to clipboard</a>
+    <a href="#" class="pure-button button-small" rv-on-click="toggleTypeKey" rv-text="toggleTypeText < showPublic"></a>
+    <a href="#/key/remove" class="pure-button button-small button-error">Remove</a>
+    <pre id="armored" rv-text="armored < showPublic"></pre>
   </div>
-  <pre id="armored" rv-text="armored < showingPublic"></pre>
 </div>
 
 <div class="well">

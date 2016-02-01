@@ -1,9 +1,9 @@
 
 module Admin {
-    export class Settings implements Application.Article {
+    export class Advanced implements Application.Article {
 
-        filename = "settings.html";
-        articleId = "settings";
+        filename = "advanced.html";
+        articleId = "advanced";
         exported: string;
 
         doExport() {

@@ -48,7 +48,7 @@ admin:
 		src/admin/articles/private_key_view.ts \
 		src/admin/articles/public_key_import.ts \
 		src/admin/articles/public_key_list.ts \
-		src/admin/articles/settings.ts
+		src/admin/articles/advanced.ts
 
 browser:
 	tsc --out src/browser.js src/browser.ts
@@ -83,7 +83,7 @@ dist:
 	cp bower_components/rivets/dist/rivets.bundled.min.js dist/lib
 	cp bower_components/openpgp/dist/openpgp.min.js dist/lib
 	cp bower_components/clipboard/dist/clipboard.min.js dist/lib
-	
+
 dist-clean:
 	rm -rfv dist
 

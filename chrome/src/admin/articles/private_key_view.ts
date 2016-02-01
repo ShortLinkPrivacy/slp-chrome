@@ -6,24 +6,31 @@ module Admin {
         articleId = "privateKeyView";
 
         hasPrivateKey: boolean;
-        showingPublic: boolean;
+        showPublic: boolean;
+        showAdvanced: boolean = false;
 
         onBind() {
             this.hasPrivateKey = bg.privateKey ? true : false;
-            this.showingPublic = true;
+            this.showPublic = true;
         }
 
-        toggle() {
-            this.showingPublic = !this.showingPublic;
+        toggleTypeKey(e: Event) {
+            e.preventDefault();
+            this.showPublic = !this.showPublic;
         }
 
-        toggleText(): string {
-            return this.showingPublic ? 'show secret key' : 'show public key';
+        toggleTypeText(): string {
+            return this.showPublic ? 'show secret key' : 'show public key';
+        }
+
+        toggleShowKey(e: Event) {
+            e.preventDefault();
+            this.showAdvanced = !this.showAdvanced;
         }
 
         armored(): Interfaces.Armor {
             if ( !this.hasPrivateKey ) return;
-            return this.showingPublic
+            return this.showPublic
                 ? bg.privateKey.toPublic().armored()
                 : bg.privateKey.armored()
         }
