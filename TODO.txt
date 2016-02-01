@@ -1,5 +1,6 @@
 browser
 ==================================
+- show "please wait" when the private key is being unlocked
 
 content
 ==================================

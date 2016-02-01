@@ -12,6 +12,9 @@ var privateKey: Keys.PrivateKey;
 // Active elements for each tab
 var elementLocatorDict: Interfaces.ElementLocatorDict = {};
 
+// Context menu
+var contextMenu: any;
+
 //############################################################################
 
 enum ArmorType { None, MultipartSection, MultipartLast, Signed, Message, PublicKey, PrivateKey };
@@ -247,7 +250,22 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse: Interfaces.
 chrome.runtime.onInstalled.addListener((reason) => {
     if (!privateKey)
         chrome.runtime.openOptionsPage();
-})
+});
+
+contextMenu = chrome.contextMenus.create({
+    title: "Encrypt for Last Recepient",
+    contexts: ["editable"],
+    onclick: (info, tab) => {
+        var eloc = elementLocatorDict[tab.id];
+        if (!eloc) return;
+        chrome.tabs.sendMessage(tab.id, { 
+            encryptLast: true,
+            elementLocator: eloc
+        });
+    }
+});
+
+console.log(contextMenu);
 
 //############################################################################
 

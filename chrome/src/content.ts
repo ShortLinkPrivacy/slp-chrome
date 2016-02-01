@@ -25,6 +25,7 @@ interface ContentMessage {
     traverse?: boolean;
     lock?: boolean;
     restoreElementText?: boolean;
+    encryptLast: boolean;
 
     elementLocator?: Interfaces.ElementLocator;
     lastKeysUsed?: Array<string>;
@@ -71,11 +72,12 @@ class Editable {
         this.element.addEventListener('keydown', (e: KeyboardEvent) => {
             var trigger: boolean;
             trigger = e.keyCode == 76 && e.metaKey == true && e.altKey == true;
-            if (trigger == true) this.encrypt();
+            if (trigger == true) this.encryptLast();
         })
     }
 
-    private encrypt(): void {
+    // Encrypt the editable with the last keys used
+    encryptLast(callback?: Interfaces.ResultCallback): void {
         var text = this.getText(),
             lastKeysUsed = this.lastKeysUsed;
 
@@ -84,6 +86,9 @@ class Editable {
         chrome.runtime.sendMessage({ command: 'encryptLastKeysUsed', text: text, lastKeysUsed: this.lastKeysUsed }, (result) => {
             if ( result.success ) {
                 this.setText(result.value);
+                if ( callback ) {
+                    callback(result.value);
+                }
             }
         })
     }
@@ -298,6 +303,12 @@ function listenToMessages() {
         sendResponse({ success: result });
     }
 
+
+    var encryptLast = function(msg: ContentMessage, sendResponse) {
+        if (!editable) return;
+        editable.encryptLast();
+    }
+
     // Return all decrypted nodes to their original values
     // ------------------------------------------------------------
     var lock = function(msg: ContentMessage, sendResponse) {
@@ -351,8 +362,9 @@ function listenToMessages() {
 
             // At this point, we have determined that the element and frame ID
             // provided in the locator match the document we're running in.
-            element = document.getElementById(eloc.elementId);
-            editable = $data(element, init.config.pgpElAttr);
+            if (element = document.getElementById(eloc.elementId)) {
+                editable = $data(element, init.config.pgpElAttr);
+            }
         } else {
             editable = null;
         }
@@ -367,6 +379,8 @@ function listenToMessages() {
             lock(msg, sendResponse)
         else if ( msg.restoreElementText )
             restoreElementText(msg, sendResponse)
+        else if ( msg.encryptLast )
+            encryptLast(msg, sendResponse)
     });
 }
 
