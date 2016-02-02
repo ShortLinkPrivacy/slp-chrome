@@ -61,6 +61,10 @@ class Editable {
 
         var eventHandler = function() {
             chrome.runtime.sendMessage(message);
+            chrome.runtime.sendMessage({ 
+                command: 'updateContextMenu', 
+                update: { enabled: this.getText() && this.lastKeysUsed && this.lastKeysUsed.length > 0 ? true : false } 
+            });
         }.bind(this);
 
         // Change listeners

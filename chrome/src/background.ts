@@ -13,7 +13,7 @@ var privateKey: Keys.PrivateKey;
 var elementLocatorDict: Interfaces.ElementLocatorDict = {};
 
 // Context menu
-var contextMenu: any;
+var contextMenuId: any;
 
 //############################################################################
 
@@ -237,6 +237,12 @@ class Message {
             }
     }
 
+    // Send updates to the context menu. Most cases enable and disable it.
+    updateContextMenu(): void {
+        var update = this.request.update;
+        chrome.contextMenus.update(contextMenuId, update);
+    }
+
 }
 
 //############################################################################
@@ -252,9 +258,10 @@ chrome.runtime.onInstalled.addListener((reason) => {
         chrome.runtime.openOptionsPage();
 });
 
-contextMenu = chrome.contextMenus.create({
+contextMenuId = chrome.contextMenus.create({
     title: "Encrypt for Last Recepient",
     contexts: ["editable"],
+    enabled: false,
     onclick: (info, tab) => {
         var eloc = elementLocatorDict[tab.id];
         if (!eloc) return;
@@ -265,14 +272,12 @@ contextMenu = chrome.contextMenus.create({
     }
 });
 
-console.log(contextMenu);
-
 //############################################################################
 
 privateKeyStore.get((pk) => {
     if ( pk ) {
         privateKey = pk;
     } else {
-        // TODO: nag about adding a public key
+        // TODO: ??
     }
 });
