@@ -14,10 +14,26 @@ var urlRe: RegExp;
 var port: chrome.runtime.Port;
 
 // Generator of element IDs
-var idGenerator = function(prefix: string) {
+function idGenerator (prefix: string) {
     if (typeof prefix == "undefined") prefix = "id";
     return Math.random().toString(36).substr(2, 16);
 };
+
+interface BgPageArgs {
+    frameId?: string;
+    elementId?: string;
+    messageId?: string;
+    properties?: any;
+    text?: string;
+    lastKeysUsed?: Array<Interfaces.Fingerprint>;
+    url?: string;
+}
+
+function messageBgPage(command: string, args: BgPageArgs, callback?: Interfaces.ResultCallback): void {
+    var message = args ? args : {};
+    message["command"] = command;
+    chrome.runtime.sendMessage(message, callback);
+}
 
 interface ContentMessage {
     getElementText?: boolean;
@@ -53,24 +69,21 @@ class Editable {
     }
 
     private bindEvents(): void {
-        var message: Interfaces.ElementLocator = {
-            command: 'setActiveElement',
-            frameId: this.frameId,
-            elementId: this.element.id
-        };
-
         var eventHandler = function() {
-            chrome.runtime.sendMessage(message);
-            chrome.runtime.sendMessage({ 
-                command: 'updateContextMenu', 
-                update: { enabled: this.getText() && this.lastKeysUsed && this.lastKeysUsed.length > 0 ? true : false } 
+            messageBgPage('setActiveElement', {
+                frameId: this.frameId,
+                elementId: this.element.id
+            });
+
+            messageBgPage('updateContextMenu', { 
+                properties: { enabled: this.okToUseLast() } 
             });
         }.bind(this);
 
         // Change listeners
         this.element.addEventListener('focus', eventHandler);
         this.element.addEventListener('click', eventHandler);
-        this.element.addEventListener('change', eventHandler);
+        this.element.addEventListener('input', eventHandler);
 
         // Quick encrypt shortcut
         this.element.addEventListener('keydown', (e: KeyboardEvent) => {
@@ -80,21 +93,30 @@ class Editable {
         })
     }
 
+    private okToUseLast(): boolean {
+        return this.getText()
+            && !urlRe.exec(this.getText())
+            && this.lastKeysUsed 
+            && this.lastKeysUsed.length > 0 
+                ? true 
+                : false
+    }
+
     // Encrypt the editable with the last keys used
     encryptLast(callback?: Interfaces.ResultCallback): void {
-        var text = this.getText(),
-            lastKeysUsed = this.lastKeysUsed;
+        if ( this.okToUseLast() == false ) return;
 
-        if ( !text || !lastKeysUsed || !lastKeysUsed.length) return;
+        var args = {
+            text: this.getText(), 
+            lastKeysUsed: this.lastKeysUsed 
+        };
 
-        chrome.runtime.sendMessage({ command: 'encryptLastKeysUsed', text: text, lastKeysUsed: this.lastKeysUsed }, (result) => {
+        messageBgPage('encryptLastKeysUsed', args, (result) => {
             if ( result.success ) {
                 this.setText(result.value);
-                if ( callback ) {
-                    callback(result.value);
-                }
+                if ( callback ) callback(result.value);
             }
-        })
+        });
     }
 
     // Get the text value of the editable
@@ -150,7 +172,7 @@ var hotlinkPublicKeys = (function() {
         return function(e: MouseEvent): void {
             e.preventDefault();
             e.stopPropagation();
-            chrome.runtime.sendMessage({ command: 'addPublicKey', messageId: el.getAttribute('rel') }, (result) => {
+            messageBgPage('addPublicKey', { messageId: el.getAttribute('rel') }, (result) => {
                 if ( result.success ) {
                     el.classList.add(init.config.pgpPKAdded);
                     el.removeEventListener('click', _bindOnClick(el));
@@ -176,8 +198,10 @@ var hotlinkPublicKeys = (function() {
 var traverseNodes = (function(){
 
     function decodeURL(url: string, callback: { (decodedText): void }): void {
-        chrome.runtime.sendMessage({ command: "decryptLink", url: url }, (result) => {
+        messageBgPage( 'decryptLink', { url: url }, (result) => {
             callback( result.success ? result.value : "Error decrypting" );
+            if ( !result.success )
+                console.log(result.error);
         });
     }
 
@@ -185,7 +209,7 @@ var traverseNodes = (function(){
 
         // If the private key has not been unlocked, then add a notification
         if ( !init.isDecrypted ) {
-            chrome.runtime.sendMessage({ command: 'needPassword' });
+            messageBgPage('needPassword', {});
             return;
         }
 
@@ -258,7 +282,7 @@ function eventObserver(): void {
 // Retrieves variables indicating the status of the background page, such as
 // 'isDecrypted' (the private key) and others.
 function getInitVars(callback: Interfaces.Callback): void {
-    chrome.runtime.sendMessage({command: 'initVars'}, (result) => {
+    messageBgPage('initVars', {}, (result) => {
         init = result.value;
         urlRe = new RegExp(init.linkRe);
         callback()

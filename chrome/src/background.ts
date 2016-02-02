@@ -239,8 +239,8 @@ class Message {
 
     // Send updates to the context menu. Most cases enable and disable it.
     updateContextMenu(): void {
-        var update = this.request.update;
-        chrome.contextMenus.update(contextMenuId, update);
+        var properties = this.request.properties;
+        chrome.contextMenus.update(contextMenuId, properties);
     }
 
 }
