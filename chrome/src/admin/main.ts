@@ -101,7 +101,7 @@ module Admin {
             rivets.bind(document.body, this);
 
             // Clipboard
-            new Clipboard('.copy');
+            //new Clipboard('.copy');
 
             // App
             Path.listen();

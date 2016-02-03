@@ -2,7 +2,6 @@
 /// <reference path="interfaces.ts" />
 
 class LocalStorage {
-    label: string;
     store: chrome.storage.StorageArea;
 
     constructor(store: chrome.storage.StorageArea) {
@@ -36,5 +35,26 @@ class LocalStorage {
             this.checkRuntimeError();
             callback();
         });
+    }
+
+    _get_many(getter: any, callback: Interfaces.ResultCallback): void {
+        this.store.get(getter, (result) => {
+            this.checkRuntimeError();
+            callback(result);
+        })
+    }
+
+    _set_many(setter: any, callback: Interfaces.Callback): void {
+        this.store.set(setter, () => {
+            this.checkRuntimeError();
+            callback();
+        })
+    }
+
+    _remove_many(remover: any, callback: Interfaces.Callback): void {
+        this.store.remove( remover, () => {
+            this.checkRuntimeError();
+            callback();
+        })
     }
 }

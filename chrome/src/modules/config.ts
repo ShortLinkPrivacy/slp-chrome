@@ -52,9 +52,9 @@ class Config {
 
     // AddressBook storage types
     addressBookStore = {
-        localStore: {
+        local: {
             store: chrome.storage.local,
-            directory: 'directory',
+            label: 'directory',
         }
     };
 
@@ -73,9 +73,9 @@ class Config {
 
     // Preferences storage types
     prefsStore = {
-        localStore: {
+        local: {
             store: chrome.storage.sync,
-            prefsLabel: 'preferences'
+            label: 'preferences'
         }
     };
 }
