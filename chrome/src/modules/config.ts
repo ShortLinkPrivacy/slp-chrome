@@ -50,8 +50,8 @@ class Config {
         }
     };
 
-    // Key storage types
-    keyStore = {
+    // AddressBook storage types
+    addressBookStore = {
         localStore: {
             store: chrome.storage.local,
             directory: 'directory',

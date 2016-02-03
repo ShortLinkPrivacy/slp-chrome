@@ -9,7 +9,7 @@ module MessageStore {
         url: string;
         path: string;
 
-        constructor(config: any) {
+        constructor(config: Config) {
             var c = config.messageStore.remoteService;
             this.url = c.url;
             this.path = c.path;

@@ -9,7 +9,7 @@ module PrivateKeyStore {
         private store: chrome.storage.StorageArea;
         private privateKeyLabel: string;
 
-        constructor(config: any) {
+        constructor(config: Config) {
             var c = config.privateKeyStore.localStore;
             this.store = c.store;
             this.privateKeyLabel = c.privateKeyLabel;

@@ -23,8 +23,8 @@ module AddressBookStore {
         private messages: Interfaces.Dictionary = {};
         private config: LocalStoreConfig;
 
-        constructor(config: any) {
-            this.config = config.keyStore.localStore;
+        constructor(config: Config) {
+            this.config = config.addressBookStore.localStore;
         }
 
         private checkRuntimeError(): void {
