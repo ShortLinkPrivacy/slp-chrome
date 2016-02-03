@@ -5,11 +5,6 @@
 
 module PrivateKeyStore {
 
-    export interface PrivateKeyStoreConfig {
-        store: chrome.storage.StorageArea;
-        privateKeyLabel: string;
-    }
-
     export class LocalStore implements Interface {
         private store: chrome.storage.StorageArea;
         private privateKeyLabel: string;

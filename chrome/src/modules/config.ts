@@ -66,4 +66,12 @@ class Config {
             path: '/x'
         }
     };
+
+    // Preferences storage types
+    prefsStore = {
+        localStore: {
+            store: chrome.storage.sync,
+            prefsLabel: 'preferences'
+        }
+    };
 }
