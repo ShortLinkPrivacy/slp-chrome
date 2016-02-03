@@ -1,7 +1,7 @@
-/// <reference path="../../../typings/chrome/chrome.d.ts" />
-/// <reference path="../privatekey-store.ts" />
-/// <reference path="../interfaces.ts" />
-/// <reference path="../keys.ts" />
+/// <reference path="../../../../typings/chrome/chrome.d.ts" />
+/// <reference path="../../interfaces.ts" />
+/// <reference path="../../keys.ts" />
+/// <reference path="../PrivateKey.ts" />
 
 module PrivateKeyStore {
 

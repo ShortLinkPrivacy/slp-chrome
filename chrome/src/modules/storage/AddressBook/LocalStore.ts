@@ -1,9 +1,9 @@
-/// <reference path="../../../typings/chrome/chrome.d.ts" />
-/// <reference path="../interfaces.ts" />
-/// <reference path="../keys.ts" />
-/// <reference path="../key-store.ts" />
+/// <reference path="../../../../typings/chrome/chrome.d.ts" />
+/// <reference path="../../interfaces.ts" />
+/// <reference path="../../keys.ts" />
+/// <reference path="../AddressBook.ts" />
 
-module KeyStore {
+module AddressBookStore {
 
     interface LocalStoreConfig {
         // chrome storage (local or sync)
@@ -82,7 +82,7 @@ module KeyStore {
                     var key = new Keys.PublicKey( found[p] );
                     result.push( key );
                 });
-                
+
                 if (callback) callback(result);
             });
         }
@@ -97,7 +97,7 @@ module KeyStore {
                     var userIds = this.directory[p];
                     userIds.forEach((id:string) => {
                         var idLower = id.toLowerCase();
-                        if (idLower.search(userIdLower) >= 0) 
+                        if (idLower.search(userIdLower) >= 0)
                             getter.push(p);
                     });
                 })
@@ -136,14 +136,14 @@ module KeyStore {
                 armors: Array<Interfaces.Armor>;
 
             this.initialize(() => {
-                fingerprints = Object.keys(this.directory);   
+                fingerprints = Object.keys(this.directory);
                 this.load(fingerprints, (pubKeyArr) => {
                     // convert result to array of armors and return it via the callback
                     armors = pubKeyArr.map((k) => { return k.armored() })
                     callback(armors);
                 })
             })
-            
+
         }
 
         importKeys(keys: Array<Interfaces.Armor>, callback: Interfaces.Callback): void {

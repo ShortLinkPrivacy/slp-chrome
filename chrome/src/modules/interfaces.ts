@@ -45,9 +45,12 @@ module Interfaces {
 
     export interface BackgroundPage extends Window {
         config: Config;
+
         privateKeyStore: PrivateKeyStore.Interface;
         messageStore: MessageStore.Interface;
-        keyStore: KeyStore.Interface;
+        addressBookStore: AddressBookStore.Interface;
+        //prefsStore: PrefsStore.Interface;
+
         privateKey: Keys.PrivateKey;
         elementLocatorDict: ElementLocatorDict;
 

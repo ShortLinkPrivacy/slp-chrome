@@ -1,6 +1,7 @@
 browser
 ==================================
 - show "please wait" when the private key is being unlocked
+- do not allow anything unless there is an active editable
 
 content
 ==================================

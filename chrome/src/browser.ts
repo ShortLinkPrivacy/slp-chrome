@@ -119,7 +119,7 @@ class App {
             // have to look them up in the address book and translate them into
             // keys
             if ( lastKeysUsed.length ) {
-                bg.keyStore.load(lastKeysUsed, (keys) => {
+                bg.addressBookStore.load(lastKeysUsed, (keys) => {
                     this.selectedKeys = keys.map( k => {
                         return new Keys.KeyItem(k)
                     });
@@ -144,7 +144,7 @@ class App {
             return;
         }
 
-        bg.keyStore.search(this.filter, (keys) => {
+        bg.addressBookStore.search(this.filter, (keys) => {
             this.foundKeys = keys.map( k => { return new Keys.KeyItem(k) } );
         });
     }

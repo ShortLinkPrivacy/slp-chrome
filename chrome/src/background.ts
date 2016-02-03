@@ -4,7 +4,7 @@
 var config = new Config(),
     privateKeyStore: PrivateKeyStore.Interface = new PrivateKeyStore.LocalStore(config),
     messageStore: MessageStore.Interface = new MessageStore.RemoteService(config.messageStore.localHost),
-    keyStore: KeyStore.Interface = new KeyStore.LocalStore(config);
+    addressBookStore: AddressBookStore.Interface = new AddressBookStore.LocalStore(config);
 
 // Private key
 var privateKey: Keys.PrivateKey;
@@ -84,7 +84,7 @@ function makePublicKeyText(armor: Interfaces.Armor, messageId: string, callback:
     //icon = '<img src="' + chrome.runtime.getURL('/images/pubkey.png') + '">';
     classList = [config.pgpPK];
 
-    keyStore.search(username, (keys) => {
+    addressBookStore.search(username, (keys) => {
         if ( keys.length ) classList.push(config.pgpPKAdded);
         html = "<span class='" + classList.join(' ') + "' rel='" + messageId + "'>" + username + "</span>";
         callback(html);
@@ -202,7 +202,7 @@ class Message {
                 return;
             }
 
-            keyStore.save(key, () => {
+            addressBookStore.save(key, () => {
                 this.sendResponse({ success: true });
             });
         });
@@ -227,7 +227,7 @@ class Message {
             keyList: Array<openpgp.key.Key> = [];
 
             if ( lastKeysUsed.length ) {
-                keyStore.load(lastKeysUsed, (foundKeys) => {
+                addressBookStore.load(lastKeysUsed, (foundKeys) => {
                     keyList = foundKeys.map( k => { return k.openpgpKey() });
                     keyList.push(privateKey.key.toPublic());
                     encryptMessage(text, keyList, (result) => {
@@ -265,7 +265,7 @@ contextMenuId = chrome.contextMenus.create({
     onclick: (info, tab) => {
         var eloc = elementLocatorDict[tab.id];
         if (!eloc) return;
-        chrome.tabs.sendMessage(tab.id, { 
+        chrome.tabs.sendMessage(tab.id, {
             encryptLast: true,
             elementLocator: eloc
         });

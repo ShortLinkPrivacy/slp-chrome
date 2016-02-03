@@ -7,7 +7,7 @@ module Admin {
         exported: string;
 
         doExport() {
-            bg.keyStore.exportKeys((keys) => {
+            bg.addressBookStore.exportKeys((keys) => {
                 this.exported = JSON.stringify({
                     privateKey: bg.privateKey ? bg.privateKey.armored() : null,
                     addressBook: keys
