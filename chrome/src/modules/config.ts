@@ -42,7 +42,7 @@ class Config {
     // Storages
     //######################################################
 
-    // Settings types
+    // Private Key types
     privateKeyStore = {
         localStore: {
             store: chrome.storage.sync,
