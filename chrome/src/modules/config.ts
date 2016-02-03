@@ -71,11 +71,4 @@ class Config {
         }
     };
 
-    // Preferences storage types
-    prefsStore = {
-        local: {
-            store: chrome.storage.sync,
-            label: 'preferences'
-        }
-    };
 }
