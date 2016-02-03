@@ -34,11 +34,11 @@ function encryptPublicKey(callback: Interfaces.SuccessCallback): void {
     // TODO: cache this link in the settings
     armoredText = bg.privateKey.toPublic().armored();
 
-    bg.messageStore.save(armoredText, (result) => {
+    bg.store.message.save(armoredText, (result) => {
         if ( result.success ) {
             callback({
                 success: true,
-                value: bg.messageStore.getURL(result.id)
+                value: bg.store.message.getURL(result.id)
             })
         } else {
             callback({
@@ -104,7 +104,7 @@ class App {
         var re: RegExp, text: string, lastKeysUsed: Array<string>,
             i: number;
 
-        re = new RegExp(bg.messageStore.getReStr());
+        re = new RegExp(bg.store.message.getReStr());
 
         sendElementMessage({ getElementText: true }, (response) => {
             if ( !response ) return;
@@ -119,7 +119,7 @@ class App {
             // have to look them up in the address book and translate them into
             // keys
             if ( lastKeysUsed.length ) {
-                bg.addressBookStore.load(lastKeysUsed, (keys) => {
+                bg.store.addressBook.load(lastKeysUsed, (keys) => {
                     this.selectedKeys = keys.map( k => {
                         return new Keys.KeyItem(k)
                     });
@@ -144,7 +144,7 @@ class App {
             return;
         }
 
-        bg.addressBookStore.search(this.filter, (keys) => {
+        bg.store.addressBook.search(this.filter, (keys) => {
             this.foundKeys = keys.map( k => { return new Keys.KeyItem(k) } );
         });
     }

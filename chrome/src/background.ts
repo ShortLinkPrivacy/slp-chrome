@@ -1,10 +1,13 @@
 /// <reference path="../typings/chrome/chrome.d.ts" />
 /// <reference path="modules.d.ts" />
 
-var config = new Config(),
-    privateKeyStore: PrivateKeyStore.Interface = new PrivateKeyStore.LocalStore(config),
-    messageStore: MessageStore.Interface = new MessageStore.RemoteService(config.messageStore.localHost),
-    addressBookStore: AddressBookStore.Interface = new AddressBookStore.LocalStore(config);
+var config = new Config();
+
+var store: Interfaces.StoreCollection = {
+    privateKey: new PrivateKeyStore.LocalStore(config),
+    message: new MessageStore.RemoteService(config.messageStore.localHost), // TODO: weird config
+    addressBook: new AddressBookStore.LocalStore(config)
+}
 
 // Private key
 var privateKey: Keys.PrivateKey;
@@ -84,7 +87,7 @@ function makePublicKeyText(armor: Interfaces.Armor, messageId: string, callback:
     //icon = '<img src="' + chrome.runtime.getURL('/images/pubkey.png') + '">';
     classList = [config.pgpPK];
 
-    addressBookStore.search(username, (keys) => {
+    store.addressBook.search(username, (keys) => {
         if ( keys.length ) classList.push(config.pgpPKAdded);
         html = "<span class='" + classList.join(' ') + "' rel='" + messageId + "'>" + username + "</span>";
         callback(html);
@@ -94,9 +97,9 @@ function makePublicKeyText(armor: Interfaces.Armor, messageId: string, callback:
 function encryptMessage(text: string, keyList: Array<openpgp.key.Key>, callback: Interfaces.SuccessCallback): void {
     openpgp.encryptMessage( keyList, text )
         .then((armoredText) => {
-            messageStore.save(armoredText, (result) => {
+            store.message.save(armoredText, (result) => {
                 if ( result.success ) {
-                    callback({ success: true, value: messageStore.getURL(result.id) });
+                    callback({ success: true, value: store.message.getURL(result.id) });
                 } else {
                     callback({ success: false, error: result.error });
                 }
@@ -133,7 +136,7 @@ class Message {
     initVars(): void {
         var result: Interfaces.InitVars = {};
 
-        result.linkRe = messageStore.getReStr();
+        result.linkRe = store.message.getReStr();
         result.hasPrivateKey = privateKey ? true : false;
         result.isDecrypted = privateKey ? privateKey.isDecrypted() : false;
         result.config = config;
@@ -144,7 +147,7 @@ class Message {
     decryptLink(): void {
         var re: RegExp, match: Array<string>, messageId: string;
 
-        re  = new RegExp(messageStore.getReStr());
+        re  = new RegExp(store.message.getReStr());
         match = re.exec(this.request.url)
 
         if (!match) {
@@ -154,7 +157,7 @@ class Message {
 
         messageId = match[1];
 
-        messageStore.load( messageId, (result) => {
+        store.message.load( messageId, (result) => {
             if ( !result.success ) {
                this.sendResponse({ success: false, error: 'decode', value: messageId });
                return;
@@ -189,7 +192,7 @@ class Message {
         var key: Keys.PublicKey,
             messageId: string = this.request.messageId;
 
-        messageStore.load( messageId, (result) => {
+        store.message.load( messageId, (result) => {
             if ( !result.success ) {
                this.sendResponse({ success: false, error: 'decode', value: messageId });
                return;
@@ -202,7 +205,7 @@ class Message {
                 return;
             }
 
-            addressBookStore.save(key, () => {
+            store.addressBook.save(key, () => {
                 this.sendResponse({ success: true });
             });
         });
@@ -227,7 +230,7 @@ class Message {
             keyList: Array<openpgp.key.Key> = [];
 
             if ( lastKeysUsed.length ) {
-                addressBookStore.load(lastKeysUsed, (foundKeys) => {
+                store.addressBook.load(lastKeysUsed, (foundKeys) => {
                     keyList = foundKeys.map( k => { return k.openpgpKey() });
                     keyList.push(privateKey.key.toPublic());
                     encryptMessage(text, keyList, (result) => {
@@ -274,7 +277,7 @@ contextMenuId = chrome.contextMenus.create({
 
 //############################################################################
 
-privateKeyStore.get((pk) => {
+store.privateKey.get((pk) => {
     if ( pk ) {
         privateKey = pk;
     } else {

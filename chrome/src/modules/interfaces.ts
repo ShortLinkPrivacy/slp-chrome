@@ -43,14 +43,15 @@ module Interfaces {
         [tabId: number]: ElementLocator;
     }
 
+    export interface StoreCollection {
+        privateKey: PrivateKeyStore.Interface;
+        message: MessageStore.Interface;
+        addressBook: AddressBookStore.Interface;
+    }
+
     export interface BackgroundPage extends Window {
         config: Config;
-
-        privateKeyStore: PrivateKeyStore.Interface;
-        messageStore: MessageStore.Interface;
-        addressBookStore: AddressBookStore.Interface;
-        //prefsStore: PrefsStore.Interface;
-
+        store: StoreCollection;
         privateKey: Keys.PrivateKey;
         elementLocatorDict: ElementLocatorDict;
 

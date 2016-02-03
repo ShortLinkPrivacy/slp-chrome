@@ -7,7 +7,7 @@ module Admin {
 
         doRemove(): void {
             var view: PrivateKeyView = <PrivateKeyView>app.articles["privateKeyView"];
-            bg.privateKeyStore.remove(() => {
+            bg.store.privateKey.remove(() => {
                 bg.privateKey = null;
                 bg.lockDown();
                 view.hasPrivateKey = false;

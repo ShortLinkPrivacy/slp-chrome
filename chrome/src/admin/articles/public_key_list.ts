@@ -23,7 +23,7 @@ module Admin {
             }
 
             this.wait = true;
-            bg.addressBookStore.search(this.filter, (keys) => {
+            bg.store.addressBook.search(this.filter, (keys) => {
                 this.foundKeys = keys.map((k) => { return new Keys.KeyItem(k) })
                 this.wait = false;
             });

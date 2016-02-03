@@ -10,7 +10,7 @@ module Admin {
             e.preventDefault();
 
             try {
-                bg.privateKeyStore.set(this.key, (pk) => {
+                bg.store.privateKey.set(this.key, (pk) => {
                     bg.privateKey = pk;
                     this.key = "";
                     window.location.hash = "#/key/view"

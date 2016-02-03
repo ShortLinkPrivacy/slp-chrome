@@ -18,7 +18,7 @@ module Admin {
             }
 
             try {
-                bg.addressBookStore.save(publicKey, () => {
+                bg.store.addressBook.save(publicKey, () => {
                     app.log("Added: ", publicKey);
                     app.notify.info = "Key for " + publicKey.getPrimaryUser() + " added successfully";
                     this.key = "";
