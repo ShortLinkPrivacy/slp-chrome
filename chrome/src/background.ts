@@ -4,8 +4,8 @@
 var config = new Config();
 
 var store: Interfaces.StoreCollection = {
-    privateKey: new PrivateKeyStore.LocalStore(config),
-    message: new MessageStore.RemoteService(config.messageStore.localHost), // TODO: weird config
+    privateKey:  new PrivateKeyStore.LocalStore(config),
+    message:     new MessageStore.RemoteService(config),
     addressBook: new AddressBookStore.LocalStore(config)
 }
 

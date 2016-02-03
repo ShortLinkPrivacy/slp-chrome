@@ -61,8 +61,12 @@ class Config {
     // Message storage types
     messageStore = {
         localHost: {
+            url: 'http://localhost:5000',
+            path: '/x'
+        },
+
+        remoteService: {
             url: 'http://slp.li',
-            //url: 'http://localhost:5000',
             path: '/x'
         }
     };

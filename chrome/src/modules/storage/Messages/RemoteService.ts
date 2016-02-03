@@ -10,8 +10,9 @@ module MessageStore {
         path: string;
 
         constructor(config: any) {
-            this.url = config.url;
-            this.path = config.path;
+            var c = config.messageStore.remoteService;
+            this.url = c.url;
+            this.path = c.path;
         }
 
         save(armor: Interfaces.Armor, callback: MessageIdCallback): void {
