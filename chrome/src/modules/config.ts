@@ -44,9 +44,9 @@ class Config {
 
     // Private Key types
     privateKeyStore = {
-        localStore: {
+        local: {
             store: chrome.storage.sync,
-            privateKeyLabel: 'privateKey'
+            label: 'privateKey'
         }
     };
 

@@ -1,24 +1,18 @@
 /// <reference path="../../../../typings/chrome/chrome.d.ts" />
 /// <reference path="../../interfaces.ts" />
 /// <reference path="../../keys.ts" />
+/// <reference path="../../storage.ts" />
 /// <reference path="../PrivateKey.ts" />
 
 module PrivateKeyStore {
 
-    export class LocalStore implements Interface {
-        private store: chrome.storage.StorageArea;
-        private privateKeyLabel: string;
+    export class Local extends LocalStorage implements Interface {
+
+        label: string;
 
         constructor(config: Config) {
-            var c = config.privateKeyStore.localStore;
-            this.store = c.store;
-            this.privateKeyLabel = c.privateKeyLabel;
-        }
-
-        private checkRuntimeError(): void {
-            if ( typeof chrome.runtime != "undefined" && chrome.runtime.lastError ) {
-                throw chrome.runtime.lastError;
-            }
+            this.label = config.privateKeyStore.local.label;
+            super(config.privateKeyStore.local.store);
         }
 
         set(key: Keys.PrivateKey|string, callback: PrivateKeyCallback): void {
@@ -31,18 +25,13 @@ module PrivateKeyStore {
             else
                 _key = <Keys.PrivateKey>key
 
-            setter[this.privateKeyLabel] = _key.armored();
-            this.store.set(setter, () => {
-                this.checkRuntimeError();
+            this._set_single(this.label, _key.armored(), () => {
                 callback(_key);
-            });
+            })
         }
 
         getArmored(callback: {(armored: string): void}) {
-            this.store.get(this.privateKeyLabel, (result) => {
-                var armoredText: string = result[this.privateKeyLabel];
-                callback(armoredText);
-            });
+            this._get_single(this.label, callback);
         }
 
         get(callback: PrivateKeyCallback): void {
@@ -59,9 +48,7 @@ module PrivateKeyStore {
         }
 
         remove(callback: Interfaces.Callback): void {
-            this.store.remove(this.privateKeyLabel, () => {
-                callback();
-            });
+            this._remove_single(this.label, callback);
         }
     }
 }
