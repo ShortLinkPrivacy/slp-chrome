@@ -8,7 +8,7 @@ content
 
 background
 ==================================
-- cache the public key link in the settings and reuse it
+- decide what to do with the cached public key link
 
 settings
 ====================================
@@ -27,6 +27,5 @@ API
 
 Development
 ====================================
-- The background page reports an error when there is a public key in the DOM (can'r reproduce?)
 - Use port to communicate from content to background (should be faster). At least to decrypt the links;
 - Use chrome.i18n to implement i18n
