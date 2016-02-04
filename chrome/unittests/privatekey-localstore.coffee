@@ -1,7 +1,8 @@
 
 #############################################################
 
-pks = new PrivateKeyStore.LocalStore(app.config)
+bg = chrome.extension.getBackgroundPage()
+pks = bg.store.privateKey
 secret = TestKeys.secret
 
 #############################################################
@@ -13,8 +14,6 @@ describe "PrivateKeyStore :: LocalStore", ->
 
     #--------------------------------------------------------
     describe 'Prerequisites', ->
-        it 'has a privateKeyStore object', ->
-            expect(pks).to.be.a PrivateKeyStore.LocalStore
 
         it 'has a private key', ->
             expect(secret).to.be.a Keys.PrivateKey
@@ -39,15 +38,13 @@ describe "PrivateKeyStore :: LocalStore", ->
         it 'throws when the armored text is corrupted', (done)->
             fn = -> pks.set "alabama"
             expect(fn).to.throwException (e)->
-                expect(e).to.be.a Keys.KeyError
                 done()
 
         it 'throws when the armored text is missing', (done)->
             fn = -> pks.set ""
             expect(fn).to.throwException (e)->
-                expect(e).to.be.a Keys.KeyError
                 done()
-    
+
     #--------------------------------------------------------
     describe 'get', ->
         key = null
@@ -58,9 +55,6 @@ describe "PrivateKeyStore :: LocalStore", ->
                     pks.get (k)->
                         key = k
                         done()
-
-        it 'retrieves the private key', ->
-            expect(key).to.be.a Keys.PrivateKey
 
         it 'retrieves a correct key', ->
             expect(key.armored()).to.be secret.armored()
