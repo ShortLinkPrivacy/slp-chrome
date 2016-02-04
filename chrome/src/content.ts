@@ -55,6 +55,9 @@ class Editable {
     lastKeysUsed: Array<string>;
 
     constructor(el: HTMLElement) {
+        // If the element was already initialized, then bail
+        if ( $data(el, init.config.pgpElAttr) ) return;
+
         // If the element has no id, then assign one to it
         if ( el.id == "" ) {
             el.id = idGenerator('editable');
@@ -233,6 +236,35 @@ var traverseNodes = (function(){
         });
     }
 
+    // Tells if the A element is a match for decryption. Most A elements will
+    // have the URL in the href attribute, but Twitter (and possibly others)
+    // will have it in the 'data-expanded-url'. This function tries all of them
+    // to determine match.  Returns the match result or null.
+    function isLinkMatch(el: HTMLElement): Array<string> {
+        var match: Array<string>,
+            attrs = ['href', 'data-expanded-url'],
+            i: number;
+
+        for(i = 0; i < attrs.length; i++) {
+            if (match = urlRe.exec(el.getAttribute(attrs[i])))
+                return match;
+        }
+    }
+
+    // Tells if the element is inside an editable. It will check up to 'steps'
+    // levels up to find the editable element.  Twitter (and possibly others)
+    // will create a link inside the editable. We don't want to decrypt it!
+    function isInsideEditable(el: HTMLElement): boolean {
+        var steps: number = 3;
+
+        while (el.parentElement && !el.parentElement.isContentEditable && steps > 0){
+            el = el.parentElement;
+            steps--;
+        }
+
+        return el.parentElement && el.parentElement.isContentEditable;
+    }
+
     function traverseNodes(root: HTMLElement): void {
         var walk: TreeWalker,
             node: Node,
@@ -253,10 +285,10 @@ var traverseNodes = (function(){
                 if ( el.contentEditable  == "true" || el.tagName == "TEXTAREA" ) {
                     new Editable(el);
 
-                // Is it a link? Then get the href, place it in the textContent of the link,
+                // Is it a link? Then get the url from it, place it in the textContent of the link,
                 // then traverse this node only to decode
-                } else if ( el.tagName == "A" && (match = urlRe.exec(el.getAttribute('href'))) ) {
-                    decodeNode(node, match[0]);
+                } else if ( el.tagName == "A" && (match = isLinkMatch(el)) ) {
+                    if (!isInsideEditable(el)) decodeNode(node, match[0]);
                     walk.nextNode();    // Skip next node (it's the text inside the A)
                 }
             }
