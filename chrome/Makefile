@@ -32,7 +32,19 @@ clean:
 #------------------------------------------------------------------
 
 modules:
-	find src/modules -name "*.ts" | xargs tsc --out src/modules.js --declaration
+	tsc --out src/modules.js --declaration \
+	src/modules/application.ts \
+	src/modules/config.ts \
+	src/modules/interfaces.ts \
+	src/modules/keys.ts \
+	src/modules/storage.ts \
+	src/modules/preferences.ts \
+	src/modules/storage/AddressBook/Local.ts \
+	src/modules/storage/AddressBook.ts \
+	src/modules/storage/Messages/RemoteService.ts \
+	src/modules/storage/Messages.ts \
+	src/modules/storage/PrivateKey/Local.ts \
+	src/modules/storage/PrivateKey.ts
 
 #------------------------------------------------------------------
 

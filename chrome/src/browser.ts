@@ -7,7 +7,6 @@ var app: App,
     bg: Interfaces.BackgroundPage = <Interfaces.BackgroundPage>chrome.extension.getBackgroundPage(),
     tab: chrome.tabs.Tab;   // current open tab
 
-
 interface ElementMessage {
     elementLocator?: Interfaces.ElementLocator;
     getElementText?: boolean;
@@ -29,22 +28,33 @@ function sendElementMessage(msg: ElementMessage, callback?: Interfaces.ResultCal
 // Encrypt own public key and create a crypted url
 //---------------------------------------------------------------------------
 function encryptPublicKey(callback: Interfaces.SuccessCallback): void {
-    var armoredText: Interfaces.Armor;
+    var armoredText: Interfaces.Armor,
+        url: string;
 
-    // TODO: cache this link in the settings
+    // If the url is already in the prefs, then use it DISABLED
+    /* 
+    if ( url = bg.preferences.publicKeyUrl ) {
+        callback({ success: true, value: url });
+        return;
+    }
+    */
+
     armoredText = bg.privateKey.toPublic().armored();
 
     bg.store.message.save(armoredText, (result) => {
         if ( result.success ) {
-            callback({
-                success: true,
-                value: bg.store.message.getURL(result.id)
-            })
+            // Get the url of the public key and store it in the prefs
+            url = bg.store.message.getURL(result.id);
+            bg.preferences.publicKeyUrl = url;
+            bg.preferences.publicKeySaveTime = new Date();
+            bg.store.preferences.save();
+
+            // Then return success
+            callback({ success: true, value: url });
         } else {
-            callback({
-                success: false,
-                error: result.error
-            })
+
+            // Return error
+            callback({ success: false, error: result.error })
         }
     });
 }

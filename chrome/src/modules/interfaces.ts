@@ -47,6 +47,12 @@ module Interfaces {
         privateKey: PrivateKeyStore.Interface;
         message: MessageStore.Interface;
         addressBook: AddressBookStore.Interface;
+        preferences: PrefsStore;
+    }
+
+    export interface Preferences {
+        publicKeyUrl: string;
+        publicKeySaveTime: Date;
     }
 
     export interface BackgroundPage extends Window {
@@ -54,6 +60,7 @@ module Interfaces {
         store: StoreCollection;
         privateKey: Keys.PrivateKey;
         elementLocatorDict: ElementLocatorDict;
+        preferences: Preferences;
 
         initialize(): InitVars;
         encryptMessage(text: string, keyList: Array<openpgp.key.Key>, callback: Interfaces.SuccessCallback): void;

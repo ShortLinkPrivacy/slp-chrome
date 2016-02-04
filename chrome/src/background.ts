@@ -6,8 +6,12 @@ var config = new Config();
 var store: Interfaces.StoreCollection = {
     privateKey:  new PrivateKeyStore.Local(config),
     message:     new MessageStore.RemoteService(config),
-    addressBook: new AddressBookStore.Local(config)
+    addressBook: new AddressBookStore.Local(config),
+    preferences: new PrefsStore(config)
 }
+
+// Preferences
+var preferences: Preferences;
 
 // Private key
 var privateKey: Keys.PrivateKey;
@@ -257,8 +261,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse: Interfaces.
 });
 
 chrome.runtime.onInstalled.addListener((reason) => {
-    if (!privateKey)
-        chrome.runtime.openOptionsPage();
+    store.privateKey.get((pk) => {
+        if (!pk) chrome.runtime.openOptionsPage();
+    });
 });
 
 contextMenuId = chrome.contextMenus.create({
@@ -277,10 +282,13 @@ contextMenuId = chrome.contextMenus.create({
 
 //############################################################################
 
-store.privateKey.get((pk) => {
-    if ( pk ) {
-        privateKey = pk;
-    } else {
-        // TODO: ??
-    }
+store.preferences.load(() => {
+    preferences = store.preferences.data;
+    store.privateKey.get((pk) => {
+        if ( pk ) {
+            privateKey = pk;
+        } else {
+            // TODO: ??
+        }
+    });
 });
