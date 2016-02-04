@@ -11,7 +11,7 @@ var store: Interfaces.StoreCollection = {
 }
 
 // Preferences
-var preferences: Preferences;
+var preferences: Interfaces.Preferences;
 
 // Private key
 var privateKey: Keys.PrivateKey;
