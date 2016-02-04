@@ -1,9 +1,4 @@
 
-// Password
-@screenWidth: 300px;
-@screenHeight: 125px;
-
-
 // Main
 @mainBg: #EFECCA;
 @mainWidth: 360px;
@@ -58,6 +53,11 @@ textarea:focus, input:focus, a:focus {
   background-color: rgba(0, 0, 0, 0.1);
   color: #002F2F;
   border: 1px solid #aaa;
+}
+
+input[type=password] {
+  font-size: 150%;
+  padding: 5px;
 }
 
 // General error and info
@@ -128,41 +128,22 @@ textarea:focus, input:focus, a:focus {
 .middle {
   display: table-cell;
   width: @mainWidth;
+  height: @mainHeight - @menuHeight;
   text-align: center;
   vertical-align: middle;
 }
 
-// Password and no-key screens
-.screen {
-  background-color: @mainBg;
-  width: @screenWidth;
-  height: @screenHeight;
-  text-align: center;
-
-  input {
-    font-size: 150%;
-    padding: 5px;
-  }
-
-  .middle {
-    width: @screenWidth;
-    height: @screenHeight;
-  }
-}
-
-// Main view of the dialog
-#main {
+#container {
   width: @mainWidth;
   height: @mainHeight;
   display: block;
   background-color: @mainBg;
-
 }
 
 // Menu
 nav {
   height: @menuHeight;
-  line-height: @menuHeight;
+  line-height: @menuHeight - 1;
   background-color: @menuBg;
 
   .logo {

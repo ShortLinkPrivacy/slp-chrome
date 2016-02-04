@@ -17,31 +17,27 @@
     <script src="src/browser.js"></script>
   </head>
   <body>
-    <div class="error" rv-if="error" rv-text="error"></div>
-    <nav>
-      <div class="logo pull-left">short link privacy</div>
-      <ul id="tabs" class="pull-right">
-        <li rv-show="isDecrypted"><a rv-on-click="lock" href="#"><i class="icon-lock"></i>lock</a></li>
-        <li><a rv-on-click="goSettings" href="#"><i class="icon-cog"></i>settings</a></li>
-      </ul>
-    </nav>
+    <div id="container">
+      <div class="error" rv-if="error" rv-text="error"></div>
+      <nav>
+        <div class="logo pull-left">short link privacy</div>
+        <ul id="tabs" class="pull-right">
+          <li rv-show="isDecrypted"><a rv-on-click="lock" href="#"><i class="icon-lock"></i>lock</a></li>
+          <li><a rv-on-click="goSettings" href="#"><i class="icon-cog"></i>settings</a></li>
+        </ul>
+      </nav>
 
-    <div class="screen" rv-hide="hasPrivateKey">
-      <span class="middle">
+      <div class="middle" rv-hide="hasPrivateKey">
         <p>You have not created or imported your PGP key yet.</p>
         <button class="button" rv-on-click="goSettings">Setup</button>
-      </span>
-    </div><!-- !hasPrivateKey -->
+      </div><!-- !hasPrivateKey -->
 
-    <div rv-show="hasPrivateKey">
-      <div class="screen" rv-hide="isDecrypted">
-        <div class="middle">
+      <div rv-show="hasPrivateKey">
+        <div class="middle" rv-hide="isDecrypted">
           <input id="pwd" rv-value="password" rv-on-keyup="enterPassword" type="password" placeholder="private key password">
         </div>
-      </div>
 
-      <div id="main" rv-show="isDecrypted">
-        <article>
+        <article rv-show="isDecrypted">
           <div rv-hide="alreadyEncrypted">
             <div class="clear-text">
               <label>Text:</label>
@@ -71,7 +67,8 @@
             <button class="button" rv-on-click="restoreMessage">Restore original message</button>
           </div><!-- alreadyEncrypted -->
         </article><!-- #encrypted-tab -->
-      </div><!-- #main -->
-    </div><!-- hasPrivateKey -->
+
+      </div><!-- hasPrivateKey -->
+    </div><!-- #container -->
   </body>
 </html>
