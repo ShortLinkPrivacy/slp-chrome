@@ -40,6 +40,7 @@ modules:
 	src/modules/storage.ts \
 	src/modules/preferences.ts \
 	src/modules/storage/AddressBook/Local.ts \
+	src/modules/storage/AddressBook/IndexedDB.ts \
 	src/modules/storage/AddressBook.ts \
 	src/modules/storage/Messages/RemoteService.ts \
 	src/modules/storage/Messages.ts \

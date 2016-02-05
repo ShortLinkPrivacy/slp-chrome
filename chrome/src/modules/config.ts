@@ -55,6 +55,10 @@ class Config {
         local: {
             store: chrome.storage.local,
             label: 'directory',
+        },
+
+        indexedDb: {
+            dbName: "AddressBook"
         }
     };
 
