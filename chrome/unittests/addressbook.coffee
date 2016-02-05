@@ -1,19 +1,23 @@
 
 #############################################################
 
+# TODO: use a test database
 config = new Config()
 addressBook = new AddressBookStore.IndexedDB(config)
 
 alice = TestKeys.alice
 bob = TestKeys.bob
 charlie = TestKeys.charlie
+stefan = TestKeys.stefan
 
 #############################################################
 
 describe "Key Storage :: LocalStore", ->
     before (done)->
         addressBook.deleteAll ->
-            done()
+            addressBook.search 'ifnx', (result)->
+                expect(result).to.have.length 0
+                done()
 
     #--------------------------------------------------------
     describe 'storePublicKey', ->
@@ -41,11 +45,12 @@ describe "Key Storage :: LocalStore", ->
             addressBook.save alice, ->
                 addressBook.save bob, ->
                     addressBook.save charlie, ->
-                        done()
+                        addressBook.save stefan, ->
+                            done()
 
         it 'finds all by domain', (done)->
             addressBook.search 'ifnx', (result)->
-                expect(result).to.have.length 3
+                expect(result).to.have.length 4
                 done()
 
         it 'filters by name', (done)->
@@ -53,3 +58,7 @@ describe "Key Storage :: LocalStore", ->
                 expect(result).to.have.length 1
                 done()
 
+        it 'finds other userIds', (done)->
+            addressBook.search 'stefanguen', (result)->
+                expect(result).to.have.length 1
+                done()

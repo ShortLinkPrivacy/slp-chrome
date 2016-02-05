@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+  <head>
+    <script type="text/javascript">
+      var request = indexedDB.open("library", 5);
+
+      request.onerror = function(e) {
+        console.log("Error ", request.error);
+      }
+
+      request.onsuccess = function(e) {
+        db = request.result;
+        db.transaction("pks", "readwrite").objectStore("pks").openCursor().onsuccess = function(e){
+          var cursor = e.target.result;
+          if ( cursor ) {
+            cursor.delete().onsuccess = function() {
+              cursor.continue();
+            }
+          } else {
+
+          }
+        }
+      };
+
+      request.onupgradeneeded = function() {
+        // The database did not previously exist, so create object stores and indexes.
+        var db = request.result;
+        db.deleteObjectStore("pks");
+
+        var store = db.createObjectStore("pks", { keyPath: "fingerprint" });
+        store.createIndex("userId", "userIds");
+
+        // Populate with initial data.
+        store.put({fingerprint: "1111", userIds: ["bar" , "foo", "baz"]});
+        store.put({fingerprint: "2222", userIds: ["moo" , "goo", "yag"]});
+        store.put({fingerprint: "3333", userIds: ["coo" , "gat", "oink"]});
+
+        console.log("DB upgraded");
+      };
+
+
+    </script>
+  </head>
+  <body>
+  </body>
+</html>

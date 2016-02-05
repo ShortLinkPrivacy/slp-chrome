@@ -54,6 +54,8 @@ module AddressBookStore {
         }
 
         loadSingle(fingerprint: Interfaces.Fingerprint, callback: PublicKeyCallback): void {
+            if (!fingerprint) return;
+
             this.initialize((db) => {
                 var request = db.transaction("armor").objectStore("armor").get(fingerprint);
 
@@ -85,7 +87,11 @@ module AddressBookStore {
             }.bind(this);
 
             this.initialize((db) => {
-                _load(0, callback);
+                if (fingerprints.length > 0) {
+                    _load(0, callback);
+                } else {
+                    callback(result);
+                }
             });
         }
 
@@ -119,7 +125,9 @@ module AddressBookStore {
 
                 request.onsuccess = ()=> {
                     if ( cursor = request.result ) {
-                        cursor.delete().onsuccess = onsuccess;
+                        cursor.delete().onsuccess = ()=>{
+                            cursor.continue();
+                        }
                     } else {
                         onsuccess();
                     }
