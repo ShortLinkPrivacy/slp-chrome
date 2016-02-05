@@ -58,7 +58,8 @@ class Config {
         },
 
         indexedDb: {
-            dbName: "AddressBook"
+            dbName: "AddressBook",
+            dbVersion: 1
         }
     };
 

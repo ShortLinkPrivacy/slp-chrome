@@ -1,8 +1,8 @@
 
 #############################################################
 
-bg = chrome.extension.getBackgroundPage()
-addressBook = bg.store.addressBook
+config = new Config()
+addressBook = new AddressBookStore.IndexedDB(config)
 
 alice = TestKeys.alice
 bob = TestKeys.bob
@@ -12,8 +12,8 @@ charlie = TestKeys.charlie
 
 describe "Key Storage :: LocalStore", ->
     before (done)->
-        addressBook.store.clear()
-        done()
+        addressBook.deleteAll ->
+            done()
 
     #--------------------------------------------------------
     describe 'storePublicKey', ->
@@ -52,12 +52,4 @@ describe "Key Storage :: LocalStore", ->
             addressBook.search 'alice', (result)->
                 expect(result).to.have.length 1
                 done()
-
-    #--------------------------------------------------------
-    describe 'deleteAllPublicKeys', ->
-        it 'deletes all', (done)->
-            addressBook.deleteAll ->
-                addressBook.search 'ifnx', (result)->
-                    expect(result).to.have.length 0
-                    done()
 

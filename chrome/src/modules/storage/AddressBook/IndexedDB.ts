@@ -5,63 +5,68 @@
 
 module AddressBookStore {
 
-    var storeName = "keys";
-
     export class IndexedDB implements Interface {
 
-        private dbName: string;
+        private config: any;
+        private onerror: { (e: any): void };
 
         constructor(config: Config) {
-            this.dbName = config.addressBookStore.indexedDb.dbName;
+            this.config = config.addressBookStore.indexedDb;
+            this.onerror = function(e){
+                throw Error(e.target.request.error);
+            }.bind(this);
         }
 
         private initialize(callback: Interfaces.ResultCallback): void {
-            var request = indexedDB.open(this.dbName);
-            request.onupgradeneeded = function() {
+            var request = indexedDB.open(this.config.dbName, this.config.dbVersion);
+
+            request.onupgradeneeded = ()=> {
                 var db = request.result;
-                var store = db.createObjectStore(storeName, {keyPath: "fingerprint"});
-                store.createIndex("by_fingerprint", "fingerprint");
-                store.createIndex("by_userId", "userId", { unique: true });
+                db.createObjectStore("ids", {keyPath: "userId"});
+                db.createObjectStore("armor", {keyPath: "fingerprint"});
+                console.log("DB initialized: ", this.config.dbVersion);
             };
 
-            request.onsuccess = function() {
+            request.onsuccess = ()=> {
                 callback(request.result);
             };
+
+            request.onerror = this.onerror;
         }
 
         save(key: Keys.PublicKey, callback: Interfaces.Callback): void {
             this.initialize((db) => {
-                var tx = db.transaction(storeName, "readwrite"),
-                    store = tx.objectStore(storeName),
-                    userIds = key.userIds();
-
-                tx.oncomplete = callback;
-
-                userIds.forEach((userId) => {
-                    store.put({
-                        fingerprint: key.fingerprint(),
-                        armor: key.armored(),
-                        userId: userId
-                    });
+                var request = db.transaction("armor", "readwrite").objectStore("armor").put({
+                    fingerprint: key.fingerprint(),
+                    armor: key.armored()
                 });
+                
+                request.onsuccess = ()=> {
+                    var tx = db.transaction("ids", "readwrite"), ids = tx.objectStore("ids");
+                    key.userIds().forEach((userId) => {
+                        ids.put({ userId: userId, fingerprint: key.fingerprint() })
+                    });
+                    tx.oncomplete = callback;
+                };
+
+                request.onerror = this.onerror;
             });
         }
 
         loadSingle(fingerprint: Interfaces.Fingerprint, callback: PublicKeyCallback): void {
             this.initialize((db) => {
-                var tx = db.transaction(storeName, "readonly"),
-                    store = tx.objectStore(storeName),
-                    index = store.index("by_fingerprint");
+                var request = db.transaction("armor").objectStore("armor").get(fingerprint);
 
-                var request = index.get(fingerprint);
-                request.onsuccess = () => {
+                request.onsuccess = ()=> {
                     var obj = request.result;
                     var key: Keys.PublicKey;
                     if ( obj != undefined ) {
                         key = new Keys.PublicKey(obj.armor);
                     }
                     callback(key);
-                }
+                };
+
+                request.onerror = this.onerror.bind(this);
             })
         }
 
@@ -85,9 +90,47 @@ module AddressBookStore {
         }
 
         search(userId: Interfaces.UserID, callback: PublicKeySearchCallback): void {
+            var fingerprints: Array<Interfaces.Fingerprint> = [],
+                userIdLower = userId.toLowerCase();
+
+            this.initialize((db) => {
+                var request = db.transaction("ids", "readonly").objectStore("ids").openCursor();
+
+                request.onsuccess = ()=> {
+                    var cursor = request.result;
+                    if (cursor) {
+                        var idLower = cursor.value.userId.toLowerCase();
+                        if (idLower.search(userIdLower) >= 0)
+                            fingerprints.push(cursor.value.fingerprint);
+                        cursor.continue();
+                    } else {
+                        this.load(fingerprints, callback);
+                    }
+                }
+
+            })
+
         }
 
         deleteAll(callback: Interfaces.Callback): void {
+            var deleteStore = function(name: string, db: any, onsuccess: Interfaces.Callback) {
+                var request = db.transaction(name, "readwrite").objectStore(name).openCursor();
+                var cursor;
+
+                request.onsuccess = ()=> {
+                    if ( cursor = request.result ) {
+                        cursor.delete().onsuccess = onsuccess;
+                    } else {
+                        onsuccess();
+                    }
+                };
+            }
+
+            this.initialize((db) => {
+                deleteStore("ids", db, () => {
+                    deleteStore("armor", db, callback)
+                });
+            })
         }
 
         exportKeys(callback: ArmorArrayCallback): void {

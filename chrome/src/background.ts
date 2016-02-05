@@ -6,7 +6,7 @@ var config = new Config();
 var store: Interfaces.StoreCollection = {
     privateKey:  new PrivateKeyStore.Local(config),
     message:     new MessageStore.RemoteService(config),
-    addressBook: new AddressBookStore.Local(config),
+    addressBook: new AddressBookStore.IndexedDB(config),
     preferences: new PrefsStore(config)
 }
 
