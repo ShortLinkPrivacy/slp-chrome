@@ -1,8 +1,8 @@
 
 #############################################################
 
-# TODO: use a test database
 config = new Config()
+config.addressBookStore.indexedDb.dbName = "Test"
 addressBook = new AddressBookStore.IndexedDB(config)
 
 alice = TestKeys.alice
