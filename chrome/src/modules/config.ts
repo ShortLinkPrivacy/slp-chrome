@@ -38,6 +38,10 @@ class Config {
     // encrypted.
     pgpElAttr = '__pgp_crypted';
 
+    // Class name to five text nodes, after they're converted to enchanted
+    // elements.
+    pgpEnchanted = '__pgp_enchanted';
+
     //######################################################
     // Storages
     //######################################################

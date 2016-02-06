@@ -284,13 +284,13 @@ var traverseNodes = (function(){
         }
 
         // Replace all magic urls inside the link with magic <span> elements
-        text = node.nodeValue.replace(reg, "<span class='__pgp_enchanted' rel='$1'>Decrypting ...</span>");
+        text = node.nodeValue.replace(reg, "<span class='" + init.config.pgpEnchanted + "' rel='$1'>Decrypting ...</span>");
         parentEl.innerHTML = text;
     }
 
     // Gathers a list of all enchanted elements and decodes them one by one
     function decodeEnchanted(root: HTMLElement, callback: Interfaces.Callback): void {
-        var els = root.getElementsByClassName('__pgp_enchanted'),
+        var els = root.getElementsByClassName(init.config.pgpEnchanted),
             i: number,
             count = 0;
 
