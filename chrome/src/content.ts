@@ -201,57 +201,29 @@ var hotlinkPublicKeys = (function() {
 var traverseNodes = (function(){
     var re  = new RegExp("http://slp.li/x/([0-9,a-f]+)"),
         reg = new RegExp("http://slp.li/x/([0-9,a-f]+)", "g");
-
-
-    function decodeURL(url: string, callback: { (decodedText): void }): void {
-        messageBgPage( 'decryptLink', { url: url }, (result) => {
-            callback( result.success ? result.value : "Can not decrypt" );
-        });
-    }
-
-    // Nakes a node and replaces all magic links with magic <span> elements
-    function enchantNode(node: Node): void {
-        var text: string,
-            parentEl = node.parentElement;
-
-        if ( node.nodeType == Node.TEXT_NODE) {
-
-            // Save the current value of the element and give it a new class
-            $data(parentEl, init.config.pgpData, parentEl.innerHTML)
-            parentEl.classList.add(init.config.pgpClassName);
-
-            // Replace all magic urls inside the link with magic <span> elements
-            text = node.nodeValue.replace(reg, "<span class='_pgp' rel='$1'>Decrypting ...</span>");
-            node.parentElement.innerHTML = text;
-        }
-    }
-
-    // Takes a magic <span> element and decodes it's value
-    function decodeEnchanted(element: HTMLElement): void {
-        decodeURL("http://slp.li/x/" + element.getAttribute('rel'), (text) => {
-            element.innerHTML = text;
-        })
-    }
-
-    // Returns true if this is an editable element
-    function isEditable(el: HTMLElement): boolean {
-        return el.contentEditable  == "true" || el.tagName == "TEXTAREA";
-    }
-
+    
     // Tells if the A element is a match for decryption. Most A elements will
     // have the URL in the href attribute, but Twitter (and possibly others)
-    // will have it in the 'data-expanded-url'.
-    function isMatchingA(el: HTMLElement): Array<string> {
-        return el.tagName == "A" && ( 
-            urlRe.exec(el.getAttribute('href')) || 
-            urlRe.exec(el.getAttribute('data-expanded-url'))
-        )
+    // will have it in the 'data-expanded-url'. Returns the magic URL if found
+    // or undefined if not.
+    function isMatchingA(el: HTMLElement): string {
+        var tags = ['href', 'data-expanded-url'],
+            i: number,
+            attr: string;
+
+        if ( el.tagName != 'A' ) return;
+
+        for (i = 0; i < tags.length; i++) {
+            if ( attr = el.getAttribute(tags[i]) ) {
+                if ( attr.match(re) ) return attr;
+            }
+        }
     }
 
     // Tells if the element is inside an editable. It will check up to 'steps'
     // levels up to find the editable element.  Twitter (and possibly others)
     // will create a link inside the editable. We don't want to decrypt it!
-    function isInsideEditable(el: HTMLElement): boolean {
+    function isInsideEditable(el: HTMLElement|Node): boolean {
         var steps: number = 3;
 
         while (el.parentElement && !el.parentElement.isContentEditable && steps > 0){
@@ -262,28 +234,96 @@ var traverseNodes = (function(){
         return el.parentElement && el.parentElement.isContentEditable;
     }
 
-    // Returns an array of nodes that contain short links. These nodes may be
-    // both TEXT and A tags.  Some nodes might have several short links in them
-    // mixed inside unencrypted text.
+    // Finds all links that point to magic urls and replaces them with text
+    // nodes, so they can be found by getNodeList. 
+    function fixLinks(root: HTMLElement): void {
+        if ((<Node>root).nodeType != Node.ELEMENT_NODE) return;
+
+        var els = root.getElementsByTagName('a'),
+            url: string,
+            i: number;
+
+        for (i = 0; i < els.length; i++) {
+            var element = els[i];
+            if ( isInsideEditable(element) ) return;
+            if ( url = isMatchingA(element) ) {
+                element.innerText = url
+            }
+        }
+    }
+
+    // Decode a single magic url
+    function decodeURL(url: string, callback: { (decodedText): void }): void {
+        messageBgPage( 'decryptLink', { url: url }, (result) => {
+            callback( result.success ? result.value : "Can not decrypt" );
+        });
+    }
+
+    // Nakes a node and replaces all magic links with magic <span> elements
+    function enchantNode(node: Node): void {
+        var text: string,
+            parentEl, memoryEl: HTMLElement;
+
+        parentEl = node.parentElement;
+        memoryEl = parentEl.tagName == "A" ? parentEl.parentElement : parentEl;
+        
+        // Save the element value it its "memory" element, so it can be restored
+        if ( !memoryEl.classList.contains(init.config.pgpClassName) ) {
+            $data(memoryEl, init.config.pgpData, memoryEl.innerHTML)
+            memoryEl.classList.add(init.config.pgpClassName);
+        }
+
+        // If the node is trapped in a link, then break out of it, by replacing
+        // the link node with a text node
+        if ( parentEl.tagName == "A" ) {
+            var linkEl = parentEl;
+            parentEl = document.createElement('span');
+            node = document.createTextNode(linkEl.innerText);
+            parentEl.appendChild(node);
+            linkEl.parentElement.replaceChild(parentEl, linkEl);
+        }
+
+        // Replace all magic urls inside the link with magic <span> elements
+        text = node.nodeValue.replace(reg, "<span class='__pgp_enchanted' rel='$1'>Decrypting ...</span>");
+        parentEl.innerHTML = text;
+    }
+
+    // Gathers a list of all enchanted elements and decodes them one by one
+    function decodeEnchanted(root: HTMLElement, callback: Interfaces.Callback): void {
+        var els = root.getElementsByClassName('__pgp_enchanted'),
+            i: number,
+            count = 0;
+
+        var _decode = function(idx: number, done: Interfaces.Callback): void {
+            var element = <HTMLElement>(els[idx]);
+            count++;
+            decodeURL("http://slp.li/x/" + element.getAttribute('rel'), (text) => {
+                element.innerHTML = text;
+                count--;
+                if ( count <= 0) done();
+            })
+        }
+
+        if ( els.length > 0) {
+            for (i = 0; i < els.length; i++) _decode(i, callback);
+        } else {
+            callback();
+        }
+    }
+
+    // Returns an array of nodes that contain short links. These nodes will be
+    // of type TEXT.  Some nodes might have several short links in them mixed
+    // inside unencrypted text.
     function getNodeList(root: HTMLElement): Array<Node> {
         var walk: TreeWalker,
             node: Node,
             nodeList: Array<Node> = [];
 
         // Create a walker from the root element, searching only for text nodes
-        walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT  | NodeFilter.SHOW_ELEMENT);
+        walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
 
         while (node = walk.nextNode()) {
-            if ( node.nodeType == Node.TEXT_NODE ) {
-                if (node.nodeValue.match(re)) 
-                    nodeList.push(node);
-            } else if ( node.nodeType == Node.ELEMENT_NODE ) {
-                var el = <HTMLElement>node;
-                if ( isMatchingA(el) && !isInsideEditable(el) ) {
-                    nodeList.push(node);
-                    walk.nextNode();
-                }
-            }
+            if (node.nodeValue.match(re) && !isInsideEditable(node)) nodeList.push(node);
         }
 
         return nodeList;
@@ -293,34 +333,36 @@ var traverseNodes = (function(){
         var nodeList: Array<Node>,
             i: number;
 
+        // Fix links with altered magic urls in the innerText
+        fixLinks(root);
+
+        // Gather a list of TEXT nodes that contain magic urls
         nodeList = getNodeList(root);
 
-        // No nodes found
+        // If no nodes found, return
         if (nodeList.length == 0) return;
 
         // If the private key has not been unlocked, then add a notification
+        // and return
         if ( !init.isDecrypted ) {
             messageBgPage('needPassword', {});
             return;
         }
 
-        // Run over all found nodes, look for magic URLs and turn them into
-        // HTML elements with a special class.
+        // Run over all found nodes, look for magic urls and turn them into
+        // enchanted span elements
         for (i = 0; i < nodeList.length; i++) {
             enchantNode(nodeList[i]);
         }
 
-        // Now find all the elements of that special class and convert them
-        // into decrypted text.
-        var els = document.getElementsByClassName('_pgp'),
-            i: number;
-        
-        i = els.length - 1;
-        for (i = els.length - 1; i >= 0; i--) {
-            var element: HTMLElement = <HTMLElement>els[i];
-            decodeEnchanted(element);
-            hotlinkPublicKeys(element);
-        }
+        // Find all echanted elements and decode them. Then send a message to
+        // the current widow, which can be used for tests.
+        decodeEnchanted(root, () => {
+            window.postMessage('slp_done_decoding', document.location.href);
+        });
+
+        // Look for the public key class and bind onclick events
+        hotlinkPublicKeys(root);
     }
 
     return traverseNodes;
@@ -328,6 +370,8 @@ var traverseNodes = (function(){
 
 // Find all editables and bind class Editable to them
 function bindEditables(root: HTMLElement): void {
+    if ((<Node>root).nodeType != Node.ELEMENT_NODE) return;
+
     var editables = root.querySelectorAll("[contenteditable='true']"),
         textareas = root.getElementsByTagName('textarea'),
         i: number;
