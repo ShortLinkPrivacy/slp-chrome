@@ -16,6 +16,8 @@
   "dependencies": {
     "jquery": "",
     "rivets": "",
-    "openpgp": "~1.4.0"
+    "openpgp": "~1.4.0",
+    "mocha": "~2.4.5",
+    "expect": "~0.3.1"
   }
 }

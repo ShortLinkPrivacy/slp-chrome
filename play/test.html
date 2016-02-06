@@ -2,51 +2,49 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Playroom</title>
+    <title>Content tests</title>
+    <style type="text/css">
+      #content { padding: 20px }
+    </style>
+    <link href="./bower_components/mocha/mocha.css" rel="stylesheet" />
+    <script src="./bower_components/mocha/mocha.js"></script>
+    <script src="./bower_components/expect/index.js"></script>
 
-    <link rel="stylesheet" href="css/min.css">
-    <link rel="stylesheet" href="css/style.css">
   </head>
   <body>
+    <div id="mocha"></div>
     <div id="content">
       <div class="row">
         <div class="col c7">
           <div>
-            <h3>Paragraphs</h3>
-            <p>http://localhost:5000/x/568dedadbb96af38c97f993e</p>
-            <p>
-              <p>1. http://localhost:5000/x/568dedadbb96af38c97f993e</p>
-              <p>2. http://localhost:5000/x/568dedadbb96af38c97f993e</p>
-            </p>
-            <p>
-              one http://localhost:5000/x/568dedadbb96af38c97f993e two
-              three http://localhost:5000/x/568dedadbb96af38c97f993e four
-            </p>
-            <p>
-              <ul>
-                <li>http://localhost:5000/x/568dedadbb96af38c97f993e</li>
-                <li>http://localhost:5000/x/568dedadbb96af38c97f993e</li>
-              </ul>
-            </p>
+            <h3>Simple paragraph</h3>
+            <p id="p1">http://slp.li/x/56b53ddee365a2380ca86cd1</p>
+            <h3>Link with other text</h3>
+            <p id="p2">http://slp.li/x/56b53ddee365a2380ca86cd1 two</p>
+            <p id="p3">one http://slp.li/x/56b53ddee365a2380ca86cd1</p>
+            <p id="p4">one http://slp.li/x/56b53ddee365a2380ca86cd1 two</p>
+            <h3>Multiple links in the same P</h3>
+            <p id="p5">http://slp.li/x/56b53ddee365a2380ca86cd1 http://slp.li/x/56b53ddee365a2380ca86cd1</p>
             <h3>Connected text</h3>
-            <p>
-              fronthttp://localhost:5000/x/568dedadbb96af38c97f993e
-            </p>
+            <p id="c1">fronthttp://slp.li/x/56b53ddee365a2380ca86cd1</p>
             <h3>404</h3>
-            <p>
-              http://localhost:5000/x/568dedadbb96af38c97f993eback
+            <p id="e1">
+              http://slp.li/x/56b53ddee365a2380ca86cd1back
             </p>
-            <p>
-              http://localhost:5000/x/5681cab8da96b04654f50123
+            <p id="e2">
+              http://slp.li/x/5681cab8da96b04654f50123
             </p>
             <h3>Links</h3>
-            <p>
-              <a href="http://localhost:5000/x/568dedadbb96af38c97f993e">http://localhost:5000/x/568dedadbb96af38c97f993e</a>
+            <p id="l1">
+              <a href="http://slp.li/x/56b53ddee365a2380ca86cd1">http://slp.li/x/56b53ddee365a2380ca86cd1</a>
             </p>
           </div>
         </div>
 
       </div>
     </div>
+    <script src="js/tests/init.js"></script>
+    <script src="js/tests/content.js"></script>
+    <script src="js/tests/run.js"></script>
   </body>
 </html>
