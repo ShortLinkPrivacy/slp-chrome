@@ -53,8 +53,8 @@ describe("Links", () => {
   it("Decodes regular links", () => {
     expect(document.getElementById('l1').innerText).to.equal('test');
   })
-  it("Removes the A tags", () => {
-    expect(document.getElementById('l1').innerHTML).to.not.match(/\<a/i);
+  it("Removes the href from the A tags", () => {
+    expect(document.getElementById('l1').innerHTML).to.not.match(/href/i);
   })
   it("Decodes shortened links", () => {
     expect(document.getElementById('l2').innerText).to.equal('test');

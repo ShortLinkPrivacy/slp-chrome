@@ -213,19 +213,17 @@ var traverseNodes = (function(){
     
     // Tells if the A element is a match for decryption. Most A elements will
     // have the URL in the href attribute, but Twitter (and possibly others)
-    // will have it in the 'data-expanded-url'. Returns the magic URL if found
-    // or undefined if not.
+    // will have it in the 'data-expanded-url' and such. Returns the magic URL
+    // if found or undefined if not.
     function isMatchingA(el: HTMLElement): string {
-        var tags = ['href', 'data-expanded-url'],
-            i: number,
+        var i: number,
             attr: string;
 
         if ( el.tagName != 'A' ) return;
 
-        for (i = 0; i < tags.length; i++) {
-            if ( attr = el.getAttribute(tags[i]) ) {
-                if ( attr.match(urlRe) ) return attr;
-            }
+        for (i = 0; i < el.attributes.length; i++) {
+            attr = el.attributes.item(i).value;
+            if ( attr.match(urlRe) ) return attr;
         }
     }
 
