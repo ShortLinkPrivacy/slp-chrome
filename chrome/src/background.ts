@@ -149,17 +149,14 @@ class Message {
     }
 
     decryptLink(): void {
-        var re: RegExp, match: Array<string>, messageId: string;
+        var re: RegExp, messageId: string;
 
-        re  = new RegExp(store.message.getReStr());
-        match = re.exec(this.request.url)
+        messageId = this.request.messageId;
 
-        if (!match) {
-            this.sendResponse({ success: false, error: 'match' });
+        if (!messageId) {
+            this.sendResponse({ success: false, error: 'Wrong link ID' });
             return;
         }
-
-        messageId = match[1];
 
         store.message.load( messageId, (result) => {
             if ( !result.success ) {

@@ -8,7 +8,8 @@ var init: Interfaces.InitVars;
 var observer: MutationObserver;
 
 // Regular expression for the url
-var urlRe: RegExp;
+var urlRe: RegExp,
+    urlReg: RegExp;
 
 // Connection port for messages to background
 var port: chrome.runtime.Port;
@@ -199,8 +200,6 @@ var hotlinkPublicKeys = (function() {
 })();
 
 var traverseNodes = (function(){
-    var re  = new RegExp("http://slp.li/x/([0-9,a-f]+)"),
-        reg = new RegExp("http://slp.li/x/([0-9,a-f]+)", "g");
     
     // Tells if the A element is a match for decryption. Most A elements will
     // have the URL in the href attribute, but Twitter (and possibly others)
@@ -215,7 +214,7 @@ var traverseNodes = (function(){
 
         for (i = 0; i < tags.length; i++) {
             if ( attr = el.getAttribute(tags[i]) ) {
-                if ( attr.match(re) ) return attr;
+                if ( attr.match(urlRe) ) return attr;
             }
         }
     }
@@ -253,13 +252,13 @@ var traverseNodes = (function(){
     }
 
     // Decode a single magic url
-    function decodeURL(url: string, callback: { (decodedText): void }): void {
-        messageBgPage( 'decryptLink', { url: url }, (result) => {
+    function decodeURL(messageId: string, callback: { (decodedText): void }): void {
+        messageBgPage( 'decryptLink', { messageId: messageId }, (result) => {
             callback( result.success ? result.value : "Can not decrypt" );
         });
     }
 
-    // Nakes a node and replaces all magic links with magic <span> elements
+    // Takes a node and replaces all magic links with magic <span> elements
     function enchantNode(node: Node): void {
         var text: string,
             parentEl, memoryEl: HTMLElement;
@@ -284,7 +283,7 @@ var traverseNodes = (function(){
         }
 
         // Replace all magic urls inside the link with magic <span> elements
-        text = node.nodeValue.replace(reg, "<span class='" + init.config.pgpEnchanted + "' rel='$1'>Decrypting ...</span>");
+        text = node.nodeValue.replace(urlReg, "<span class='" + init.config.pgpEnchanted + "' rel='$1'>Decrypting ...</span>");
         parentEl.innerHTML = text;
     }
 
@@ -295,9 +294,13 @@ var traverseNodes = (function(){
             count = 0;
 
         var _decode = function(idx: number, done: Interfaces.Callback): void {
-            var element = <HTMLElement>(els[idx]);
+            var element = <HTMLElement>(els[idx]),
+                messageId: string = element.getAttribute('rel');
+
+            if (!messageId) return;
+
             count++;
-            decodeURL("http://slp.li/x/" + element.getAttribute('rel'), (text) => {
+            decodeURL(messageId, (text) => {
                 element.innerHTML = text;
                 count--;
                 if ( count <= 0) done();
@@ -323,7 +326,7 @@ var traverseNodes = (function(){
         walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
 
         while (node = walk.nextNode()) {
-            if (node.nodeValue.match(re) && !isInsideEditable(node)) nodeList.push(node);
+            if (node.nodeValue.match(urlRe) && !isInsideEditable(node)) nodeList.push(node);
         }
 
         return nodeList;
@@ -402,6 +405,7 @@ function getInitVars(callback: Interfaces.Callback): void {
     messageBgPage('initVars', {}, (result) => {
         init = result.value;
         urlRe = new RegExp(init.linkRe);
+        urlReg = new RegExp(init.linkRe, 'g');
         callback()
     });
 }

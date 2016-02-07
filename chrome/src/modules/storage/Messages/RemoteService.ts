@@ -82,7 +82,7 @@ module MessageStore {
         }
 
         getReStr(): string {
-            return this.url + this.path + "/(\\w+)";
+            return this.url + this.path + "/([0-9,a-f]+)";
         }
     }
 }
