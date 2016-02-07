@@ -191,8 +191,18 @@ var hotlinkPublicKeys = (function() {
 
         for (i = 0; i < list.length; i++) {
             var el = list[i];
-            if (el.classList.contains(init.config.pgpPKAdded)) continue;
-            el.addEventListener('click', _bindOnClick(<HTMLElement>el));
+
+            // Add no-style class to the paren element, which is
+            // the echanted span container.
+            if ( el.parentElement ) {
+                el.parentElement.classList.add('__pgp_no_style')
+            }
+
+            // Add click binding only if the 'added-already' class is not set
+            if (!el.classList.contains(init.config.pgpPKAdded)) {
+                el.addEventListener('click', _bindOnClick(<HTMLElement>el));
+            }
+
         }
     }
 
@@ -251,13 +261,6 @@ var traverseNodes = (function(){
         }
     }
 
-    // Decode a single magic url
-    function decodeURL(messageId: string, callback: { (decodedText): void }): void {
-        messageBgPage( 'decryptLink', { messageId: messageId }, (result) => {
-            callback( result.success ? result.value : "Can not decrypt" );
-        });
-    }
-
     // Takes a node and replaces all magic links with magic <span> elements
     function enchantNode(node: Node): void {
         var text: string,
@@ -267,7 +270,7 @@ var traverseNodes = (function(){
         memoryEl = parentEl.tagName == "A" ? parentEl.parentElement : parentEl;
         
         // Save the element value it its "memory" element, so it can be restored
-        if ( !memoryEl.classList.contains(init.config.pgpClassName) ) {
+        if ( memoryEl && !memoryEl.classList.contains(init.config.pgpClassName) ) {
             $data(memoryEl, init.config.pgpData, memoryEl.innerHTML)
             memoryEl.classList.add(init.config.pgpClassName);
         }
@@ -300,8 +303,14 @@ var traverseNodes = (function(){
             if (!messageId) return;
 
             count++;
-            decodeURL(messageId, (text) => {
-                element.innerHTML = text;
+            messageBgPage( 'decryptLink', { messageId: messageId }, (result) => {
+                if ( result.success ) {
+                    element.innerHTML = result.value;
+                    element.classList.add("__pgp_decrypted");
+                } else {
+                    element.innerText = "Can not decrypt";
+                    element.classList.add("__pgp_error");
+                }
                 count--;
                 if ( count <= 0) done();
             })
@@ -358,14 +367,16 @@ var traverseNodes = (function(){
             enchantNode(nodeList[i]);
         }
 
-        // Find all echanted elements and decode them. Then send a message to
-        // the current widow, which can be used for tests.
+        // Find all echanted elements and decode them. 
         decodeEnchanted(root, () => {
+            // Look for the public key class and bind onclick events
+            hotlinkPublicKeys(root);
+
+            // Send a 'decoding_complete' message to the window. Can be used
+            // for testing and such.
             window.postMessage('slp_done_decoding', document.location.href);
         });
 
-        // Look for the public key class and bind onclick events
-        hotlinkPublicKeys(root);
     }
 
     return traverseNodes;
