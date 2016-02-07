@@ -254,7 +254,7 @@ var traverseNodes = (function(){
 
         for (i = 0; i < els.length; i++) {
             var element = els[i];
-            if ( isInsideEditable(element) ) return;
+            if ( isInsideEditable(element) ) continue;
             if ( url = isMatchingA(element) ) {
                 element.innerText = url
             }
