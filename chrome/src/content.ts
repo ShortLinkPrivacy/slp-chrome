@@ -274,7 +274,7 @@ var traverseNodes = (function(){
     // Takes a node and replaces all magic links with magic <span> elements
     function enchantNode(node: Node): void {
         var text: string,
-            parentEl: HTMLElement;
+            parentEl, grandParentEl: HTMLElement;
 
         if ( node.nodeType != Node.TEXT_NODE ) return;
         if ( !node.parentElement ) return;
@@ -284,11 +284,24 @@ var traverseNodes = (function(){
         // We will be creating element, so we must stop the observer
         stopObserver();
 
-        // If the node is trapped in a link, then remove the link href
-        // attribute and add a resetting class
+        // If the node is trapped in a link, then try to replace the A element
+        // with a SPAN element. Sometimes that's not possible (Hangouts), so in
+        // this case we neuter the A element and reuse it as a container.
         if ( parentEl.tagName == "A" ) {
-            removeAllAttributes(<HTMLAnchorElement>parentEl);
-            parentEl.className = '__pgp_inherit';
+
+            // If the A element has a parent (in Hangouts it doesn't), then
+            // swap A with SPAN
+            if ( grandParentEl = parentEl.parentElement ) {
+                var span = document.createElement('span');
+                span.appendChild(node);
+                grandParentEl.replaceChild(span, parentEl);
+                parentEl = span;
+
+            // Otherwise, neuter the A element and give it a resetting class
+            } else {
+                removeAllAttributes(<HTMLAnchorElement>parentEl);
+                parentEl.className = '__pgp_inherit';
+            }
         }
 
         // Save the element value it its "memory" element, so it can be restored
