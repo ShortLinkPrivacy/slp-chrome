@@ -264,6 +264,9 @@ var traverseNodes = (function(){
         var text: string,
             parentEl, memoryEl: HTMLElement;
 
+        if ( node.nodeType != Node.TEXT_NODE ) return;
+        if ( !node.parentElement || !node.parentElement.parentElement ) return;
+
         parentEl = node.parentElement;
         memoryEl = parentEl.tagName == "A" ? parentEl.parentElement : parentEl;
         
@@ -280,6 +283,9 @@ var traverseNodes = (function(){
             parentEl = document.createElement('span');
             node = document.createTextNode(linkEl.innerText);
             parentEl.appendChild(node);
+            if ( !linkEl.parentElement ) {
+                debugger
+            }
             linkEl.parentElement.replaceChild(parentEl, linkEl);
         }
 
@@ -399,9 +405,14 @@ function eventObserver(): void {
     observer = new MutationObserver((mutationArray) => {
         mutationArray.forEach((mutation) => {
             for (var i = 0; i < mutation.addedNodes.length; i++) {
-                var node = mutation.addedNodes[i];
-                traverseNodes(<HTMLElement>node);
-                bindEditables(<HTMLElement>node);
+                var el = <HTMLElement>mutation.addedNodes[i];
+                
+                // Do not observe node that have been inserted by us
+                if (el.className && el.className.match(/__pgp/)) return;
+                console.log("Obeserved: ", el);
+
+                traverseNodes(el);
+                bindEditables(el);
             }
         });
     });
