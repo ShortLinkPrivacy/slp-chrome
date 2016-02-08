@@ -62,7 +62,7 @@ module AddressBookStore {
             });
         }
 
-        search(userId: Interfaces.UserID, callback: PublicKeySearchCallback): void {
+        search(searchTerm: string, callback: PublicKeySearchCallback): void {
             var result: PublicKeyArray = [],
                 getter: Array<string> = [],
                 userIdLower = userId.toLowerCase();

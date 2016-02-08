@@ -95,19 +95,24 @@ module AddressBookStore {
             });
         }
 
-        search(userId: Interfaces.UserID, callback: PublicKeySearchCallback): void {
-            var fingerprints: Array<Interfaces.Fingerprint> = [],
-                userIdLower = userId.toLowerCase();
+        search(searchTerm: Interfaces.UserID, callback: PublicKeySearchCallback): void {
+            var fingerprints: Array<Interfaces.Fingerprint> = [];
 
             this.initialize((db) => {
                 var request = db.transaction("ids", "readonly").objectStore("ids").openCursor();
 
                 request.onsuccess = ()=> {
-                    var cursor = request.result;
+                    var cursor = request.result,
+                        userId: string,
+                        fingerprint: string;
+
                     if (cursor) {
-                        var idLower = cursor.value.userId.toLowerCase();
-                        if (idLower.search(userIdLower) >= 0)
-                            fingerprints.push(cursor.value.fingerprint);
+                        userId = cursor.value.userId;
+                        fingerprint = cursor.value.fingerprint;
+                        if (userId.toLocaleLowerCase().search(searchTerm.toLocaleLowerCase()) >= 0 
+                            && fingerprints.indexOf(fingerprint) < 0) {
+                            fingerprints.push(fingerprint);
+                        }
                         cursor["continue"]();
                     } else {
                         this.load(fingerprints, callback);

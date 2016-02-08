@@ -24,7 +24,7 @@ module Admin {
 
             this.wait = true;
             bg.store.addressBook.search(this.filter, (keys) => {
-                this.foundKeys = keys.map((k) => { return new Keys.KeyItem(k) })
+                this.foundKeys = keys.map((k) => { return new Keys.KeyItem(k, this.filter) })
                 this.wait = false;
             });
         }

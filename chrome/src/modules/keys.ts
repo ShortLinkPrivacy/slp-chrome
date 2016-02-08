@@ -67,6 +67,25 @@ module Keys {
             return result.keys[0];
         }
 
+        // Some keys may have several userIds and only one of them is primary.
+        // When we search for a userId, we will find the key fingerprint, but
+        // then we need to know what we searched for, so we can display the
+        // matching userId.  Example: Stefan G. has a key with the following
+        // userIds: stefanguen@gmail.com, sge@ifnx.com.  We search for ifnx, we
+        // select Stefan. We want to see sge@ifnx.com in the selection box.
+        getMatchingUserId(searchTerm: string): Interfaces.UserID {
+            var i: number,
+                userIds = this.userIds();
+
+            for (i = 0; i < userIds.length; i++) {
+                var id = userIds[i];
+                if ( id.toLocaleLowerCase().search(searchTerm.toLocaleLowerCase()) >= 0 )
+                    return id;
+            }
+
+            return this.getPrimaryUser();
+        }
+
     }
 
     export class PublicKey extends Key {
@@ -116,10 +135,14 @@ module Keys {
         getPrimaryUser: { (): string };
         fingerprint: { (): Interfaces.Fingerprint };
 
-        constructor(k: Key) {
+        // The constructor will optionally take a searched term, which will
+        // be used to initialize the name to show for that key.
+        constructor(k: Key, searchedTerm?: string) {
             this.key = k;
             this.getPrimaryUser = function() {
-                return this.key.getPrimaryUser();
+                return searchedTerm
+                    ? this.key.getMatchingUserId(searchedTerm)
+                    : this.key.getPrimaryUser();
             }
             this.fingerprint = function() {
                 return this.key.fingerprint();

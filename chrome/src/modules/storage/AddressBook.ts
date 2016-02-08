@@ -31,7 +31,7 @@ module AddressBookStore {
     export interface Interface {
         save(key: Keys.PublicKey, callback: Interfaces.Callback): void;
         load(fingerprints: Array<Interfaces.Fingerprint>, callback: PublicKeySearchCallback): void;
-        search(userId: Interfaces.UserID, callback: PublicKeySearchCallback): void;
+        search(searchTerm: string, callback: PublicKeySearchCallback): void;
         deleteAll(callback: Interfaces.Callback): void;
         exportKeys(callback: ArmorArrayCallback): void;
         importKeys(keys: Array<Interfaces.Armor>, callback: Interfaces.Callback): void;
