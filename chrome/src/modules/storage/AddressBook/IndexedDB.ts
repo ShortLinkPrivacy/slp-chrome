@@ -108,7 +108,7 @@ module AddressBookStore {
                         var idLower = cursor.value.userId.toLowerCase();
                         if (idLower.search(userIdLower) >= 0)
                             fingerprints.push(cursor.value.fingerprint);
-                        cursor.continue();
+                        cursor["continue"]();
                     } else {
                         this.load(fingerprints, callback);
                     }
@@ -125,8 +125,8 @@ module AddressBookStore {
 
                 request.onsuccess = ()=> {
                     if ( cursor = request.result ) {
-                        cursor.delete().onsuccess = ()=>{
-                            cursor.continue();
+                        cursor["delete"]().onsuccess = ()=>{
+                            cursor["continue"]();
                         }
                     } else {
                         onsuccess();
