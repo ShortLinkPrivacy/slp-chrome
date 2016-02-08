@@ -276,6 +276,9 @@ var traverseNodes = (function(){
             memoryEl.classList.add(init.config.pgpClassName);
         }
 
+        // We will be creating element, so we must stop the observer
+        stopObserver();
+
         // If the node is trapped in a link, then break out of it, by replacing
         // the link node with a text node
         if ( parentEl.tagName == "A" ) {
@@ -283,15 +286,15 @@ var traverseNodes = (function(){
             parentEl = document.createElement('span');
             node = document.createTextNode(linkEl.innerText);
             parentEl.appendChild(node);
-            if ( !linkEl.parentElement ) {
-                debugger
-            }
             linkEl.parentElement.replaceChild(parentEl, linkEl);
         }
 
         // Replace all magic urls inside the link with magic <span> elements
         text = node.nodeValue.replace(urlReg, "<span class='" + init.config.pgpEnchanted + "' rel='$1'>Decrypting ...</span>");
         parentEl.innerHTML = text;
+
+        // Restart the observer
+        startObserver();
     }
 
     // Gathers a list of all enchanted elements and decodes them one by one
@@ -406,17 +409,21 @@ function eventObserver(): void {
         mutationArray.forEach((mutation) => {
             for (var i = 0; i < mutation.addedNodes.length; i++) {
                 var el = <HTMLElement>mutation.addedNodes[i];
-                
-                // Do not observe node that have been inserted by us
-                if (el.className && el.className.match(/__pgp/)) return;
-                console.log("Obeserved: ", el);
-
                 traverseNodes(el);
                 bindEditables(el);
             }
         });
     });
-    observer.observe(document, { childList: true, subtree: true });
+    startObserver();
+}
+
+function stopObserver() {
+    if ( observer ) observer.disconnect();
+}
+
+function startObserver() {
+    if ( observer )
+        observer.observe(document, { childList: true, subtree: true });
 }
 
 // Retrieves variables indicating the status of the background page, such as
@@ -486,7 +493,7 @@ function listenToMessages() {
             parentEl: HTMLElement,
             orgValue: string;
 
-        observer.disconnect()
+        stopObserver();
         getInitVars(() => {
             // getElementsByClassName returns a live collection, which will
             // change as the collection criteria changes. This is why we
@@ -499,7 +506,7 @@ function listenToMessages() {
                     $data(parentEl, init.config.pgpData, null);
                 }
             }
-            observer.observe(document, { childList: true, subtree: true });
+            startObserver();
         });
     }
 
@@ -563,9 +570,9 @@ getInitVars(() => {
     }
 
     if ( init.hasPrivateKey ) {
+        listenToMessages();
+        eventObserver();
         traverseNodes(document.body);
         bindEditables(document.body);
-        eventObserver();
-        listenToMessages();
     }
 })
