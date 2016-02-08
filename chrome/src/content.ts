@@ -195,7 +195,7 @@ var hotlinkPublicKeys = (function() {
             // Add no-style class to the paren element, which is
             // the echanted span container.
             if ( el.parentElement ) {
-                el.parentElement.classList.add('__pgp_no_style')
+                el.parentElement.classList.add('__pgp_neutral')
             }
 
             // Add click binding only if the 'added-already' class is not set
@@ -259,34 +259,42 @@ var traverseNodes = (function(){
         }
     }
 
+    // Remove all attributes from an anchor element
+    function removeAllAttributes(el: HTMLAnchorElement): void {
+        var i: number, name: string;
+
+        if ( el.tagName != 'A' ) return;
+
+        for (i = el.attributes.length - 1; i >= 0; i--) {
+            name = el.attributes.item(i).name;
+            el.removeAttribute(name);
+        }
+    }
+
     // Takes a node and replaces all magic links with magic <span> elements
     function enchantNode(node: Node): void {
         var text: string,
-            parentEl, memoryEl: HTMLElement;
+            parentEl: HTMLElement;
 
         if ( node.nodeType != Node.TEXT_NODE ) return;
-        if ( !node.parentElement || !node.parentElement.parentElement ) return;
+        if ( !node.parentElement ) return;
 
         parentEl = node.parentElement;
-        memoryEl = parentEl.tagName == "A" ? parentEl.parentElement : parentEl;
         
-        // Save the element value it its "memory" element, so it can be restored
-        if ( memoryEl && !memoryEl.classList.contains(init.config.pgpClassName) ) {
-            $data(memoryEl, init.config.pgpData, memoryEl.innerHTML)
-            memoryEl.classList.add(init.config.pgpClassName);
-        }
-
         // We will be creating element, so we must stop the observer
         stopObserver();
 
-        // If the node is trapped in a link, then break out of it, by replacing
-        // the link node with a text node
+        // If the node is trapped in a link, then remove the link href
+        // attribute and add a resetting class
         if ( parentEl.tagName == "A" ) {
-            var linkEl = parentEl;
-            parentEl = document.createElement('span');
-            node = document.createTextNode(linkEl.innerText);
-            parentEl.appendChild(node);
-            linkEl.parentElement.replaceChild(parentEl, linkEl);
+            removeAllAttributes(<HTMLAnchorElement>parentEl);
+            parentEl.className = '__pgp_inherit';
+        }
+
+        // Save the element value it its "memory" element, so it can be restored
+        if ( !parentEl.classList.contains(init.config.pgpClassName) ) {
+            $data(parentEl, init.config.pgpData, parentEl.innerHTML);
+            parentEl.classList.add(init.config.pgpClassName);
         }
 
         // Replace all magic urls inside the link with magic <span> elements
