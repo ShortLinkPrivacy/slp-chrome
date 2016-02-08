@@ -289,19 +289,17 @@ var traverseNodes = (function(){
         // this case we neuter the A element and reuse it as a container.
         if ( parentEl.tagName == "A" ) {
 
-            // If the A element has a parent (in Hangouts it doesn't), then
-            // swap A with SPAN
-            if ( grandParentEl = parentEl.parentElement ) {
+            if ( window.location.host == 'hangouts.google.com') {
+                removeAllAttributes(<HTMLAnchorElement>parentEl);
+                parentEl.className = '__pgp_inherit';
+            } else {
+                grandParentEl = parentEl.parentElement;
                 var span = document.createElement('span');
                 span.appendChild(node);
                 grandParentEl.replaceChild(span, parentEl);
                 parentEl = span;
-
-            // Otherwise, neuter the A element and give it a resetting class
-            } else {
-                removeAllAttributes(<HTMLAnchorElement>parentEl);
-                parentEl.className = '__pgp_inherit';
             }
+
         }
 
         // Save the element value it its "memory" element, so it can be restored
