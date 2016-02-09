@@ -85,14 +85,12 @@ function makePublicKeyText(armor: Interfaces.Armor, messageId: string, callback:
     var key = new Keys.PublicKey(armor),
         username = key.getPrimaryUser(),
         classList: Array<string>,
-        icon: string,
         html: string;
 
-    //icon = '<img src="' + chrome.runtime.getURL('/images/pubkey.png') + '">';
     classList = [config.pgpPK];
 
-    store.addressBook.search(username, (keys) => {
-        if ( keys.length ) classList.push(config.pgpPKAdded);
+    store.addressBook.loadSingle(key.fingerprint(), (found) => {
+        if ( found ) classList.push(config.pgpPKAdded);
         html = "<span class='" + classList.join(' ') + "' rel='" + messageId + "'>" + username + "</span>";
         callback(html);
     });
