@@ -1,8 +1,9 @@
 browser
 ==================================
 - show "please wait" when the private key is being unlocked
-- do not allow anything unless there is an active editable
+- do not allow anything unless there is an active editable (SEE IF YOU CAN MOVE BROWSER ACTION TO PAGE ACTION)
 - if the key looked up has multiple user ids, they all show in the drowpdown as the primary id
+- add message expiration. Expire messages.
 
 content
 ==================================
