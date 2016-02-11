@@ -74,14 +74,8 @@ class Editable {
 
     private bindEvents(): void {
         var eventHandler = function() {
-            messageBgPage('setActiveElement', {
-                frameId: this.frameId,
-                elementId: this.element.id
-            });
-
-            messageBgPage('updateContextMenu', { 
-                properties: { enabled: this.okToUseLast() } 
-            });
+            this.setAsActive();
+            this.updateContextMenu();
         }.bind(this);
 
         // Change listeners
@@ -97,13 +91,30 @@ class Editable {
         })
     }
 
+    // Tells if it's OK to encrypt for the last recepient
+    // TODO: pull urlRe condition into a function and use .match
     private okToUseLast(): boolean {
-        return this.getText()
-            && !urlRe.exec(this.getText())
-            && this.lastKeysUsed 
-            && this.lastKeysUsed.length > 0 
+        return this.getText()                   // there is text
+            && !urlRe.exec(this.getText())      // and it's not a magic url
+            && this.lastKeysUsed                // and this has been encrypted before
+            && this.lastKeysUsed.length > 0     // with at least one key
                 ? true 
                 : false
+    }
+
+    // Set this editable as the active one for this tab
+    setAsActive(): void {
+        messageBgPage('setActiveElement', {
+            frameId: this.frameId,
+            elementId: this.element.id
+        });
+    }
+
+    // Update the context menu based on the contents of the editable
+    updateContextMenu(): void {
+        messageBgPage('updateContextMenu', { 
+            properties: { enabled: this.okToUseLast() } 
+        });
     }
 
     // Encrypt the editable with the last keys used
@@ -414,12 +425,16 @@ function bindEditables(root: HTMLElement): void {
 
     var editables = root.querySelectorAll("[contenteditable='true']"),
         textareas = root.getElementsByTagName('textarea'),
-        i: number;
+        i: number,
+        last: Editable;
 
-    for (i = 0; i < editables.length; i++) 
-        new Editable(<HTMLElement>editables[i]);
     for (i = 0; i < textareas.length; i++) 
-        new Editable(<HTMLElement>textareas[i]);
+        last = new Editable(<HTMLElement>textareas[i]);
+    for (i = 0; i < editables.length; i++) 
+        last = new Editable(<HTMLElement>editables[i]);
+
+    // Set the last one found as the active one
+    last.setAsActive();
 }
 
 // Observe for new nodes
@@ -485,9 +500,13 @@ function listenToMessages() {
     // Set the active element and mark it as encrypted
     // ------------------------------------------------------------
     var setElementText = function(msg: ContentMessage, sendResponse) {
-        if (!editable) return;
+        if (!editable) {
+            sendResponse({ success: false });
+            return;
+        };
         editable.setText(msg.setElementText);
         editable.lastKeysUsed = msg.lastKeysUsed;
+        sendResponse({ success: true });
     }
 
     // Restore the original text of the textarea

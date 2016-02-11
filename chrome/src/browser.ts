@@ -226,8 +226,13 @@ class App {
         bg.encryptMessage(this.clearText, keyList, (result) => {
             this.wait = false;
             if ( result.success ) {
-                sendElementMessage({ setElementText: result.value, lastKeysUsed: fingerprintList });
-                window.close();
+                sendElementMessage({ setElementText: result.value, lastKeysUsed: fingerprintList }, (result) => {
+                    if ( result.success ) {
+                        window.close();
+                    } else {
+                        this.error = "No input field was found on the page";
+                    }
+                });
             } else {
                 this.error = result.error;
             }
