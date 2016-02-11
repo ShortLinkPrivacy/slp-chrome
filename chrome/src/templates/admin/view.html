@@ -14,17 +14,13 @@
   <div rv-hide="showAdvanced">
     <p>You are ready to receive encrypted messages. You can share your public key
     with your friends via a short link, using the "Share My Public Key" button in
-    the browser popup, as shown below. </p>
-    <div style="text-align: center;">
-      <img src="images/key_share.png">
-    </div>
+    the browser popup. </p>
     <div class="well">
       <button href="#" class="pure-button button-small" rv-on-click="toggleShowKey">Advanced key view ...</button>
     </div>
   </div>
   <div rv-show="showAdvanced">
     <a href="#" class="pure-button button-small" rv-on-click="toggleTypeKey" rv-text="toggleTypeText < showPublic"></a>
-    <a href="#" class="pure-button button-small copy" data-clipboard-target="#armored" rv-show="showPublic">copy to clipboard</a>
     <a href="#/key/remove" class="pure-button button-small button-error pull-right">Remove</a>
     <pre id="armored" rv-text="armored < showPublic"></pre>
   </div>

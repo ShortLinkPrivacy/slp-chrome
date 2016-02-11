@@ -1,9 +1,11 @@
 browser
 ==================================
 - show "please wait" when the private key is being unlocked
-- do not allow anything unless there is an active editable (SEE IF YOU CAN MOVE BROWSER ACTION TO PAGE ACTION)
+- do not allow anything unless there is an active editable 
+- when there is no text in the editable, show "No text entered" with a link "Add text" that shows the text box. This way the focus will be on "Share pub key" button
 - if the key looked up has multiple user ids, they all show in the drowpdown as the primary id
 - add message expiration. Expire messages.
+- BUG: backspace deletes a bead with the last letter of the text
 
 content
 ==================================

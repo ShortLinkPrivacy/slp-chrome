@@ -1,27 +1,27 @@
 
 // Main
-@mainBg: #EFECCA;
+@mainBg: #F3F5F8;
 @mainWidth: 360px;
 @mainHeight: 300px;
 
-// Logo
-@logoBg: #8e2800;
-@logoFg: #fff;
-@logoBorder: 6px solid #DBAC00;
-
 // Menu
 @menuHeight: 20px;
-@menuBg: #A7A37E;
+@menuBg: #b9c9ed;
 @menuFg: #333;
 @menuHover: #fff;
+
+// Logo
+@logoBg: @menuBg;
+@logoFg: @menuFg;
+@logoBorder: none;
 
 // Article
 @articlePadding: 10px;
 @articleHeight: @mainHeight - @menuHeight - @articlePadding * 2;
 
 // Select
-@selectBg: #0078e7;
-@selectFg: #fff;
+@selectBg: #ADC6FF;
+@selectFg: #002070;
 
 // Beads
 @beadBg: #ADC6FF;
@@ -149,7 +149,9 @@ nav {
   background-color: @menuBg;
 
   .logo {
+    font-size: 115%;
     text-decoration: none;
+    font-variant: small-caps;
     color: @logoFg;
     background-color: @logoBg;
     padding: 0 5px;
@@ -172,6 +174,7 @@ nav {
       color: @menuFg;
       padding: 0 5px;
       margin-right: 3px;
+      font-variant: small-caps;
 
       &:hover {
         color: @menuHover;
