@@ -92,14 +92,16 @@ class Editable {
     }
 
     // Tells if it's OK to encrypt for the last recepient
-    // TODO: pull urlRe condition into a function and use .match
     private okToUseLast(): boolean {
-        return this.getText()                   // there is text
-            && !urlRe.exec(this.getText())      // and it's not a magic url
+        return !this.isAlreadyEncrypted()       // it's not already encrypted
             && this.lastKeysUsed                // and this has been encrypted before
             && this.lastKeysUsed.length > 0     // with at least one key
                 ? true 
                 : false
+    }
+
+    isAlreadyEncrypted(): boolean {
+        return this.getText() && this.getText().match(urlRe) ? true : false;
     }
 
     // Set this editable as the active one for this tab
