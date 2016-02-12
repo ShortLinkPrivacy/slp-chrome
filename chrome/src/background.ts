@@ -282,8 +282,6 @@ store.preferences.load(() => {
     store.privateKey.get((pk) => {
         if ( pk ) {
             privateKey = pk;
-        } else {
-            // TODO: ??
         }
     });
 });
