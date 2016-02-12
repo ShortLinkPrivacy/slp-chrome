@@ -11,8 +11,9 @@ var observer: MutationObserver;
 var urlRe: RegExp,
     urlReg: RegExp;
 
-// Connection port for messages to background
-var port: chrome.runtime.Port;
+// Has anything been done on this tab slp-wise. Used to determine if the tab
+// needs to get refreshed after upgrade
+var hasWorkDone: boolean;
 
 // Generator of element IDs
 function idGenerator (prefix: string) {
@@ -93,15 +94,17 @@ class Editable {
 
     // Tells if it's OK to encrypt for the last recepient
     private okToUseLast(): boolean {
-        return !this.isAlreadyEncrypted()       // it's not already encrypted
-            && this.lastKeysUsed                // and this has been encrypted before
-            && this.lastKeysUsed.length > 0     // with at least one key
-                ? true 
-                : false
+        return this.hasLastKeysUsed() && !this.isAlreadyEncrypted();
     }
 
+    // Does the editable contain a magic url?
     isAlreadyEncrypted(): boolean {
         return this.getText() && this.getText().match(urlRe) ? true : false;
+    }
+
+    // Do we have the last keys used to encrypt?
+    hasLastKeysUsed(): boolean {
+        return this.lastKeysUsed && this.lastKeysUsed.length > 0 ? true : false;
     }
 
     // Set this editable as the active one for this tab
@@ -393,6 +396,9 @@ var traverseNodes = (function(){
         // If no nodes found, return
         if (nodeList.length == 0) return;
 
+        // Found something to decrypt in the page, mark hasWorkDone
+        hasWorkDone = true;
+
         // If the private key has not been unlocked, then add a notification
         // and return
         if ( !init.isDecrypted ) {
@@ -436,7 +442,10 @@ function bindEditables(root: HTMLElement): void {
         last = new Editable(<HTMLElement>editables[i]);
 
     // Set the last one found as the active one
-    last.setAsActive();
+    if ( last ) {
+        last.setAsActive();
+        hasWorkDone = true;
+    }
 }
 
 // Observe for new nodes
@@ -485,6 +494,7 @@ function $data(el: HTMLElement, name: string, value?: any): any {
 }
 
 // Listen for messages from the extension
+// TODO: maybe convert it to class, like background
 function listenToMessages() {
 
     var editable: Editable;
@@ -520,6 +530,8 @@ function listenToMessages() {
     }
 
 
+    // Encrypt using the last used keys
+    // ------------------------------------------------------------
     var encryptLast = function(msg: ContentMessage, sendResponse) {
         if (!editable) return;
         editable.encryptLast();
