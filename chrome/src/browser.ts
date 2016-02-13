@@ -59,6 +59,29 @@ function encryptPublicKey(callback: Interfaces.SuccessCallback): void {
     });
 }
 
+module Components {
+    export class Expiration {
+        value: number;
+        show: boolean;
+
+        constructor(data: { value: number }) {
+            this.value = data.value;
+            this.show = false;
+        }
+
+        toggle(e: Event): void {
+            e.preventDefault();
+            this.show = !this.show;
+        }
+
+        change(e: Event): void {
+            if ( this.value == 0 ) {
+                this.show = false;
+            }
+        }
+    }
+}
+
 /*
  * The main application handles all articles, bit it itself
  * also handles the private key password entry screen.
@@ -79,7 +102,7 @@ class App {
     hasSelectedKeys: BoolFunc;
     hasFoundKeys: BoolFunc;
     alreadyEncrypted: boolean;
-    expirationShown: boolean;
+    expiration: number;
 
     filter: string;
     foundKeys: Array<Keys.KeyItem> = [];
@@ -88,6 +111,8 @@ class App {
 
     constructor() {
         this.filter = "";
+
+        this.expiration = 0;
 
         this.hasPrivateKey = function() {
             return bg.privateKey ? true : false;
@@ -304,11 +329,6 @@ class App {
         })
     }
 
-    toggleExpiration(e: MouseEvent): void {
-        e.preventDefault();
-        this.expirationShown = !this.expirationShown;
-    }
-
     //---------------------------------------------------------------------------
     // Go to the settings page
     //---------------------------------------------------------------------------
@@ -322,9 +342,19 @@ class App {
     run(): void {
         rivets.configure({
             handler: function(target, ev, binding) {
-                this.call(app, ev, binding.view.models)
+                this.call(binding.model, ev, binding.view.models)
             }
         });
+
+        rivets.components['expiration'] = {
+            template: () => {
+                return document.getElementById('rvt-expiration').innerHTML
+            },
+            initialize: (el: HTMLElement, data) => {
+                return new Components.Expiration(data)
+            }
+        };
+
         rivets.bind(document.body, this);
 
         if (this.isDecrypted() == false) {

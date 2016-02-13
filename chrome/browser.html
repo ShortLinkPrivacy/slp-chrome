@@ -15,6 +15,23 @@
     <!-- Code -->
     <script src="src/modules.js"></script>
     <script src="src/browser.js"></script>
+
+    <!-- Components -->
+    <script type="text/rivets" id="rvt-expiration">
+      <span class="expiration">
+        <a rv-on-click="toggle" rv-hide="show">expiration</a>
+        <small rv-show="show">
+          <select rv-value="value" rv-on-change="change">
+            <option value="3600">1 hour</option>
+            <option value="86400">1 day</option>
+            <option value="604800">7 day</option>
+            <option value="2592000">30 days</option>
+            <option value="0">no expiration</option>
+          </select>
+        </small>
+      </span>
+    </script>
+
   </head>
   <body>
     <div id="container">
@@ -57,18 +74,7 @@
               <span rv-show="clearText">
                 <span rv-show="hasSelectedKeys < selectedKeys">
                   <button class="button" rv-disabled="wait" rv-on-click="sendMessage">Encrypt Message <span rv-show="wait"><i class="icon-spin5"></i></span></button>
-                  <span class="expiration">
-                    <a rv-on-click="toggleExpiration" rv-hide="expirationShown">expiration</a>
-                    <small rv-show="expirationShown">
-                      <select rv-value="expiration">
-                        <option value="3600">1 hour</option>
-                        <option value="84600">1 day</option>
-                        <option value="">7 day</option>
-                        <option value="">30 days</option>
-                        <option value="0">no expiration</option>
-                      </select>
-                    </small>
-                  </span>
+                  <expiration value="expiration"></expiration>
                 </span>
               </span>
               <span rv-hide="clearText">
