@@ -17,7 +17,7 @@
     <script src="src/browser.js"></script>
 
     <!-- Components -->
-    <script type="text/rivets" id="rvt-expiration">
+    <script type="text/template" id="exp-tmpl">
       <span class="expiration">
         <a rv-on-click="toggle" rv-hide="show">expiration</a>
         <small rv-show="show">
@@ -30,6 +30,17 @@
           </select>
         </small>
       </span>
+    </script>
+
+    <script type="text/template" id="rcp-tmpl">
+      <label for="filter">Recepients:</label>
+      <ul class="selected-keys" rv-on-click="focus">
+        <li class="bead" rv-each-key="data.keys"><div class="name">{ key.getPrimaryUser }</div><div class="remove" rv-on-click="remove">✖</div></li>
+        <li><input id="ftr" class="filter" rv-value="filter" rv-on-keyup="search"></li>
+      </ul>
+      <ul class="found-keys" rv-show="hasFound < found">
+        <li rv-on-click="add" rv-each-key="found"><span>{ key.getPrimaryUser }</span></li>
+      </ul>
     </script>
 
   </head>
@@ -61,14 +72,7 @@
               <textarea rv-value="clearText"></textarea>
             </div>
             <div rv-show="clearText">
-              <label for="filter">Recepients:</label>
-              <ul class="selected-keys" rv-on-click="focusFilter">
-                <li class="bead" rv-each-key="selectedKeys"><div class="name">{ key.getPrimaryUser }</div><div class="remove" rv-on-click="removePublicKey">✖</div></li>
-                <li><input id="ftr" class="filter" rv-value="filter" rv-on-keyup="doFilter"></li>
-              </ul>
-              <ul class="found-keys" rv-show="hasFoundKeys < foundKeys">
-                <li rv-on-click="addPublicKey" rv-each-key="foundKeys"><span>{ key.getPrimaryUser }</span></li>
-              </ul>
+              <recepients keys="selectedKeys"></recepients>
             </div><!-- clearText -->
             <div class="bottom">
               <span rv-show="clearText">

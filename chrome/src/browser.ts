@@ -80,6 +80,90 @@ module Components {
             }
         }
     }
+
+    export class Recepients {
+        data: { keys: Array<Keys.KeyItem> };
+        found: Array<Keys.KeyItem>;
+        filter: string;
+        hasFound: BoolFunc;
+        add: any;
+        remove: any;
+
+        constructor(data: { keys: Array<Keys.KeyItem> }) {
+            this.data = data;
+            this.found = [];
+            this.hasFound = function() {
+                return this.found.length > 0
+            };
+            this.add = function(e: Event, model: {index: number}) {
+                var item = this.found[model.index];
+                if ( this.isSelected(item) == false ) {
+                    this.data.keys.push(item);
+                }
+                this.filter = "";
+                this.found= [];
+            }.bind(this)
+
+            this.remove = function(e: Event, model: {index: number}) {
+                this.data.keys.splice(model.index, 1);
+            }.bind(this)
+        }
+        
+        // Checks if 'key' is already in the 'selectedKeys' array
+        private isSelected(item: Keys.KeyItem): boolean {
+            var i: number;
+            for (i = 0; i < this.data.keys.length; i++) {
+                var testItem = this.data.keys[i];
+                if ( item.key.fingerprint() == testItem.key.fingerprint())
+                    return true;
+            }
+
+            return false;
+        }
+
+        focus(e: MouseEvent): void {
+            e.preventDefault();
+            e.stopPropagation();
+            var el = <HTMLInputElement>document.getElementById('ftr');
+            el.focus();
+        }
+
+        search(e: KeyboardEvent): void {
+
+            // Backspace removes the last added key if the filter is empty
+            if ( e.keyCode == 8 && !this.filter ) {
+                this.data.keys.pop();
+                return;
+            }
+
+            if ( !this.filter ) {
+                this.found= [];
+                return;
+            }
+
+            bg.store.addressBook.search(this.filter, (keys) => {
+                this.found= keys.map( k => { 
+                    return new Keys.KeyItem(k, this.filter) 
+                });
+            });
+        }
+
+        /*
+        add(e: Event, model: {index: number}) {
+            var item = this.found[model.index];
+            if ( this.isSelected(item) == false ) {
+                this.data.keys.push(item);
+            }
+            this.filter = "";
+            this.found= [];
+        }
+
+        remove(e: Event, model: {index: number}) {
+            this.data.keys.splice(model.index, 1);
+        }
+        */
+
+    }
 }
 
 /*
@@ -100,18 +184,13 @@ class App {
     hasPrivateKey: BoolFunc;
     isDecrypted: BoolFunc;
     hasSelectedKeys: BoolFunc;
-    hasFoundKeys: BoolFunc;
     alreadyEncrypted: boolean;
     expiration: number;
 
-    filter: string;
-    foundKeys: Array<Keys.KeyItem> = [];
     selectedKeys: Array<Keys.KeyItem> = [];
     clearText: string;
 
     constructor() {
-        this.filter = "";
-
         this.expiration = 0;
 
         this.hasPrivateKey = function() {
@@ -124,10 +203,6 @@ class App {
 
         this.hasSelectedKeys = function() {
             return this.selectedKeys.length > 0
-        };
-
-        this.hasFoundKeys = function() {
-            return this.foundKeys.length > 0
         };
 
         chrome.tabs.query({ active: true }, (tabs) => {
@@ -162,67 +237,6 @@ class App {
                 });
             }
         });
-    }
-
-    //---------------------------------------------------------------------------
-    // Execute the search for public keys
-    //---------------------------------------------------------------------------
-    doFilter(e: KeyboardEvent): void {
-
-        // Backspace removes the last added key if the filter is empty
-        if ( e.keyCode == 8 && !this.filter ) {
-            this.selectedKeys.pop();
-            return;
-        }
-
-        if ( !this.filter ) {
-            this.foundKeys = [];
-            return;
-        }
-
-        bg.store.addressBook.search(this.filter, (keys) => {
-            this.foundKeys = keys.map( k => { 
-                return new Keys.KeyItem(k, this.filter) 
-            });
-        });
-    }
-
-    focusFilter(e: MouseEvent): void {
-        e.preventDefault();
-        e.stopPropagation();
-        var el = <HTMLInputElement>document.getElementById('ftr');
-        el.focus();
-    }
-
-    // Checks if 'key' is already in the 'selectedKeys' array
-    private isSelected(item: Keys.KeyItem): boolean {
-        var i: number;
-        for (i = 0; i < this.selectedKeys.length; i++) {
-            var testItem = this.selectedKeys[i];
-            if ( item.key.fingerprint() == testItem.key.fingerprint())
-                return true;
-        }
-
-        return false;
-    }
-
-    //---------------------------------------------------------------------------
-    // Add the clicked key to the list of selected keys
-    //---------------------------------------------------------------------------
-    addPublicKey(e: Event, model: {index: number}) {
-        var item = this.foundKeys[model.index];
-        if ( this.isSelected(item) == false ) {
-            this.selectedKeys.push(item);
-        }
-        this.filter = "";
-        this.foundKeys = [];
-    }
-
-    //---------------------------------------------------------------------------
-    // Remove the clicked key from the list of selected keys
-    //---------------------------------------------------------------------------
-    removePublicKey(e: Event, model: {index: number}) {
-        this.selectedKeys.splice(model.index, 1);
     }
 
     //---------------------------------------------------------------------------
@@ -346,15 +360,6 @@ class App {
             }
         });
 
-        rivets.components['expiration'] = {
-            template: () => {
-                return document.getElementById('rvt-expiration').innerHTML
-            },
-            initialize: (el: HTMLElement, data) => {
-                return new Components.Expiration(data)
-            }
-        };
-
         rivets.bind(document.body, this);
 
         if (this.isDecrypted() == false) {
@@ -363,7 +368,50 @@ class App {
     }
 }
 
+function loadComponents() {
+    var expEl = document.getElementById('exp-tmpl'),
+        rcpEl = document.getElementById('rcp-tmpl');
+
+    rivets.components['expiration'] = {
+        template: function() {
+            return expEl.innerHTML;
+        },
+        initialize: function(el, data) {
+            return new Components.Expiration(data);
+        }
+    };
+
+    rivets.components['recepients'] = {
+        template: function() {
+            return rcpEl.innerHTML;
+        },
+        initialize: function(el, data) {
+            return new Components.Recepients(data);
+        }
+    };
+}
+
+/*
+function loadComponents() {
+    var tmpls = document.querySelectorAll('script[type="text/rivets"]'),
+        i: number;
+
+    for (i = 0; i < tmpls.length; i++) {
+        var el = <HTMLElement>tmpls[i],
+            html = el.innerHTML,
+            name = el.getAttribute('data-name'),
+            clss = el.getAttribute('data-class');
+
+        rivets.components[name] = {
+            template: () => { return html },
+            initialize: (el, data) => { return new Components[clss](data) }
+        }
+    }
+}
+*/
+
 window.onload = function() {
+    loadComponents();
     app = window["app"] = new App();
     app.run();
 };
