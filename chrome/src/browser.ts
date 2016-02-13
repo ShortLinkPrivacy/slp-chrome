@@ -79,6 +79,7 @@ class App {
     hasSelectedKeys: BoolFunc;
     hasFoundKeys: BoolFunc;
     alreadyEncrypted: boolean;
+    expirationShown: boolean;
 
     filter: string;
     foundKeys: Array<Keys.KeyItem> = [];
@@ -86,7 +87,7 @@ class App {
     clearText: string;
 
     constructor() {
-        this.filter = ""; // TODO - last used
+        this.filter = "";
 
         this.hasPrivateKey = function() {
             return bg.privateKey ? true : false;
@@ -301,6 +302,11 @@ class App {
                 this.error = result.error;
             }
         })
+    }
+
+    toggleExpiration(e: MouseEvent): void {
+        e.preventDefault();
+        this.expirationShown = !this.expirationShown;
     }
 
     //---------------------------------------------------------------------------
