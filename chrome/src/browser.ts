@@ -16,6 +16,10 @@ interface ElementMessage {
     lastKeysUsed?: Array<Interfaces.Fingerprint>;
 }
 
+interface BoolFunc {
+    (): boolean;
+}
+
 //---------------------------------------------------------------------------
 // Sends messages to the active element in the content script of the current tab
 //---------------------------------------------------------------------------
@@ -59,121 +63,108 @@ function encryptPublicKey(callback: Interfaces.SuccessCallback): void {
     });
 }
 
-module Components {
-    export class Expiration {
-        value: number;
-        show: boolean;
 
-        constructor(data: { value: number }) {
-            this.value = data.value;
+class Expiration {
+    value: number;
+    show: boolean;
+
+    constructor(data: { value: number }) {
+        this.value = data.value;
+        this.show = false;
+    }
+
+    toggle(e: Event): void {
+        e.preventDefault();
+        this.show = !this.show;
+    }
+
+    change(e: Event): void {
+        if ( this.value == 0 ) {
             this.show = false;
         }
+    }
+}
 
-        toggle(e: Event): void {
-            e.preventDefault();
-            this.show = !this.show;
+class Recepients {
+    data: { keys: Keys.KeyItemList };
+    found: Keys.KeyItemList;
+    filter: string;
+    hasFound: BoolFunc;
+    add: Function;
+    remove: Function;
+
+    constructor(data: { keys: Keys.KeyItemList }) {
+        this.data = data;
+        this.found = [];
+
+        this.hasFound = function() {
+            return this.found.length > 0
+        };
+
+        // These two must be bound to this, because they are
+        // invoked from within a loop, and the model gets lost
+        this.add = this._add.bind(this);
+        this.remove = this._remove.bind(this);
+    }
+    
+    // Checks if 'item' is already selected
+    private isSelected(item: Keys.KeyItem): boolean {
+        var i: number;
+        for (i = 0; i < this.data.keys.length; i++) {
+            var testItem = this.data.keys[i];
+            if ( item.key.fingerprint() == testItem.key.fingerprint())
+                return true;
         }
 
-        change(e: Event): void {
-            if ( this.value == 0 ) {
-                this.show = false;
-            }
-        }
+        return false;
     }
 
-    export class Recepients {
-        data: { keys: Array<Keys.KeyItem> };
-        found: Array<Keys.KeyItem>;
-        filter: string;
-        hasFound: BoolFunc;
-        add: any;
-        remove: any;
-
-        constructor(data: { keys: Array<Keys.KeyItem> }) {
-            this.data = data;
-            this.found = [];
-            this.hasFound = function() {
-                return this.found.length > 0
-            };
-            this.add = function(e: Event, model: {index: number}) {
-                var item = this.found[model.index];
-                if ( this.isSelected(item) == false ) {
-                    this.data.keys.push(item);
-                }
-                this.filter = "";
-                this.found= [];
-            }.bind(this)
-
-            this.remove = function(e: Event, model: {index: number}) {
-                this.data.keys.splice(model.index, 1);
-            }.bind(this)
+    _add(e: Event, model: {index: number}) {
+        var item = this.found[model.index];
+        if ( this.isSelected(item) == false ) {
+            this.data.keys.push(item);
         }
-        
-        // Checks if 'key' is already in the 'selectedKeys' array
-        private isSelected(item: Keys.KeyItem): boolean {
-            var i: number;
-            for (i = 0; i < this.data.keys.length; i++) {
-                var testItem = this.data.keys[i];
-                if ( item.key.fingerprint() == testItem.key.fingerprint())
-                    return true;
-            }
+        this.filter = "";
+        this.found= [];
+    }
 
-            return false;
+    _remove(e: Event, model: {index: number}) {
+        this.data.keys.splice(model.index, 1);
+    }
+
+    focus(e: MouseEvent): void {
+        e.preventDefault();
+        e.stopPropagation();
+        var el = <HTMLInputElement>document.getElementById('ftr');
+        el.focus();
+    }
+
+    search(e: KeyboardEvent): void {
+
+        // Backspace removes the last added key if the filter is empty
+        if ( e.keyCode == 8 && !this.filter ) {
+            this.data.keys.pop();
+            return;
         }
 
-        focus(e: MouseEvent): void {
-            e.preventDefault();
-            e.stopPropagation();
-            var el = <HTMLInputElement>document.getElementById('ftr');
-            el.focus();
-        }
-
-        search(e: KeyboardEvent): void {
-
-            // Backspace removes the last added key if the filter is empty
-            if ( e.keyCode == 8 && !this.filter ) {
-                this.data.keys.pop();
-                return;
-            }
-
-            if ( !this.filter ) {
-                this.found= [];
-                return;
-            }
-
-            bg.store.addressBook.search(this.filter, (keys) => {
-                this.found= keys.map( k => { 
-                    return new Keys.KeyItem(k, this.filter) 
-                });
-            });
-        }
-
-        /*
-        add(e: Event, model: {index: number}) {
-            var item = this.found[model.index];
-            if ( this.isSelected(item) == false ) {
-                this.data.keys.push(item);
-            }
-            this.filter = "";
+        if ( !this.filter ) {
             this.found= [];
+            return;
         }
 
-        remove(e: Event, model: {index: number}) {
-            this.data.keys.splice(model.index, 1);
-        }
-        */
-
+        bg.store.addressBook.search(this.filter, (keys) => {
+            this.found= keys.map( k => { 
+                return new Keys.KeyItem(k, this.filter) 
+            });
+        });
     }
+
 }
 
 /*
  * The main application handles all articles, bit it itself
  * also handles the private key password entry screen.
  */
-
-interface BoolFunc {
-    (): boolean;
-}
 
 class App {
 
@@ -377,7 +368,7 @@ function loadComponents() {
             return expEl.innerHTML;
         },
         initialize: function(el, data) {
-            return new Components.Expiration(data);
+            return new Expiration(data);
         }
     };
 
@@ -386,7 +377,7 @@ function loadComponents() {
             return rcpEl.innerHTML;
         },
         initialize: function(el, data) {
-            return new Components.Recepients(data);
+            return new Recepients(data);
         }
     };
 }
