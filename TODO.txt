@@ -4,6 +4,7 @@ browser
 - when there is no text in the editable, show "No text entered" with a link "Add text" that shows the text box. This way the focus will be on "Share pub key" button
 - add message expiration. Expire messages.
 - BUG: backspace deletes a bead with the last letter of the text
+- BUG: special symbols like '\' in the filter result in error "Uncaught SyntaxError: Invalid regular expression: /\/: \ at end of pattern"
 
 content
 ==================================
