@@ -57,7 +57,7 @@
     <script type="text/template" data-name="recepients" data-class="Recepients">
       <label for="filter">Recepients:</label>
       <ul class="selected-keys" rv-on-click="focus">
-        <li class="bead" rv-each-item="data.items"><div class="name">{ item.getPrimaryUser }</div><div class="remove" rv-on-click="remove">✖</div></li>
+        <li class="bead" rv-each-item="selected"><div class="name">{ item.getPrimaryUser }</div><div class="remove" rv-on-click="remove">✖</div></li>
         <li><input id="ftr" class="filter" rv-value="filter" rv-on-keyup="search"></li>
       </ul>
       <ul class="found-keys" rv-show="hasFound < found">
@@ -91,7 +91,7 @@
           <div rv-hide="alreadyEncrypted">
             <textinput value="clearText"></textinput>
             <div rv-show="clearText">
-              <recepients items="selectedKeys"></recepients>
+              <recepients selected-keys="selectedKeys"></recepients>
             </div><!-- clearText -->
             <div class="bottom">
               <span rv-show="clearText">

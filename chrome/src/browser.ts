@@ -119,15 +119,15 @@ module Components {
     }
 
     export class Recepients {
-        data: { items: Keys.KeyItemList };
+        selected: Keys.KeyItemList;
         found: Keys.KeyItemList;
         filter: string;
         hasFound: BoolFunc;
         add: Function;
         remove: Function;
 
-        constructor(data: { items: Keys.KeyItemList }) {
-            this.data = data;
+        constructor(data: { selectedKeys: Keys.KeyItemList }) {
+            this.selected = data.selectedKeys;
             this.found = [];
 
             this.hasFound = function() {
@@ -143,8 +143,8 @@ module Components {
         // Checks if 'item' is already selected
         private isSelected(item: Keys.KeyItem): boolean {
             var i: number;
-            for (i = 0; i < this.data.items.length; i++) {
-                var testItem = this.data.items[i];
+            for (i = 0; i < this.selected.length; i++) {
+                var testItem = this.selected[i];
                 if ( item.key.fingerprint() == testItem.key.fingerprint())
                     return true;
             }
@@ -155,14 +155,14 @@ module Components {
         _add(e: Event, model: {index: number}) {
             var item = this.found[model.index];
             if ( this.isSelected(item) == false ) {
-                this.data.items.push(item);
+                this.selected.push(item);
             }
             this.filter = "";
             this.found= [];
         }
 
         _remove(e: Event, model: {index: number}) {
-            this.data.items.splice(model.index, 1);
+            this.selected.splice(model.index, 1);
         }
 
         focus(e: MouseEvent): void {
@@ -176,7 +176,7 @@ module Components {
 
             // Backspace removes the last added key if the filter is empty
             if ( e.keyCode == 8 && !this.filter ) {
-                this.data.items.pop();
+                this.selected.pop();
                 return;
             }
 
@@ -387,7 +387,9 @@ function loadComponents(): void {
 
         rivets.components[name] = {
             template: function() { return el.innerHTML },
-            initialize: function(el, data) { return new Components[func](data) }
+            initialize: function(el, data) { 
+                return new Components[func](data)
+            }
         };
     })
 }
