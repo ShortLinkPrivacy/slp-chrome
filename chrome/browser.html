@@ -17,6 +17,27 @@
     <script src="src/browser.js"></script>
 
     <!-- Components -->
+    <script type="text/template" id="txt-tmpl">
+      <div class="clear-text">
+        <div rv-show="visible">
+          <label>Message:</label>
+          <textarea id="clear-text" rv-value="value"></textarea>
+        </div>
+        <div rv-hide="visible">
+          <h1 class="center">No text detected</h1>
+          <p>
+            There is no text entered anywhere on the page to be encrypted.
+            Press the "Enter Text" button to type your message here, or press
+            the "Share My Public Key" to send a short link of your public key.
+          </p>
+          <div class="center">
+            <button rv-on-click="show" class="button">Enter Text</button>
+            <button rv-on-click="sendPublicKey" rv-disabled="wait" class="button">Share My Public Key <span rv-show="wait"><i class="icon-spin5"></i></span></button>
+          </div>
+        </div>
+      </div>
+    </script>
+
     <script type="text/template" id="exp-tmpl">
       <span class="expiration">
         <a rv-on-click="toggle" rv-hide="show">expiration</a>
@@ -35,11 +56,11 @@
     <script type="text/template" id="rcp-tmpl">
       <label for="filter">Recepients:</label>
       <ul class="selected-keys" rv-on-click="focus">
-        <li class="bead" rv-each-key="data.keys"><div class="name">{ key.getPrimaryUser }</div><div class="remove" rv-on-click="remove">✖</div></li>
+        <li class="bead" rv-each-item="data.items"><div class="name">{ item.getPrimaryUser }</div><div class="remove" rv-on-click="remove">✖</div></li>
         <li><input id="ftr" class="filter" rv-value="filter" rv-on-keyup="search"></li>
       </ul>
       <ul class="found-keys" rv-show="hasFound < found">
-        <li rv-on-click="add" rv-each-key="found"><span>{ key.getPrimaryUser }</span></li>
+        <li rv-on-click="add" rv-each-item="found"><span>{ item.getPrimaryUser }</span></li>
       </ul>
     </script>
 
@@ -67,12 +88,9 @@
 
         <article rv-show="isDecrypted">
           <div rv-hide="alreadyEncrypted">
-            <div class="clear-text">
-              <label>Text:</label>
-              <textarea rv-value="clearText"></textarea>
-            </div>
+            <textinput value="clearText"></textinput>
             <div rv-show="clearText">
-              <recepients keys="selectedKeys"></recepients>
+              <recepients items="selectedKeys"></recepients>
             </div><!-- clearText -->
             <div class="bottom">
               <span rv-show="clearText">
@@ -80,9 +98,6 @@
                   <button class="button" rv-disabled="wait" rv-on-click="sendMessage">Encrypt Message <span rv-show="wait"><i class="icon-spin5"></i></span></button>
                   <expiration value="expiration"></expiration>
                 </span>
-              </span>
-              <span rv-hide="clearText">
-                <button rv-on-click="sendPublicKey" rv-disabled="wait" class="button">Share My Public Key <span rv-show="wait"><i class="icon-spin5"></i></span></button>
               </span>
             </div><!-- .bottom -->
           </div><!-- !alreadyEncrypted -->

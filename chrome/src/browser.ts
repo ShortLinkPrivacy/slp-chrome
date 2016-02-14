@@ -63,6 +63,35 @@ function encryptPublicKey(callback: Interfaces.SuccessCallback): void {
     });
 }
 
+class TextInput {
+    value: string;
+    visible: boolean;
+    wait: boolean;
+
+    constructor(data: { value: string }) {
+        this.value = data.value;
+        this.visible = this.value ? true : false;
+        this.wait = false;
+    }
+
+    show(): void {
+        this.visible = true;
+        document.getElementById('clear-text').focus();
+    }
+
+    sendPublicKey(): void {
+        this.wait = true;
+        encryptPublicKey((result) => {
+            this.wait = false;
+            if ( result.success ) {
+                sendElementMessage({ setElementText: result.value });
+                window.close();
+            } else {
+                app.error = result.error;
+            }
+        })
+    }
+}
 
 class Expiration {
     value: number;
@@ -86,14 +115,14 @@ class Expiration {
 }
 
 class Recepients {
-    data: { keys: Keys.KeyItemList };
+    data: { items: Keys.KeyItemList };
     found: Keys.KeyItemList;
     filter: string;
     hasFound: BoolFunc;
     add: Function;
     remove: Function;
 
-    constructor(data: { keys: Keys.KeyItemList }) {
+    constructor(data: { items: Keys.KeyItemList }) {
         this.data = data;
         this.found = [];
 
@@ -110,8 +139,8 @@ class Recepients {
     // Checks if 'item' is already selected
     private isSelected(item: Keys.KeyItem): boolean {
         var i: number;
-        for (i = 0; i < this.data.keys.length; i++) {
-            var testItem = this.data.keys[i];
+        for (i = 0; i < this.data.items.length; i++) {
+            var testItem = this.data.items[i];
             if ( item.key.fingerprint() == testItem.key.fingerprint())
                 return true;
         }
@@ -122,14 +151,14 @@ class Recepients {
     _add(e: Event, model: {index: number}) {
         var item = this.found[model.index];
         if ( this.isSelected(item) == false ) {
-            this.data.keys.push(item);
+            this.data.items.push(item);
         }
         this.filter = "";
         this.found= [];
     }
 
     _remove(e: Event, model: {index: number}) {
-        this.data.keys.splice(model.index, 1);
+        this.data.items.splice(model.index, 1);
     }
 
     focus(e: MouseEvent): void {
@@ -143,7 +172,7 @@ class Recepients {
 
         // Backspace removes the last added key if the filter is empty
         if ( e.keyCode == 8 && !this.filter ) {
-            this.data.keys.pop();
+            this.data.items.pop();
             return;
         }
 
@@ -319,22 +348,6 @@ class App {
     }
 
     //---------------------------------------------------------------------------
-    // Encrypt own private key and pastes the url to the textarea
-    //---------------------------------------------------------------------------
-    sendPublicKey(): void {
-        this.wait = true;
-        encryptPublicKey((result) => {
-            this.wait = false;
-            if ( result.success ) {
-                sendElementMessage({ setElementText: result.value });
-                window.close();
-            } else {
-                this.error = result.error;
-            }
-        })
-    }
-
-    //---------------------------------------------------------------------------
     // Go to the settings page
     //---------------------------------------------------------------------------
     goSettings(e: MouseEvent): void {
@@ -359,47 +372,27 @@ class App {
     }
 }
 
-function loadComponents() {
-    var expEl = document.getElementById('exp-tmpl'),
-        rcpEl = document.getElementById('rcp-tmpl');
-
-    rivets.components['expiration'] = {
-        template: function() {
-            return expEl.innerHTML;
-        },
-        initialize: function(el, data) {
-            return new Expiration(data);
-        }
-    };
-
-    rivets.components['recepients'] = {
-        template: function() {
-            return rcpEl.innerHTML;
-        },
-        initialize: function(el, data) {
-            return new Recepients(data);
-        }
-    };
-}
-
-/*
-function loadComponents() {
-    var tmpls = document.querySelectorAll('script[type="text/rivets"]'),
-        i: number;
-
-    for (i = 0; i < tmpls.length; i++) {
-        var el = <HTMLElement>tmpls[i],
-            html = el.innerHTML,
-            name = el.getAttribute('data-name'),
-            clss = el.getAttribute('data-class');
-
-        rivets.components[name] = {
-            template: () => { return html },
-            initialize: (el, data) => { return new Components[clss](data) }
-        }
+function loadComponents(): void {
+    interface CompRec {
+        name: string;
+        tmpl: string;
+        func: any;
     }
+
+    var components: Array<CompRec> = [
+        { name: 'textinput',  tmpl: 'txt-tmpl', func: TextInput },
+        { name: 'expiration', tmpl: 'exp-tmpl', func: Expiration },
+        { name: 'recepients', tmpl: 'rcp-tmpl', func: Recepients },
+    ];
+
+    components.forEach((comp: CompRec) => {
+        var el: HTMLElement = document.getElementById(comp.tmpl);
+        rivets.components[comp.name] = {
+            template: function() { return el.innerHTML },
+            initialize: function(el, data) { return new comp.func(data) }
+        };
+    })
 }
-*/
 
 window.onload = function() {
     loadComponents();
