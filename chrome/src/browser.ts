@@ -66,17 +66,20 @@ function encryptPublicKey(callback: Interfaces.SuccessCallback): void {
 module Components {
     export class TextInput {
         value: string;
-        visible: boolean;
+        forceShow: boolean;
         wait: boolean;
+        visible: BoolFunc;
 
         constructor(data: { value: string }) {
             this.value = data.value;
-            this.visible = this.value ? true : false;
             this.wait = false;
+            this.visible = function(): boolean {
+                return this.value || this.forceShow;
+            }
         }
 
         show(): void {
-            this.visible = true;
+            this.forceShow = true;
             document.getElementById('clear-text').focus();
         }
 

@@ -19,14 +19,14 @@
     <!-- Components -->
     <script type="text/template" data-name="textinput" data-class="TextInput">
       <div class="clear-text">
-        <div rv-show="visible">
+        <div rv-show="visible < value forceShow">
           <label>Message:</label>
           <textarea id="clear-text" rv-value="value"></textarea>
         </div>
-        <div rv-hide="visible">
+        <div rv-hide="visible < value forceShow">
           <h1 class="center">No text detected</h1>
           <p>
-            There is no text entered anywhere on the page to be encrypted.
+            No text was typed anywhere on the page and we don't know what to encrypt.
             Press the "Enter Text" button to type your message here, or press
             the "Share My Public Key" to send a short link of your public key.
           </p>
@@ -43,9 +43,10 @@
         <a rv-on-click="toggle" rv-hide="show">expiration</a>
         <small rv-show="show">
           <select rv-value="value" rv-on-change="change">
+            <option value="600">10 minutes</option>
             <option value="3600">1 hour</option>
             <option value="86400">1 day</option>
-            <option value="604800">7 day</option>
+            <option value="604800">7 days</option>
             <option value="2592000">30 days</option>
             <option value="0">no expiration</option>
           </select>
