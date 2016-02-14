@@ -17,7 +17,7 @@
     <script src="src/browser.js"></script>
 
     <!-- Components -->
-    <script type="text/template" id="txt-tmpl">
+    <script type="text/template" data-name="textinput" data-class="TextInput">
       <div class="clear-text">
         <div rv-show="visible">
           <label>Message:</label>
@@ -38,7 +38,7 @@
       </div>
     </script>
 
-    <script type="text/template" id="exp-tmpl">
+    <script type="text/template" data-name="expiration" data-class="Expiration">
       <span class="expiration">
         <a rv-on-click="toggle" rv-hide="show">expiration</a>
         <small rv-show="show">
@@ -53,7 +53,7 @@
       </span>
     </script>
 
-    <script type="text/template" id="rcp-tmpl">
+    <script type="text/template" data-name="recepients" data-class="Recepients">
       <label for="filter">Recepients:</label>
       <ul class="selected-keys" rv-on-click="focus">
         <li class="bead" rv-each-item="data.items"><div class="name">{ item.getPrimaryUser }</div><div class="remove" rv-on-click="remove">✖</div></li>

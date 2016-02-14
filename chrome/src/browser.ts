@@ -63,132 +63,135 @@ function encryptPublicKey(callback: Interfaces.SuccessCallback): void {
     });
 }
 
-class TextInput {
-    value: string;
-    visible: boolean;
-    wait: boolean;
+module Components {
+    export class TextInput {
+        value: string;
+        visible: boolean;
+        wait: boolean;
 
-    constructor(data: { value: string }) {
-        this.value = data.value;
-        this.visible = this.value ? true : false;
-        this.wait = false;
-    }
-
-    show(): void {
-        this.visible = true;
-        document.getElementById('clear-text').focus();
-    }
-
-    sendPublicKey(): void {
-        this.wait = true;
-        encryptPublicKey((result) => {
+        constructor(data: { value: string }) {
+            this.value = data.value;
+            this.visible = this.value ? true : false;
             this.wait = false;
-            if ( result.success ) {
-                sendElementMessage({ setElementText: result.value });
-                window.close();
-            } else {
-                app.error = result.error;
-            }
-        })
-    }
-}
+        }
 
-class Expiration {
-    value: number;
-    show: boolean;
+        show(): void {
+            this.visible = true;
+            document.getElementById('clear-text').focus();
+        }
 
-    constructor(data: { value: number }) {
-        this.value = data.value;
-        this.show = false;
-    }
-
-    toggle(e: Event): void {
-        e.preventDefault();
-        this.show = !this.show;
+        sendPublicKey(): void {
+            this.wait = true;
+            encryptPublicKey((result) => {
+                this.wait = false;
+                if ( result.success ) {
+                    sendElementMessage({ setElementText: result.value });
+                    window.close();
+                } else {
+                    app.error = result.error;
+                }
+            })
+        }
     }
 
-    change(e: Event): void {
-        if ( this.value == 0 ) {
+    export class Expiration {
+        value: number;
+        show: boolean;
+
+        constructor(data: { value: number }) {
+            this.value = data.value;
             this.show = false;
         }
-    }
-}
 
-class Recepients {
-    data: { items: Keys.KeyItemList };
-    found: Keys.KeyItemList;
-    filter: string;
-    hasFound: BoolFunc;
-    add: Function;
-    remove: Function;
-
-    constructor(data: { items: Keys.KeyItemList }) {
-        this.data = data;
-        this.found = [];
-
-        this.hasFound = function() {
-            return this.found.length > 0
-        };
-
-        // These two must be bound to this, because they are
-        // invoked from within a loop, and the model gets lost
-        this.add = this._add.bind(this);
-        this.remove = this._remove.bind(this);
-    }
-    
-    // Checks if 'item' is already selected
-    private isSelected(item: Keys.KeyItem): boolean {
-        var i: number;
-        for (i = 0; i < this.data.items.length; i++) {
-            var testItem = this.data.items[i];
-            if ( item.key.fingerprint() == testItem.key.fingerprint())
-                return true;
+        toggle(e: Event): void {
+            e.preventDefault();
+            this.show = !this.show;
         }
 
-        return false;
-    }
-
-    _add(e: Event, model: {index: number}) {
-        var item = this.found[model.index];
-        if ( this.isSelected(item) == false ) {
-            this.data.items.push(item);
+        change(e: Event): void {
+            if ( this.value == 0 ) {
+                this.show = false;
+            }
         }
-        this.filter = "";
-        this.found= [];
     }
 
-    _remove(e: Event, model: {index: number}) {
-        this.data.items.splice(model.index, 1);
-    }
+    export class Recepients {
+        data: { items: Keys.KeyItemList };
+        found: Keys.KeyItemList;
+        filter: string;
+        hasFound: BoolFunc;
+        add: Function;
+        remove: Function;
 
-    focus(e: MouseEvent): void {
-        e.preventDefault();
-        e.stopPropagation();
-        var el = <HTMLInputElement>document.getElementById('ftr');
-        el.focus();
-    }
+        constructor(data: { items: Keys.KeyItemList }) {
+            this.data = data;
+            this.found = [];
 
-    search(e: KeyboardEvent): void {
+            this.hasFound = function() {
+                return this.found.length > 0
+            };
 
-        // Backspace removes the last added key if the filter is empty
-        if ( e.keyCode == 8 && !this.filter ) {
-            this.data.items.pop();
-            return;
+            // These two must be bound to this, because they are
+            // invoked from within a loop, and the model gets lost
+            this.add = this._add.bind(this);
+            this.remove = this._remove.bind(this);
+        }
+        
+        // Checks if 'item' is already selected
+        private isSelected(item: Keys.KeyItem): boolean {
+            var i: number;
+            for (i = 0; i < this.data.items.length; i++) {
+                var testItem = this.data.items[i];
+                if ( item.key.fingerprint() == testItem.key.fingerprint())
+                    return true;
+            }
+
+            return false;
         }
 
-        if ( !this.filter ) {
+        _add(e: Event, model: {index: number}) {
+            var item = this.found[model.index];
+            if ( this.isSelected(item) == false ) {
+                this.data.items.push(item);
+            }
+            this.filter = "";
             this.found= [];
-            return;
         }
 
-        bg.store.addressBook.search(this.filter, (keys) => {
-            this.found= keys.map( k => { 
-                return new Keys.KeyItem(k, this.filter) 
-            });
-        });
-    }
+        _remove(e: Event, model: {index: number}) {
+            this.data.items.splice(model.index, 1);
+        }
 
+        focus(e: MouseEvent): void {
+            e.preventDefault();
+            e.stopPropagation();
+            var el = <HTMLInputElement>document.getElementById('ftr');
+            el.focus();
+        }
+
+        search(e: KeyboardEvent): void {
+
+            // Backspace removes the last added key if the filter is empty
+            if ( e.keyCode == 8 && !this.filter ) {
+                this.data.items.pop();
+                return;
+            }
+
+            if ( !this.filter ) {
+                this.found= [];
+                return;
+            }
+
+            bg.store.addressBook.search(this.filter, (keys) => {
+                this.found= keys.map( k => { 
+                    return new Keys.KeyItem(k, this.filter) 
+                });
+            });
+        }
+
+    }
 }
+
 
 /*
  * The main application handles all articles, bit it itself
@@ -373,23 +376,15 @@ class App {
 }
 
 function loadComponents(): void {
-    interface CompRec {
-        name: string;
-        tmpl: string;
-        func: any;
-    }
+    var els = document.querySelectorAll('script[type="text/template"]');
 
-    var components: Array<CompRec> = [
-        { name: 'textinput',  tmpl: 'txt-tmpl', func: TextInput },
-        { name: 'expiration', tmpl: 'exp-tmpl', func: Expiration },
-        { name: 'recepients', tmpl: 'rcp-tmpl', func: Recepients },
-    ];
+    [].forEach.call(els, (el: HTMLElement) => {
+        var name = el.getAttribute('data-name'),
+            func = el.getAttribute('data-class');
 
-    components.forEach((comp: CompRec) => {
-        var el: HTMLElement = document.getElementById(comp.tmpl);
-        rivets.components[comp.name] = {
+        rivets.components[name] = {
             template: function() { return el.innerHTML },
-            initialize: function(el, data) { return new comp.func(data) }
+            initialize: function(el, data) { return new Components[func](data) }
         };
     })
 }
