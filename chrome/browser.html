@@ -85,13 +85,13 @@
                 <li class="bead" rv-each-item="recepients.selected"><div class="name">{ item.getPrimaryUser }</div><div class="remove" rv-on-click="recepients.removeFromSelected">✖</div></li>
                 <li><input id="ftr" class="filter" rv-value="recepients.filter" rv-on-keyup="recepients.search"></li>
               </ul>
-              <ul class="found-keys" rv-show="recepients.hasFound < recepients.found">
+              <ul class="found-keys" rv-show="recepients.hasFound < found">
                 <li rv-on-click="recepients.moveToSelected" rv-each-item="recepients.found"><span>{ item.getPrimaryUser }</span></li>
               </ul>
             </div><!-- clearText -->
             <div class="bottom">
               <span rv-show="clearText">
-                <span rv-show="recepients.hasSelected < recepients.selected">
+                <span rv-show="recepients.hasSelected < selected">
                   <button class="button" rv-disabled="wait" rv-on-click="sendMessage">Encrypt Message <span rv-show="wait"><i class="icon-spin5"></i></span></button>
                   <expiration value="expiration"></expiration>
                 </span>
