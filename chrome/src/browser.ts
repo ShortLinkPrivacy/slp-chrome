@@ -118,83 +118,89 @@ module Components {
         }
     }
 
-    export class Recepients {
-        selected: Keys.KeyItemList;
-        found: Keys.KeyItemList;
-        filter: string;
-        hasFound: BoolFunc;
-        add: Function;
-        remove: Function;
-
-        constructor(data: { selectedKeys: Keys.KeyItemList }) {
-            this.selected = data.selectedKeys;
-            this.found = [];
-
-            this.hasFound = function() {
-                return this.found.length > 0
-            };
-
-            // These two must be bound to this, because they are
-            // invoked from within a loop, and the model gets lost
-            this.add = this._add.bind(this);
-            this.remove = this._remove.bind(this);
-        }
-        
-        // Checks if 'item' is already selected
-        private isSelected(item: Keys.KeyItem): boolean {
-            var i: number;
-            for (i = 0; i < this.selected.length; i++) {
-                var testItem = this.selected[i];
-                if ( item.key.fingerprint() == testItem.key.fingerprint())
-                    return true;
-            }
-
-            return false;
-        }
-
-        _add(e: Event, model: {index: number}) {
-            var item = this.found[model.index];
-            if ( this.isSelected(item) == false ) {
-                this.selected.push(item);
-            }
-            this.filter = "";
-            this.found= [];
-        }
-
-        _remove(e: Event, model: {index: number}) {
-            this.selected.splice(model.index, 1);
-        }
-
-        focus(e: MouseEvent): void {
-            e.preventDefault();
-            e.stopPropagation();
-            var el = <HTMLInputElement>document.getElementById('ftr');
-            el.focus();
-        }
-
-        search(e: KeyboardEvent): void {
-
-            // Backspace removes the last added key if the filter is empty
-            if ( e.keyCode == 8 && !this.filter ) {
-                this.selected.pop();
-                return;
-            }
-
-            if ( !this.filter ) {
-                this.found= [];
-                return;
-            }
-
-            bg.store.addressBook.search(this.filter, (keys) => {
-                this.found= keys.map( k => { 
-                    return new Keys.KeyItem(k, this.filter) 
-                });
-            });
-        }
-
-    }
 }
 
+
+class Recepients {
+    found: Keys.KeyItemList;
+    selected: Keys.KeyItemList;
+    filter: string;
+    hasFound: BoolFunc;
+    hasSelected: BoolFunc;
+
+    constructor(selected: Keys.KeyItemList) {
+        this.found = [];
+        this.selected = [];
+        this.hasFound = function() {
+            return this.found.length > 0
+        };
+        this.hasSelected = function() {
+            return this.selected.length > 0
+        };
+    }
+
+    // Checks if 'item' is already selected
+    private isSelected(item: Keys.KeyItem): boolean {
+        var i: number;
+        for (i = 0; i < this.selected.length; i++) {
+            var testItem = this.selected[i];
+            if ( item.key.fingerprint() == testItem.key.fingerprint())
+                return true;
+        }
+
+        return false;
+    }
+
+    setFromKeys(list: Array<Keys.PublicKey>): void {
+        this.selected = list.map( k => {
+            return new Keys.KeyItem(k)
+        });
+    }
+
+    forEach(func: { (item: Keys.KeyItem): void }): void {
+        this.selected.forEach(func);
+    }
+
+    moveToSelected(e: Event, model: {index: number}) {
+        var item = this.found[model.index];
+        if ( this.isSelected(item) == false ) {
+            this.selected.push(item);
+        }
+        this.filter = "";
+        this.found= [];
+    }
+
+    removeFromSelected(e: Event, model: {index: number}) {
+        this.selected.splice(model.index, 1);
+    }
+
+    focus(e: MouseEvent): void {
+        e.preventDefault();
+        e.stopPropagation();
+        var el = <HTMLInputElement>document.getElementById('ftr');
+        el.focus();
+    }
+
+    search(e: KeyboardEvent): void {
+
+        // Backspace removes the last added key if the filter is empty
+        if ( e.keyCode == 8 && !this.filter ) {
+            this.selected.pop();
+            return;
+        }
+
+        if ( !this.filter ) {
+            this.found = [];
+            return;
+        }
+
+        bg.store.addressBook.search(this.filter, (keys) => {
+            this.found = keys.map( k => { 
+                return new Keys.KeyItem(k, this.filter) 
+            });
+        });
+    }
+}
 
 /*
  * The main application handles all articles, bit it itself
@@ -209,15 +215,15 @@ class App {
 
     hasPrivateKey: BoolFunc;
     isDecrypted: BoolFunc;
-    hasSelectedKeys: BoolFunc;
     alreadyEncrypted: boolean;
     expiration: number;
 
-    selectedKeys: Array<Keys.KeyItem> = [];
+    recepients: Recepients;
     clearText: string;
 
     constructor() {
         this.expiration = 0;
+        this.recepients = new Recepients([]);
 
         this.hasPrivateKey = function() {
             return bg.privateKey ? true : false;
@@ -226,10 +232,6 @@ class App {
         this.isDecrypted = function() {
             return this.hasPrivateKey() ? bg.privateKey.isDecrypted() : false;
         }
-
-        this.hasSelectedKeys = function() {
-            return this.selectedKeys.length > 0
-        };
 
         chrome.tabs.query({ active: true }, (tabs) => {
             tab = tabs[0];
@@ -257,9 +259,7 @@ class App {
             // keys
             if ( lastKeysUsed.length ) {
                 bg.store.addressBook.load(lastKeysUsed, (keys) => {
-                    this.selectedKeys = keys.map( k => {
-                        return new Keys.KeyItem(k)
-                    });
+                    this.recepients.setFromKeys(keys);
                 });
             }
         });
@@ -274,16 +274,15 @@ class App {
             i: number;
 
         // This should never happen because we don't show the submit button
-        if (this.hasSelectedKeys() == false) return;
+        if (this.recepients.hasSelected() == false) return;
 
         // Collect a list of keys and fingerprints. The keys are used to encrypt
         // the message, and the fingerprints are saved in the editable so they
         // can be reused again with a shortcut
-        for (i = 0; i < this.selectedKeys.length; i++) {
-            var item = this.selectedKeys[i];
+        this.recepients.forEach((item) => {
             keyList.push(item.key.openpgpKey());
             fingerprintList.push(item.key.fingerprint());
-        }
+        })
 
         // Also push our own key, so we can read our own message
         keyList.push(bg.privateKey.key.toPublic());
