@@ -24,14 +24,13 @@
           <textarea id="clear-text" rv-value="value"></textarea>
         </div>
         <div rv-hide="visible < value forceShow">
-          <h1 class="center">No text detected</h1>
-          <p>
-            No text was typed anywhere on the page and we don't know what to encrypt.
-            Press the "Enter Text" button to type your message here, or press
-            the "Share My Public Key" to send a short link of your public key.
+          <h3 class="center">What do you want to do?</h3>
+          <p class="weak">
+            No typed text was found anywhere on the page, and we don't know what to encrypt.
+            You can either type your message here, or you can send a short link of your public key.
           </p>
           <div class="center">
-            <button rv-on-click="show" class="button">Enter Text</button>
+            <button rv-on-click="show" class="button">Type a Message</button>
             <button rv-on-click="sendPublicKey" rv-disabled="wait" class="button">Share My Public Key <span rv-show="wait"><i class="icon-spin5"></i></span></button>
           </div>
         </div>

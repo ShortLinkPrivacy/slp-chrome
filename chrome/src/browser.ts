@@ -121,6 +121,10 @@ module Components {
 }
 
 
+/* 
+ * Receprents can not be a Rivets component, because it is not fully self
+ * contained. Its attributes leak out into other parts of the browser.html page
+ */
 class Recepients {
     found: Keys.KeyItemList;
     selected: Keys.KeyItemList;
@@ -398,4 +402,3 @@ window.onload = function() {
     app = window["app"] = new App();
     app.run();
 };
-
