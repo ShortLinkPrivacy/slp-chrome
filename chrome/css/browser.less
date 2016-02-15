@@ -188,6 +188,18 @@ nav {
   }
 }
 
+.expiration {
+  a {
+    cursor: pointer;
+    color: @menuFg;
+    border-bottom: 1px dashed @menuFg;
+    &:hover {
+      color: lighten(@menuFg, 30%);
+      border-bottom: 1px dashed lighten(@menuFg, 30%);
+    }
+  }
+}
+
 // Address book tab
 article {
   position: relative;
