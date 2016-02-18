@@ -23,7 +23,7 @@ module Messages {
     };
 
     // Armored message class
-    class Armored {
+    export class Armored {
         data: ArmorType;
 
         constructor(data: ArmorType) {
