@@ -4,6 +4,10 @@ declare var exports: { [index: string]: any };
 
 module Keys {
 
+    export type UserId = string;
+    export type Fingerprint = string;
+    export type Armor = string;
+
     export class KeyError extends Error {
         code: string;
         data: any;
@@ -18,13 +22,13 @@ module Keys {
     export class Key {
         key: openpgp.key.Key;
 
-        fingerprint: { (): Interfaces.Fingerprint };
-        userIds: { (): Array<Interfaces.UserID> };
-        getPrimaryUser: { (): Interfaces.UserID };
-        armored: { (): Interfaces.Armor };
+        fingerprint: { (): Fingerprint };
+        userIds: { (): Array<UserId> };
+        getPrimaryUser: { (): UserId };
+        armored: { (): Armor };
         openpgpKey: { (): openpgp.key.Key };
 
-        constructor(armoredText: Interfaces.Armor) {
+        constructor(armoredText: Armor) {
             if (!armoredText) {
                 throw new KeyError('missing');
             }
@@ -34,16 +38,16 @@ module Keys {
             // All of these must be bound to the object, so Rivets
             // can add its magic to them.
 
-            this.fingerprint = function(): Interfaces.Armor {
+            this.fingerprint = function(): Fingerprint {
                 return this.key.primaryKey.getFingerprint();
             };
-            this.userIds = function(): Array<Interfaces.UserID> {
+            this.userIds = function(): Array<UserId> {
                 return this.key.getUserIds();
             };
-            this.getPrimaryUser = function(): Interfaces.UserID {
+            this.getPrimaryUser = function(): UserId {
                 return this.userIds()[0];
             };
-            this.armored = function(): Interfaces.Armor {
+            this.armored = function(): Armor {
                 return this.key.armor();
             };
             this.openpgpKey = function(): openpgp.key.Key {
@@ -51,7 +55,7 @@ module Keys {
             }
         }
 
-        fromArmored(armoredText: Interfaces.Armor): openpgp.key.Key {
+        fromArmored(armoredText: Armor): openpgp.key.Key {
             var result: openpgp.key.KeyResult;
 
             result = openpgp.key.readArmored(<string>armoredText);
@@ -73,7 +77,7 @@ module Keys {
         // matching userId.  Example: Stefan G. has a key with the following
         // userIds: stefanguen@gmail.com, sge@ifnx.com.  We search for ifnx, we
         // select Stefan. We want to see sge@ifnx.com in the selection box.
-        getMatchingUserId(searchTerm: string): Interfaces.UserID {
+        getMatchingUserId(searchTerm: string): UserId {
             var i: number,
                 userIds = this.userIds();
 
@@ -89,7 +93,7 @@ module Keys {
     }
 
     export class PublicKey extends Key {
-        constructor(armoredText: Interfaces.Armor) {
+        constructor(armoredText: Armor) {
             super(armoredText);
             if (!this.key.isPublic()) {
                 throw "key.not_public";
@@ -100,7 +104,7 @@ module Keys {
     export class PrivateKey extends Key {
         private _isDecrypted: boolean;
 
-        constructor(armoredText: Interfaces.Armor) {
+        constructor(armoredText: Armor) {
             super(armoredText);
             if (!this.key.isPrivate()) {
                 throw "key.not_private";
@@ -132,8 +136,8 @@ module Keys {
     // keys.
     export class KeyItem {
         key: Key;
-        getPrimaryUser: { (): string };
-        fingerprint: { (): Interfaces.Fingerprint };
+        getPrimaryUser: { (): UserId };
+        fingerprint: { (): Fingerprint };
 
         // The constructor will optionally take a searched term, which will
         // be used to initialize the name to show for that key.

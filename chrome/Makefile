@@ -37,6 +37,7 @@ modules:
 	src/modules/config.ts \
 	src/modules/interfaces.ts \
 	src/modules/keys.ts \
+	src/modules/messages.ts \
 	src/modules/storage.ts \
 	src/modules/preferences.ts \
 	src/modules/storage/AddressBook/IndexedDB.ts \

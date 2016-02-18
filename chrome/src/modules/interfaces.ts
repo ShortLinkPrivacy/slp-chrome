@@ -1,9 +1,5 @@
 module Interfaces {
 
-    export interface Armor extends String {}
-    export interface UserID extends String {}
-    export interface Fingerprint extends String {}
-
     export interface Dictionary extends Object {
         [index: string]: any;
     }

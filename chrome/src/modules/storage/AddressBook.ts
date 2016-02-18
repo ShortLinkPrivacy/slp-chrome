@@ -25,17 +25,17 @@ module AddressBookStore {
     }
 
     export interface ArmorArrayCallback {
-        (armorArr: Array<Interfaces.Armor>): void;
+        (armorArr: Array<Keys.Armor>): void;
     }
 
     export interface Interface {
         save(key: Keys.PublicKey, callback: Interfaces.Callback): void;
-        loadSingle(fingerprint: Interfaces.Fingerprint, callback: PublicKeyCallback): void;
-        load(fingerprints: Array<Interfaces.Fingerprint>, callback: PublicKeySearchCallback): void;
+        loadSingle(fingerprint: Keys.Fingerprint, callback: PublicKeyCallback): void;
+        load(fingerprints: Array<Keys.Fingerprint>, callback: PublicKeySearchCallback): void;
         search(searchTerm: string, callback: PublicKeySearchCallback): void;
         deleteAll(callback: Interfaces.Callback): void;
         exportKeys(callback: ArmorArrayCallback): void;
-        importKeys(keys: Array<Interfaces.Armor>, callback: Interfaces.Callback): void;
+        importKeys(keys: Array<Keys.Armor>, callback: Interfaces.Callback): void;
     }
 
 }

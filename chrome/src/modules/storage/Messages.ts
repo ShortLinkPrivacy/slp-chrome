@@ -13,7 +13,7 @@ module MessageStore {
     }
 
     export interface MessageArmoredStruct extends ResultStatus {
-        armor?: Interfaces.Armor;
+        armor?: Messages.Armor;
     }
 
     // Callback interface for the function that returns the private key
@@ -27,7 +27,7 @@ module MessageStore {
 
     // Anyone implementing settings should implements this
     export interface Interface {
-        save(armor: Interfaces.Armor, callback: MessageIdCallback): void;
+        save(armor: Messages.Armor, callback: MessageIdCallback): void;
         load(id: string, callback: MessageArmoredCallback): void;
 
         // Get the URL from an id
