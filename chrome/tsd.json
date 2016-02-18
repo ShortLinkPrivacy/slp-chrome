@@ -34,6 +34,21 @@
     },
     "clipboard/clipboard.d.ts": {
       "commit": "3d2f9971a107e2eee2de3ec5318f5c54071e16ed"
+    },
+    "mocha/mocha.d.ts": {
+      "commit": "99c4fb76b5d941939ba53e61d0daee4bd74f150f"
+    },
+    "moment/moment.d.ts": {
+      "commit": "99c4fb76b5d941939ba53e61d0daee4bd74f150f"
+    },
+    "moment/moment-node.d.ts": {
+      "commit": "99c4fb76b5d941939ba53e61d0daee4bd74f150f"
+    },
+    "expect/expect.d.ts": {
+      "commit": "99c4fb76b5d941939ba53e61d0daee4bd74f150f"
+    },
+    "assert/assert.d.ts": {
+      "commit": "99c4fb76b5d941939ba53e61d0daee4bd74f150f"
     }
   }
 }
