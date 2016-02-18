@@ -26,7 +26,7 @@ var contextMenuId: any;
 
 enum ArmorType { None, MultipartSection, MultipartLast, Signed, Message, PublicKey, PrivateKey };
 
-function getArmorType(text: Interfaces.Armor): ArmorType {
+function getArmorType(text: Messages.Armor): ArmorType {
   var reHeader = /^-----BEGIN PGP (MESSAGE, PART \d+\/\d+|MESSAGE, PART \d+|SIGNED MESSAGE|MESSAGE|PUBLIC KEY BLOCK|PRIVATE KEY BLOCK|SIGNATURE)-----/;
 
   var header = text.match(reHeader);
@@ -81,7 +81,7 @@ function getArmorType(text: Interfaces.Armor): ArmorType {
 //############################################################################
 
 // Creates a HTML snippet with a button to replace a public key armored message
-function makePublicKeyText(armor: Interfaces.Armor, messageId: string, callback: Interfaces.ResultCallback): void {
+function makePublicKeyText(armor: Keys.Armor, messageId: string, callback: Interfaces.ResultCallback): void {
     var key = new Keys.PublicKey(armor),
         username = key.getPrimaryUser(),
         classList: Array<string>,
@@ -224,7 +224,7 @@ class Message {
     // Encrypt text with a set of fingerprints. Used by content to send a quick
     // encrypt with the last keys command.
     encryptLastKeysUsed(): void {
-        var lastKeysUsed: Array<Interfaces.Fingerprint> = this.request.lastKeysUsed,
+        var lastKeysUsed: Array<Keys.Fingerprint> = this.request.lastKeysUsed,
             text: string = this.request.text,
             keyList: Array<openpgp.key.Key> = [];
 

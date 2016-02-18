@@ -13,7 +13,7 @@ interface ElementMessage {
     setElementText?: string;
     restoreElementText?: boolean;
 
-    lastKeysUsed?: Array<Interfaces.Fingerprint>;
+    lastKeysUsed?: Array<Keys.Fingerprint>;
 }
 
 interface BoolFunc {
@@ -32,7 +32,7 @@ function sendElementMessage(msg: ElementMessage, callback?: Interfaces.ResultCal
 // Encrypt own public key and create a crypted url
 //---------------------------------------------------------------------------
 function encryptPublicKey(callback: Interfaces.SuccessCallback): void {
-    var armoredText: Interfaces.Armor,
+    var armoredText: Keys.Armor,
         url: string;
 
     // If the url is already in the prefs, then use it DISABLED
@@ -274,7 +274,7 @@ class App {
     //---------------------------------------------------------------------------
     sendMessage(e: Event) {
         var keyList: Array<openpgp.key.Key> = [],
-            fingerprintList: Array<Interfaces.Fingerprint> = [],
+            fingerprintList: Array<Keys.Fingerprint> = [],
             i: number;
 
         // This should never happen because we don't show the submit button

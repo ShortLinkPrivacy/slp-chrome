@@ -35,7 +35,7 @@ module Admin {
             this.showAdvanced = !this.showAdvanced;
         }
 
-        armored(): Interfaces.Armor {
+        armored(): Keys.Armor {
             if ( !this.hasPrivateKey ) return;
             return this.showPublic
                 ? bg.privateKey.toPublic().armored()

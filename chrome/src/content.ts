@@ -27,7 +27,7 @@ interface BgPageArgs {
     messageId?: string;
     properties?: any;
     text?: string;
-    lastKeysUsed?: Array<Interfaces.Fingerprint>;
+    lastKeysUsed?: Array<Keys.Fingerprint>;
     url?: string;
 }
 
