@@ -8,8 +8,8 @@ module Interfaces {
         (): void;
     }
 
-    export interface ResultCallback {
-        (result: any): void;
+    export interface ResultCallback<T> {
+        (result: T): void;
     }
 
     export interface Success {

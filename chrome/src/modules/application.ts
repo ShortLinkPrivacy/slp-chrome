@@ -29,7 +29,7 @@ module Application {
             this.path = config.path || "src/templates";
         }
 
-        private xmlGet(url: string, success: Interfaces.ResultCallback): void {
+        private xmlGet(url: string, success: Interfaces.ResultCallback<string>): void {
             var r = new XMLHttpRequest();
             r.open('GET', url, true);
             r.onreadystatechange = function() {

@@ -17,7 +17,7 @@ module AddressBookStore {
             }.bind(this);
         }
 
-        private initialize(callback: Interfaces.ResultCallback): void {
+        private initialize(callback: Interfaces.ResultCallback<any>): void {
             var request = indexedDB.open(this.config.dbName, this.config.dbVersion);
 
             request.onupgradeneeded = ()=> {

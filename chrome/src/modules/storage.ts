@@ -14,7 +14,7 @@ class LocalStorage {
         }
     }
 
-    _get_single(name: string, callback: Interfaces.ResultCallback): void {
+    _get_single(name: string, callback: Interfaces.ResultCallback<any>): void {
         this.store.get(name, (obj) => {
             this.checkRuntimeError();
             callback(obj[name]);
@@ -37,7 +37,7 @@ class LocalStorage {
         });
     }
 
-    _get_many(getter: any, callback: Interfaces.ResultCallback): void {
+    _get_many(getter: any, callback: Interfaces.ResultCallback<any>): void {
         this.store.get(getter, (result) => {
             this.checkRuntimeError();
             callback(result);

@@ -81,7 +81,7 @@ function getArmorType(text: Messages.Armor): ArmorType {
 //############################################################################
 
 // Creates a HTML snippet with a button to replace a public key armored message
-function makePublicKeyText(armor: Keys.Armor, messageId: string, callback: Interfaces.ResultCallback): void {
+function makePublicKeyText(armor: Keys.Armor, messageId: string, callback: Interfaces.ResultCallback<string>): void {
     var key = new Keys.PublicKey(armor),
         username = key.getPrimaryUser(),
         classList: Array<string>,

@@ -31,7 +31,7 @@ interface BgPageArgs {
     url?: string;
 }
 
-function messageBgPage(command: string, args: BgPageArgs, callback?: Interfaces.ResultCallback): void {
+function messageBgPage(command: string, args: BgPageArgs, callback?: Interfaces.ResultCallback<any>): void {
     var message = args ? args : {};
     message["command"] = command;
     chrome.runtime.sendMessage(message, callback);
@@ -123,7 +123,7 @@ class Editable {
     }
 
     // Encrypt the editable with the last keys used
-    encryptLast(callback?: Interfaces.ResultCallback): void {
+    encryptLast(callback?: Interfaces.ResultCallback<string>): void {
         if ( this.okToUseLast() == false ) return;
 
         var args = {
