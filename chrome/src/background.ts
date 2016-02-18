@@ -96,7 +96,7 @@ function makePublicKeyText(armor: Keys.Armor, messageId: string, callback: Inter
     });
 }
 
-function encryptMessage(text: string, keyList: Array<openpgp.key.Key>, callback: Interfaces.SuccessCallback): void {
+function encryptMessage(text: string, keyList: Array<openpgp.key.Key>, callback: Interfaces.SuccessCallback<string>): void {
     openpgp.encryptMessage( keyList, text )
         .then((armoredText) => {
             store.message.save(armoredText, (result) => {
@@ -126,9 +126,9 @@ function lockDown(callback?: Interfaces.Callback): void {
 class Message {
     private request: any;
     private sender: chrome.runtime.MessageSender;
-    private sendResponse: Interfaces.SuccessCallback;
+    private sendResponse: Interfaces.SuccessCallback<any>;
 
-    constructor(request: any, sender: chrome.runtime.MessageSender, sendResponse: Interfaces.SuccessCallback) {
+    constructor(request: any, sender: chrome.runtime.MessageSender, sendResponse: Interfaces.SuccessCallback<any>) {
         this.request = request;
         this.sender = sender;
         this.sendResponse = sendResponse;
@@ -249,7 +249,7 @@ class Message {
 
 //############################################################################
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse: Interfaces.SuccessCallback) => {
+chrome.runtime.onMessage.addListener((request, sender, sendResponse: Interfaces.SuccessCallback<any>) => {
     var message = new Message(request, sender, sendResponse);
     message[request.command]();
     return true;

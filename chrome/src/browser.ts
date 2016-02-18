@@ -31,7 +31,7 @@ function sendElementMessage(msg: ElementMessage, callback?: Interfaces.ResultCal
 //---------------------------------------------------------------------------
 // Encrypt own public key and create a crypted url
 //---------------------------------------------------------------------------
-function encryptPublicKey(callback: Interfaces.SuccessCallback): void {
+function encryptPublicKey(callback: Interfaces.SuccessCallback<string>): void {
     var armoredText: Keys.Armor,
         url: string;
 

@@ -17,8 +17,8 @@ module Interfaces {
         error?: string;
     }
 
-    export interface SuccessCallback {
-        (result: Success & { value?: any }): void;
+    export interface SuccessCallback<T> {
+        (result: Success & { value?: T }): void;
     }
 
     export interface InitVars {
@@ -58,7 +58,7 @@ module Interfaces {
         preferences: Preferences;
 
         initialize(): InitVars;
-        encryptMessage(text: string, keyList: Array<openpgp.key.Key>, callback: Interfaces.SuccessCallback): void;
+        encryptMessage(text: string, keyList: Array<openpgp.key.Key>, callback: Interfaces.SuccessCallback<string>): void;
         lockDown(callback?: Callback): void;
     }
 }
