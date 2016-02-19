@@ -96,12 +96,13 @@ function makePublicKeyText(armor: Keys.Armor, messageId: string, callback: Inter
     });
 }
 
-function encryptMessage(text: string, keyList: Array<openpgp.key.Key>, callback: Interfaces.SuccessCallback<string>): void {
-    openpgp.encryptMessage( keyList, text )
+function encryptMessage(msg: Messages.ClearType, keyList: Array<openpgp.key.Key>, callback: Interfaces.SuccessCallback<string>): void {
+    openpgp.encryptMessage( keyList, msg.body )
         .then((armoredText) => {
-            store.message.save(armoredText, (result) => {
+            msg.body = armoredText;
+            store.message.save(<Messages.ArmorType>msg, (result) => {
                 if ( result.success ) {
-                    callback({ success: true, value: store.message.getURL(result.id) });
+                    callback({ success: true, value: store.message.getURL(result.value) });
                 } else {
                     callback({ success: false, error: result.error });
                 }
@@ -147,7 +148,9 @@ class Message {
     }
 
     decryptLink(): void {
-        var re: RegExp, messageId: string;
+        var re: RegExp,
+            messageId: string,
+            armored: Messages.Armored;
 
         messageId = this.request.messageId;
 
@@ -162,18 +165,11 @@ class Message {
                return;
             }
 
-            var armorType = getArmorType(result.armor);
-            if ( armorType == ArmorType.Signed || armorType == ArmorType.Message ) {
-                var message = openpgp.message.readArmored(<string>result.armor);
-
-                openpgp.decryptMessage( privateKey.key, message )
-                   .then((plainText) => {
-                       this.sendResponse({ success: true, value: plainText });
-                   })["catch"]((error) => {
-                       this.sendResponse({ success: false, error: 'decode', value: messageId });
-                   });
-            } else if ( armorType == ArmorType.PublicKey ) {
-                makePublicKeyText(result.armor, messageId, (html) => {
+            armored = result.value;
+            if ( armored.isMessage() == true ) {
+                armored.decrypt( privateKey, (r) => this.sendResponse(r) );
+            } else if ( armored.isPublicKey() == true ) {
+                makePublicKeyText(armored.body(), messageId, (html) => {
                     this.sendResponse({ success: true, value: html });
                 });
             }
@@ -189,7 +185,8 @@ class Message {
     // containing the armored text of the public key
     addPublicKey(): void {
         var key: Keys.PublicKey,
-            messageId: string = this.request.messageId;
+            messageId: string = this.request.messageId,
+            armored: Messages.Armored;
 
         store.message.load( messageId, (result) => {
             if ( !result.success ) {
@@ -197,8 +194,9 @@ class Message {
                return;
             }
 
+            armored = result.value;
             try {
-                key = new Keys.PublicKey(result.armor);
+                key = new Keys.PublicKey(armored.body());
             } catch (err) {
                 this.sendResponse({ success: false, error: err });
                 return;
@@ -226,13 +224,15 @@ class Message {
     encryptLastKeysUsed(): void {
         var lastKeysUsed: Array<Keys.Fingerprint> = this.request.lastKeysUsed,
             text: string = this.request.text,
-            keyList: Array<openpgp.key.Key> = [];
+            keyList: Array<openpgp.key.Key> = [],
+            msg: Messages.ClearType;
 
             if ( lastKeysUsed.length ) {
                 store.addressBook.load(lastKeysUsed, (foundKeys) => {
                     keyList = foundKeys.map( k => { return k.openpgpKey() });
                     keyList.push(privateKey.key.toPublic());
-                    encryptMessage(text, keyList, (result) => {
+                    msg = { body: text }; // TODO: need last expiration used etc.
+                    encryptMessage(msg, keyList, (result) => {
                         this.sendResponse(result);
                     })
                 });
