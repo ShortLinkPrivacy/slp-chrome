@@ -58,7 +58,9 @@ module Interfaces {
         preferences: Preferences;
 
         initialize(): InitVars;
-        encryptMessage(text: string, keyList: Array<openpgp.key.Key>, callback: Interfaces.SuccessCallback<string>): void;
+        encryptMessage(msg: Messages.ClearType, keyList: Array<openpgp.key.Key>, callback: Interfaces.SuccessCallback<string>): void;
         lockDown(callback?: Callback): void;
+
+        Message: any;
     }
 }

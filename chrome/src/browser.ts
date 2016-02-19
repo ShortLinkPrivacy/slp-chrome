@@ -277,7 +277,8 @@ class App {
     sendMessage(e: Event) {
         var keyList: Array<openpgp.key.Key> = [],
             fingerprintList: Array<Keys.Fingerprint> = [],
-            i: number;
+            i: number,
+            clearMessage: Messages.ClearType;
 
         // This should never happen because we don't show the submit button
         if (this.recepients.hasSelected() == false) return;
@@ -293,8 +294,13 @@ class App {
         // Also push our own key, so we can read our own message
         keyList.push(bg.privateKey.key.toPublic());
 
+        // TODO: expiration
+        clearMessage = {
+            body: this.clearText
+        };
+
         this.wait = true;
-        bg.encryptMessage(this.clearText, keyList, (result) => {
+        bg.encryptMessage(clearMessage, keyList, (result) => {
             this.wait = false;
             if ( result.success ) {
                 sendElementMessage({ setElementText: result.value, lastKeysUsed: fingerprintList }, (result) => {

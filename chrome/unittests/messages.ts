@@ -1,6 +1,5 @@
 /// <reference path="../typings/mocha/mocha.d.ts" />
 /// <reference path="../typings/assert/assert.d.ts" />
-/// <reference path="../typings/expect/expect.d.ts" />
 /// <reference path="../typings/moment/moment.d.ts" />
 /// <reference path="../src/modules.d.ts" />
 
