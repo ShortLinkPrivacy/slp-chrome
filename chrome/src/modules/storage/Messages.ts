@@ -3,35 +3,20 @@
 
 module MessageStore {
 
-    export interface ResultStatus {
-        success?: boolean;
-        error?: string;
-    }
+    // Success callback with value type message id
+    export type IdCallback = Interfaces.SuccessCallback<Messages.Id>;
 
-    export interface MessageIdStruct extends ResultStatus {
-        id?: string
-    }
-
-    export interface MessageArmoredStruct extends ResultStatus {
-        armor?: Messages.Armor;
-    }
-
-    // Callback interface for the function that returns the private key
-    export interface MessageArmoredCallback {
-        (result: MessageArmoredStruct): void;
-    }
-
-    export interface MessageIdCallback {
-        (result: MessageIdStruct): void;
-    }
+    // Success callback with value type armored object
+    export type ArmoredCallback = Interfaces.SuccessCallback<Messages.Armored>;
 
     // Anyone implementing settings should implements this
     export interface Interface {
-        save(armor: Messages.Armor, callback: MessageIdCallback): void;
-        load(id: string, callback: MessageArmoredCallback): void;
+
+        save(armor: Messages.ArmorType, callback: IdCallback): void;
+        load(id: Messages.Id, callback: ArmoredCallback): void;
 
         // Get the URL from an id
-        getURL(id: string): string;
+        getURL(id: Messages.Id): string;
 
         // Returns a string for the regex that matches the url. Why string?
         // Because we'll end up passing it to content via a message and RegExp

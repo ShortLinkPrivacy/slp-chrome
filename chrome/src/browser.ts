@@ -32,23 +32,25 @@ function sendElementMessage(msg: ElementMessage, callback?: Interfaces.ResultCal
 // Encrypt own public key and create a crypted url
 //---------------------------------------------------------------------------
 function encryptPublicKey(callback: Interfaces.SuccessCallback<string>): void {
-    var armoredText: Keys.Armor,
+    var armoredMessage: Messages.ArmorType,
         url: string;
 
     // If the url is already in the prefs, then use it DISABLED
-    /* 
+    /*
     if ( url = bg.preferences.publicKeyUrl ) {
         callback({ success: true, value: url });
         return;
     }
     */
 
-    armoredText = bg.privateKey.toPublic().armored();
+    armoredMessage = {
+        body: bg.privateKey.toPublic().armored()
+    };
 
-    bg.store.message.save(armoredText, (result) => {
+    bg.store.message.save(armoredMessage, (result) => {
         if ( result.success ) {
             // Get the url of the public key and store it in the prefs
-            url = bg.store.message.getURL(result.id);
+            url = bg.store.message.getURL(result.value);
             bg.preferences.publicKeyUrl = url;
             bg.preferences.publicKeySaveTime = new Date();
             bg.store.preferences.save();
@@ -121,7 +123,7 @@ module Components {
 }
 
 
-/* 
+/*
  * Receprents can not be a Rivets component, because it is not fully self
  * contained. Its attributes leak out into other parts of the browser.html page
  */
@@ -199,8 +201,8 @@ class Recepients {
         }
 
         bg.store.addressBook.search(this.filter, (keys) => {
-            this.found = keys.map( k => { 
-                return new Keys.KeyItem(k, this.filter) 
+            this.found = keys.map( k => {
+                return new Keys.KeyItem(k, this.filter)
             });
         });
     }
@@ -275,7 +277,8 @@ class App {
     sendMessage(e: Event) {
         var keyList: Array<openpgp.key.Key> = [],
             fingerprintList: Array<Keys.Fingerprint> = [],
-            i: number;
+            i: number,
+            clearMessage: Messages.ClearType;
 
         // This should never happen because we don't show the submit button
         if (this.recepients.hasSelected() == false) return;
@@ -291,8 +294,13 @@ class App {
         // Also push our own key, so we can read our own message
         keyList.push(bg.privateKey.key.toPublic());
 
+        // TODO: expiration
+        clearMessage = {
+            body: this.clearText
+        };
+
         this.wait = true;
-        bg.encryptMessage(this.clearText, keyList, (result) => {
+        bg.encryptMessage(clearMessage, keyList, (result) => {
             this.wait = false;
             if ( result.success ) {
                 sendElementMessage({ setElementText: result.value, lastKeysUsed: fingerprintList }, (result) => {
@@ -390,7 +398,7 @@ function loadComponents(): void {
 
         rivets.components[name] = {
             template: function() { return el.innerHTML },
-            initialize: function(el, data) { 
+            initialize: function(el, data) {
                 return new Components[func](data)
             }
         };

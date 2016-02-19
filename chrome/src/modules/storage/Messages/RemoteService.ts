@@ -15,9 +15,9 @@ module MessageStore {
             this.path = c.path;
         }
 
-        save(armor: Messages.Armor, callback: MessageIdCallback): void {
+        save(armor: Messages.ArmorType, callback: IdCallback): void {
             var r: XMLHttpRequest,
-                json: MessageIdStruct;
+                json: Interfaces.Success & { id: Messages.Id };
 
             r = new XMLHttpRequest();
             r.open('POST', this.url + this.path, true);
@@ -38,16 +38,16 @@ module MessageStore {
                         return;
                     }
 
-                    callback({ success: true, id: json.id });
+                    callback({ success: true, value: json.id });
                 }
             }
             r.setRequestHeader('Content-Type', 'application/json');
-            r.send(JSON.stringify({armor: armor}));
+            r.send(JSON.stringify(armor));
         }
 
-        load(id: string, callback: MessageArmoredCallback): void {
+        load(id: Messages.Id, callback: ArmoredCallback): void {
             var r: XMLHttpRequest,
-                json: MessageArmoredStruct;
+                json: Messages.ArmorType;
 
             r = new XMLHttpRequest();
             r.open('GET', this.getURL(id), true);
@@ -64,7 +64,7 @@ module MessageStore {
                         callback({ success: false, error: "Bad server response" })
                     }
 
-                    callback({ success: true, armor: json.armor });
+                    callback({ success: true, value: new Messages.Armored(json) });
                 }
             };
 
