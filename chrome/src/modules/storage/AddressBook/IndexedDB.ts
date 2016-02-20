@@ -72,7 +72,7 @@ module AddressBookStore {
             })
         }
 
-        load(fingerprints: Array<Keys.Fingerprint>, callback: PublicKeySearchCallback): void {
+        load(fingerprints: Keys.FingerprintArray, callback: PublicKeySearchCallback): void {
             var result: PublicKeyArray = [];
 
             var _load = function(idx: number, done: PublicKeySearchCallback): void {
@@ -96,7 +96,7 @@ module AddressBookStore {
         }
 
         search(searchTerm: Keys.UserId, callback: PublicKeySearchCallback): void {
-            var fingerprints: Array<Keys.Fingerprint> = [];
+            var fingerprints: Keys.FingerprintArray = [];
 
             this.initialize((db) => {
                 var request = db.transaction("ids", "readonly").objectStore("ids").openCursor();
@@ -149,7 +149,7 @@ module AddressBookStore {
         exportKeys(callback: ArmorArrayCallback): void {
         }
 
-        importKeys(keys: Array<Keys.Armor>, callback: Interfaces.Callback): void {
+        importKeys(keys: Keys.ArmorArray, callback: Interfaces.Callback): void {
         }
     }
 }

@@ -13,7 +13,7 @@ interface ElementMessage {
     setElementText?: string;
     restoreElementText?: boolean;
 
-    lastKeysUsed?: Array<Keys.Fingerprint>;
+    lastKeysUsed?: Keys.FingerprintArray;
 }
 
 interface BoolFunc {
@@ -246,7 +246,7 @@ class App {
     }
 
     private getElementText(): void {
-        var re: RegExp, text: string, lastKeysUsed: Array<string>,
+        var re: RegExp, text: string, lastKeysUsed: Keys.FingerprintArray,
             i: number;
 
         re = new RegExp(bg.store.message.getReStr());
@@ -276,7 +276,7 @@ class App {
     //---------------------------------------------------------------------------
     sendMessage(e: Event) {
         var keyList: Array<openpgp.key.Key> = [],
-            fingerprintList: Array<Keys.Fingerprint> = [],
+            fingerprintList: Keys.FingerprintArray = [],
             i: number,
             clearMessage: Messages.ClearType;
 

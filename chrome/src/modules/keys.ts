@@ -7,6 +7,9 @@ module Keys {
     export type UserId = string;
     export type Fingerprint = string;
     export type Armor = string;
+    export type UserIdArray = Array<UserId>;
+    export type FingerprintArray = Array<Fingerprint>;
+    export type ArmorArray = Array<Armor>;
 
     export class KeyError extends Error {
         code: string;
@@ -23,7 +26,7 @@ module Keys {
         key: openpgp.key.Key;
 
         fingerprint: { (): Fingerprint };
-        userIds: { (): Array<UserId> };
+        userIds: { (): UserIdArray };
         getPrimaryUser: { (): UserId };
         armored: { (): Armor };
         openpgpKey: { (): openpgp.key.Key };
@@ -41,7 +44,7 @@ module Keys {
             this.fingerprint = function(): Fingerprint {
                 return this.key.primaryKey.getFingerprint();
             };
-            this.userIds = function(): Array<UserId> {
+            this.userIds = function(): UserIdArray {
                 return this.key.getUserIds();
             };
             this.getPrimaryUser = function(): UserId {

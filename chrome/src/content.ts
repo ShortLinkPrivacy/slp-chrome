@@ -27,7 +27,7 @@ interface BgPageArgs {
     messageId?: string;
     properties?: any;
     text?: string;
-    lastKeysUsed?: Array<Keys.Fingerprint>;
+    lastKeysUsed?: Keys.FingerprintArray;
     url?: string;
 }
 
@@ -46,7 +46,7 @@ interface ContentMessage {
     encryptLast: boolean;
 
     elementLocator?: Interfaces.ElementLocator;
-    lastKeysUsed?: Array<string>;
+    lastKeysUsed?: Keys.FingerprintArray;
 }
 
 // Installs listeners for 'input' and 'click' to all editable and textareas
@@ -54,7 +54,7 @@ class Editable {
     element: HTMLElement = null;
     frameId: string;
     savedValue: string;
-    lastKeysUsed: Array<string>;
+    lastKeysUsed: Keys.FingerprintArray;
 
     constructor(el: HTMLElement) {
         // If the element was already initialized, then bail

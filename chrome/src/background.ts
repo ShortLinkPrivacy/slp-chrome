@@ -166,7 +166,7 @@ class Message {
     // Encrypt text with a set of fingerprints. Used by content to send a quick
     // encrypt with the last keys command.
     encryptLastKeysUsed(): void {
-        var lastKeysUsed: Array<Keys.Fingerprint> = this.request.lastKeysUsed,
+        var lastKeysUsed: Keys.FingerprintArray = this.request.lastKeysUsed,
             text: string = this.request.text,
             keyList: Array<openpgp.key.Key> = [],
             msg: Messages.ClearType;
