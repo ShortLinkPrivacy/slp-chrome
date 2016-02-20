@@ -165,14 +165,14 @@ class Message {
 
     // Encrypt text with a set of fingerprints. Used by content to send a quick
     // encrypt with the last keys command.
-    encryptLastKeysUsed(): void {
-        var lastKeysUsed: Keys.FingerprintArray = this.request.lastKeysUsed,
+    encryptLikeLastMessage(): void {
+        var lastMessage: Interfaces.LastMessage = this.request.lastMessage,
             text: string = this.request.text,
             keyList: Array<openpgp.key.Key> = [],
             msg: Messages.ClearType;
 
-            if ( lastKeysUsed.length ) {
-                store.addressBook.load(lastKeysUsed, (foundKeys) => {
+            if ( lastMessage.body && lastMessage.body.length ) {
+                store.addressBook.load(lastMessage.body, (foundKeys) => {
                     keyList = foundKeys.map( k => { return k.openpgpKey() });
                     keyList.push(privateKey.key.toPublic());
                     msg = { body: text }; // TODO: need last expiration used etc.

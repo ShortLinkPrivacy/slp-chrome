@@ -13,7 +13,10 @@ interface ElementMessage {
     setElementText?: string;
     restoreElementText?: boolean;
 
-    lastKeysUsed?: Keys.FingerprintArray;
+    // A record holding the params sent with the last message, but this time
+    // `body` in an array of the keys (fingerprints) used to encrypt the
+    // message.
+    lastMessage?: Messages.Record<Keys.FingerprintArray>;
 }
 
 interface BoolFunc {
@@ -246,7 +249,7 @@ class App {
     }
 
     private getElementText(): void {
-        var re: RegExp, text: string, lastKeysUsed: Keys.FingerprintArray,
+        var re: RegExp, text: string, lastMessage: Messages.Record<Keys.FingerprintArray>,
             i: number;
 
         re = new RegExp(bg.store.message.getReStr());
@@ -255,19 +258,20 @@ class App {
             if ( !response ) return;
 
             text = response.value;
-            lastKeysUsed = response.lastKeysUsed;
+            lastMessage = response.lastMessage;
 
             this.alreadyEncrypted = re.exec(text) ? true : false;
             this.clearText = text;
 
-            // lastKeysUsed actually contains an array of fingerprints, so we
+            // lastMessage.body actually contains an array of fingerprints, so we
             // have to look them up in the address book and translate them into
             // keys
-            if ( lastKeysUsed.length ) {
-                bg.store.addressBook.load(lastKeysUsed, (keys) => {
+            if ( lastMessage.body.length ) {
+                bg.store.addressBook.load(lastMessage.body, (keys) => {
                     this.recepients.setFromKeys(keys);
                 });
             }
+
         });
     }
 
@@ -276,19 +280,26 @@ class App {
     //---------------------------------------------------------------------------
     sendMessage(e: Event) {
         var keyList: Array<openpgp.key.Key> = [],
-            fingerprintList: Keys.FingerprintArray = [],
+            lastMessage: Messages.Record<Keys.FingerprintArray>,
             i: number,
-            clearMessage: Messages.ClearType;
+            clearMessage: Messages.ClearType,
+            now: Date;
 
         // This should never happen because we don't show the submit button
         if (this.recepients.hasSelected() == false) return;
+
+        now = new Date();
+        lastMessage = {
+            body: [],
+            expiration: new Date(now.getTime() + this.expiration * 1000)
+        };
 
         // Collect a list of keys and fingerprints. The keys are used to encrypt
         // the message, and the fingerprints are saved in the editable so they
         // can be reused again with a shortcut
         this.recepients.forEach((item) => {
             keyList.push(item.key.openpgpKey());
-            fingerprintList.push(item.key.fingerprint());
+            lastMessage.body.push(item.key.fingerprint());
         })
 
         // Also push our own key, so we can read our own message
@@ -303,7 +314,7 @@ class App {
         bg.encryptMessage(clearMessage, keyList, (result) => {
             this.wait = false;
             if ( result.success ) {
-                sendElementMessage({ setElementText: result.value, lastKeysUsed: fingerprintList }, (result) => {
+                sendElementMessage({ setElementText: result.value, lastMessage: lastMessage }, (result) => {
                     if ( result.success ) {
                         window.close();
                     } else {

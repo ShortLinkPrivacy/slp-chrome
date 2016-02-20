@@ -27,7 +27,7 @@ interface BgPageArgs {
     messageId?: string;
     properties?: any;
     text?: string;
-    lastKeysUsed?: Keys.FingerprintArray;
+    lastMessage?: Interfaces.LastMessage;
     url?: string;
 }
 
@@ -46,7 +46,7 @@ interface ContentMessage {
     encryptLast: boolean;
 
     elementLocator?: Interfaces.ElementLocator;
-    lastKeysUsed?: Keys.FingerprintArray;
+    lastMessage?: Interfaces.LastMessage;
 }
 
 // Installs listeners for 'input' and 'click' to all editable and textareas
@@ -54,7 +54,7 @@ class Editable {
     element: HTMLElement = null;
     frameId: string;
     savedValue: string;
-    lastKeysUsed: Keys.FingerprintArray;
+    lastMessage: Interfaces.LastMessage;
 
     constructor(el: HTMLElement) {
         // If the element was already initialized, then bail
@@ -94,7 +94,7 @@ class Editable {
 
     // Tells if it's OK to encrypt for the last recepient
     private okToUseLast(): boolean {
-        return this.hasLastKeysUsed() && !this.isAlreadyEncrypted();
+        return this.hasLastMessage() && !this.isAlreadyEncrypted();
     }
 
     // Does the editable contain a magic url?
@@ -103,8 +103,10 @@ class Editable {
     }
 
     // Do we have the last keys used to encrypt?
-    hasLastKeysUsed(): boolean {
-        return this.lastKeysUsed && this.lastKeysUsed.length > 0 ? true : false;
+    hasLastMessage(): boolean {
+        return this.lastMessage 
+            && this.lastMessage.body
+            && this.lastMessage.body.length > 0 ? true : false;
     }
 
     // Set this editable as the active one for this tab
@@ -128,10 +130,10 @@ class Editable {
 
         var args = {
             text: this.getText(), 
-            lastKeysUsed: this.lastKeysUsed 
+            lastMessage: this.lastMessage 
         };
 
-        messageBgPage('encryptLastKeysUsed', args, (result) => {
+        messageBgPage('encryptLikeLastMessage', args, (result) => {
             if ( result.success ) {
                 this.setText(result.value);
                 if ( callback ) callback(result.value);
@@ -505,7 +507,7 @@ function listenToMessages() {
         if (!editable) return;
         sendResponse({ 
             value: editable.getText(), 
-            lastKeysUsed: editable.lastKeysUsed 
+            lastMessage: editable.lastMessage 
         });
     }
 
@@ -517,7 +519,7 @@ function listenToMessages() {
             return;
         };
         editable.setText(msg.setElementText);
-        editable.lastKeysUsed = msg.lastKeysUsed;
+        editable.lastMessage = msg.lastMessage;
         sendResponse({ success: true });
     }
 

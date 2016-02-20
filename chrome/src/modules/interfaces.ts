@@ -1,5 +1,11 @@
 module Interfaces {
 
+    // The LastMessage structure is like a message
+    // structure, but the `body` attribute is an array
+    // of keys (fingerprints) which were used to
+    // encrypt the previous message
+    export type LastMessage = Messages.Record<Keys.FingerprintArray>;
+
     export interface Dictionary extends Object {
         [index: string]: any;
     }
