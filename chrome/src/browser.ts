@@ -283,16 +283,16 @@ class App {
             lastMessage: Messages.Record<Keys.FingerprintArray>,
             i: number,
             clearMessage: Messages.ClearType,
-            now: Date;
+            now: Date,
+            expiration: Date;
 
         // This should never happen because we don't show the submit button
         if (this.recepients.hasSelected() == false) return;
 
+        // Figure out the expiration and the lastMessage
         now = new Date();
-        lastMessage = {
-            body: [],
-            expiration: new Date(now.getTime() + this.expiration * 1000)
-        };
+        expiration = new Date(now.getTime() + this.expiration * 1000);
+        lastMessage = { body: [], expiration: expiration };
 
         // Collect a list of keys and fingerprints. The keys are used to encrypt
         // the message, and the fingerprints are saved in the editable so they
@@ -305,10 +305,8 @@ class App {
         // Also push our own key, so we can read our own message
         keyList.push(bg.privateKey.key.toPublic());
 
-        // TODO: expiration
-        clearMessage = {
-            body: this.clearText
-        };
+        // The clear message is a record
+        clearMessage = { body: this.clearText, expiration: expiration };
 
         this.wait = true;
         bg.encryptMessage(clearMessage, keyList, (result) => {
