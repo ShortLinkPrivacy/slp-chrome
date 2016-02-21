@@ -225,13 +225,13 @@ class App {
     hasPrivateKey: BoolFunc;
     isDecrypted: BoolFunc;
     alreadyEncrypted: boolean;
-    expiration: number;
+    timeToLive: number;
 
     recepients: Recepients;
     clearText: string;
 
     constructor() {
-        this.expiration = 0;
+        this.timeToLive = 0;
         this.recepients = new Recepients([]);
 
         this.hasPrivateKey = function() {
@@ -281,18 +281,13 @@ class App {
     sendMessage(e: Event) {
         var keyList: Array<openpgp.key.Key> = [],
             lastMessage: Interfaces.LastMessage,
-            i: number,
-            clearMessage: Messages.ClearType,
-            now: Date,
-            expiration: Date;
+            clearMessage: Messages.ClearType;
 
         // This should never happen because we don't show the submit button
         if (this.recepients.hasSelected() == false) return;
 
-        // Figure out the expiration and the lastMessage
-        now = new Date();
-        expiration = new Date(now.getTime() + this.expiration * 1000);
-        lastMessage = { body: [], expiration: expiration };
+        // Figure out the lastMessage
+        lastMessage = { body: [], timeToLive: this.timeToLive };
 
         // Collect a list of keys and fingerprints. The keys are used to encrypt
         // the message, and the fingerprints are saved in the editable so they
@@ -306,7 +301,7 @@ class App {
         keyList.push(bg.privateKey.key.toPublic());
 
         // The clear message is a record
-        clearMessage = { body: this.clearText, expiration: expiration };
+        clearMessage = { body: this.clearText, timeToLive: this.timeToLive };
 
         this.wait = true;
         bg.encryptMessage(clearMessage, keyList, (result) => {

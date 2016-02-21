@@ -10,7 +10,8 @@ module Messages {
     // Messsage structure
     export interface Record<T> {
         body: T;
-        expiration?: Date;
+        createdDate?: Date;
+        timeToLive?: number;
     }
 
     // Clear and Armor message types
@@ -32,7 +33,7 @@ module Messages {
 
         isExpired(): boolean {
             var now = new Date();
-            return now > this.data.expiration;
+            return now.getTime() > this.data.createdDate.getTime() + this.data.timeToLive;
         }
 
         body(): Armor {
