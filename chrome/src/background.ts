@@ -180,7 +180,7 @@ class Message {
                     keyList.push(privateKey.key.toPublic());
 
                     // The new message is like the old message, but using the new text
-                    clearMessage = { body: text, expiration: lastMessage.expiration };
+                    clearMessage = { body: text, timeToLive: lastMessage.timeToLive };
 
                     encryptMessage(clearMessage, keyList, (result) => {
                         this.sendResponse(result);

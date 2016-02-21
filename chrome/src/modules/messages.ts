@@ -10,7 +10,7 @@ module Messages {
     // Messsage structure
     export interface Record<T> {
         body: T;
-        createdDate?: Date;
+        createdDate?: string;    // It goes thru JSON too many times
         timeToLive?: number;
     }
 
@@ -32,8 +32,8 @@ module Messages {
         }
 
         isExpired(): boolean {
-            var now = new Date();
-            return now.getTime() > this.data.createdDate.getTime() + this.data.timeToLive;
+            var now = new Date(), createdDate = new Date(this.data.createdDate);
+            return now.getTime() < createdDate.getTime() + this.data.timeToLive;
         }
 
         body(): Armor {

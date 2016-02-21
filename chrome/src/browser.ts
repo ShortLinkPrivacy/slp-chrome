@@ -104,23 +104,20 @@ module Components {
 
     export class Expiration {
         value: number;
-        show: boolean;
+        show: BoolFunc;
 
         constructor(data: { value: number }) {
             this.value = data.value;
-            this.show = false;
+            this.show = function() {
+                return this.value > 0;
+            }
         }
 
         toggle(e: Event): void {
             e.preventDefault();
-            this.show = !this.show;
+            this.value = 3600;
         }
 
-        change(e: Event): void {
-            if ( this.value == 0 ) {
-                this.show = false;
-            }
-        }
     }
 
 }
@@ -270,6 +267,10 @@ class App {
                 bg.store.addressBook.load(lastMessage.body, (keys) => {
                     this.recepients.setFromKeys(keys);
                 });
+            }
+
+            if ( lastMessage.timeToLive ) {
+                this.timeToLive = lastMessage.timeToLive;
             }
 
         });
