@@ -16,7 +16,7 @@ interface ElementMessage {
     // A record holding the params sent with the last message, but this time
     // `body` in an array of the keys (fingerprints) used to encrypt the
     // message.
-    lastMessage?: Messages.Record<Keys.FingerprintArray>;
+    lastMessage?: Interfaces.LastMessage;
 }
 
 interface BoolFunc {
@@ -249,7 +249,7 @@ class App {
     }
 
     private getElementText(): void {
-        var re: RegExp, text: string, lastMessage: Messages.Record<Keys.FingerprintArray>,
+        var re: RegExp, text: string, lastMessage: Interfaces.LastMessage,
             i: number;
 
         re = new RegExp(bg.store.message.getReStr());
@@ -280,7 +280,7 @@ class App {
     //---------------------------------------------------------------------------
     sendMessage(e: Event) {
         var keyList: Array<openpgp.key.Key> = [],
-            lastMessage: Messages.Record<Keys.FingerprintArray>,
+            lastMessage: Interfaces.LastMessage,
             i: number,
             clearMessage: Messages.ClearType,
             now: Date,
