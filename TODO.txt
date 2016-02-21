@@ -1,12 +1,12 @@
 browser
 ==================================
 - show "please wait" when the private key is being unlocked
-- add message expiration. Expire messages.
 - BUG: backspace deletes a bead with the last letter of the text
 - BUG: special symbols like '\' in the filter result in error "Uncaught SyntaxError: Invalid regular expression: /\/: \ at end of pattern"
 
 content
 ==================================
+- add timeout to expire messages in the DOM
 - on install the content script should prompt the tab to get reloaded, so it takes the new code
 - think about a more general SLP url scheme, so it can scale with other urls
 
@@ -22,11 +22,6 @@ settings
 
 installation
 ====================================
-
-
-API
-====================================
-- Reject payload bigger than X bytes (so idiots don't overload your storage)
 
 
 Development
