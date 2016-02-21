@@ -166,17 +166,23 @@ class Message {
     // Encrypt text with a set of fingerprints. Used by content to send a quick
     // encrypt with the last keys command.
     encryptLikeLastMessage(): void {
-        var lastMessage: Interfaces.LastMessage = this.request.lastMessage,
-            text: string = this.request.text,
+        var lastMessage: Interfaces.LastMessage,
+            text: string,
             keyList: Array<openpgp.key.Key> = [],
-            msg: Messages.ClearType;
+            clearMessage: Messages.ClearType;
+
+            lastMessage = this.request.lastMessage;
+            text = this.request.text;
 
             if ( lastMessage.body && lastMessage.body.length ) {
                 store.addressBook.load(lastMessage.body, (foundKeys) => {
                     keyList = foundKeys.map( k => { return k.openpgpKey() });
                     keyList.push(privateKey.key.toPublic());
-                    msg = { body: text }; // TODO: need last expiration used etc.
-                    encryptMessage(msg, keyList, (result) => {
+
+                    // The new message is like the old message, but using the new text
+                    clearMessage = { body: text, expiration: lastMessage.expiration };
+
+                    encryptMessage(clearMessage, keyList, (result) => {
                         this.sendResponse(result);
                     })
                 });
