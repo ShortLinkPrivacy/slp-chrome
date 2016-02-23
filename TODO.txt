@@ -7,6 +7,13 @@ content
 - add timeout to expire messages in the DOM
 - on install the content script should prompt the tab to get reloaded, so it takes the new code
 - think about a more general SLP url scheme, so it can scale with other urls
+- BUG: Uncaught TypeError: Cannot read property 'id' of null (in Facebook) on this code
+    Editable.prototype.setAsActive = function () {
+        messageBgPage('setActiveElement', {
+            frameId: this.frameId,
+            elementId: this.element.id
+        });
+    };
 
 background
 ==================================
