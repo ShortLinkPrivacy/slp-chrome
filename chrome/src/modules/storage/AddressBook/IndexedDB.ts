@@ -104,12 +104,14 @@ module AddressBookStore {
                 request.onsuccess = ()=> {
                     var cursor = request.result,
                         userId: string,
-                        fingerprint: string;
+                        fingerprint: string,
+                        searchRe: RegExp;
 
                     if (cursor) {
                         userId = cursor.value.userId;
                         fingerprint = cursor.value.fingerprint;
-                        if (userId.toLocaleLowerCase().search(searchTerm.toLocaleLowerCase()) >= 0 
+                        searchRe = new RegExp(searchTerm.replace(/\\/g, ""), 'i');
+                        if (userId.search(searchRe) >= 0 
                             && fingerprints.indexOf(fingerprint) < 0) {
                             fingerprints.push(fingerprint);
                         }

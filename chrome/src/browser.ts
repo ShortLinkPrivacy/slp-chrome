@@ -189,21 +189,18 @@ class Recepients {
 
     search(e: KeyboardEvent): void {
 
-        // Backspace removes the last added key if the filter is empty
-        if ( e.keyCode == 8 && !this.filter ) {
-            this.selected.pop();
-            return;
-        }
-
         if ( !this.filter ) {
             this.found = [];
             return;
         }
 
         bg.store.addressBook.search(this.filter, (keys) => {
-            this.found = keys.map( k => {
-                return new Keys.KeyItem(k, this.filter)
-            });
+            var found: Keys.KeyItemList = [], i: number;
+            for (i = 0; i < keys.length; i++) {
+                var keyItem = new Keys.KeyItem(keys[i], this.filter);
+                if ( this.isSelected(keyItem) == false ) found.push(keyItem);
+            }
+            this.found = found;
         });
     }
 }

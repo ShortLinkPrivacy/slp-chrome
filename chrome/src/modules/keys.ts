@@ -85,9 +85,8 @@ module Keys {
                 userIds = this.userIds();
 
             for (i = 0; i < userIds.length; i++) {
-                var id = userIds[i];
-                if ( id.toLocaleLowerCase().search(searchTerm.toLocaleLowerCase()) >= 0 )
-                    return id;
+                var re = new RegExp(searchTerm.replace(/\\/g, ""), 'i');
+                if ( userIds[i].search(re) >= 0 ) return userIds[i];
             }
 
             return this.getPrimaryUser();
