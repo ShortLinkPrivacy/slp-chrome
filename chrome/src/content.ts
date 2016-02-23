@@ -24,7 +24,7 @@ function idGenerator (prefix: string) {
 interface BgPageArgs {
     frameId?: string;
     elementId?: string;
-    messageId?: string;
+    messageId?: Messages.Id;
     properties?: any;
     text?: string;
     lastMessage?: Interfaces.LastMessage;
@@ -342,7 +342,7 @@ var traverseNodes = (function(){
 
         var _decode = function(idx: number, done: Interfaces.Callback): void {
             var element = <HTMLElement>(els[idx]),
-                messageId: string = element.getAttribute('rel');
+                messageId: Messages.Id = element.getAttribute('rel');
 
             if (!messageId) return;
 

@@ -25,7 +25,7 @@ var contextMenuId: any;
 //############################################################################
 
 // Creates a HTML snippet with a button to replace a public key armored message
-function makePublicKeyText(armor: Keys.Armor, messageId: string, callback: Interfaces.ResultCallback<string>): void {
+function makePublicKeyText(armor: Keys.Armor, messageId: Messages.Id, callback: Interfaces.ResultCallback<string>): void {
     var key = new Keys.PublicKey(armor),
         username = key.getPrimaryUser(),
         classList: Array<string>,
@@ -93,7 +93,7 @@ class Message {
 
     decryptLink(): void {
         var re: RegExp,
-            messageId: string,
+            messageId: Messages.Id,
             armored: Messages.Armored;
 
         messageId = this.request.messageId;
@@ -129,7 +129,7 @@ class Message {
     // containing the armored text of the public key
     addPublicKey(): void {
         var key: Keys.PublicKey,
-            messageId: string = this.request.messageId,
+            messageId: Messages.Id = this.request.messageId,
             armored: Messages.Armored;
 
         store.message.load( messageId, (result) => {
