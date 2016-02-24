@@ -160,15 +160,11 @@ class Editable {
         }
 
         // Set new value
-        if ( this.element.contentEditable == "true" ) {
-            this.element.textContent = text;
-        } else if ( this.element.tagName == "TEXTAREA" ) {
-            (<HTMLTextAreaElement>this.element).value = text;
-        }
-
-        // Dispatch events and focus
-        this.element.dispatchEvent(new Event('input'));
         this.element.focus();
+        document.execCommand('selectAll', false, null);
+        var ev = document.createEvent('TextEvent'); 
+        ev.initTextEvent('textInput', true, true, window, text, 0, 'en_US');  // XXX: Chrome only
+        this.element.dispatchEvent(ev); 
     }
 
 
