@@ -440,7 +440,7 @@ function bindEditables(root: HTMLElement): void {
         last = new Editable(<HTMLElement>editables[i]);
 
     // Set the last one found as the active one
-    if ( last ) {
+    if ( last && last.element ) {
         last.setAsActive();
         hasWorkDone = true;
     }
