@@ -149,6 +149,19 @@ class Editable {
             : this.element.textContent;
     }
 
+    // Selects the contents of the element. Needed to paste 
+    // the new value
+    private selectTextInElement(): void {
+        // http://jsfiddle.net/zAZyy/
+        if (window.getSelection) {
+            var selection = window.getSelection();        
+            var range = document.createRange();
+            range.selectNodeContents(this.element);
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
+    }
+
     // Set a new text value in the editable element while saving the original
     // value of the element so it can be restored
     setText(text: string, noSave?: boolean): void {
@@ -159,9 +172,11 @@ class Editable {
             this.savedValue = this.getText();
         }
 
-        // Set new value
+        // Focus the element and select all the text inside
         this.element.focus();
-        document.execCommand('selectAll', false, null);
+        this.selectTextInElement();
+
+        // Create a text event with the new value (it's like pasting it over the selection)
         var ev = document.createEvent('TextEvent'); 
         ev.initTextEvent('textInput', true, true, window, text, 0, 'en_US');  // XXX: Chrome only
         this.element.dispatchEvent(ev); 
