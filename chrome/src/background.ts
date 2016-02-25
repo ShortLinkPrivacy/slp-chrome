@@ -1,15 +1,13 @@
 /// <reference path="../typings/chrome/chrome.d.ts" />
 /// <reference path="modules.d.ts" />
 
+// App Config
 var config = new Config();
 
-var store: Interfaces.StoreCollection = {
-    privateKey:  new PrivateKeyStore.Local(),
-    message:     new MessageStore.RemoteService(),
-    addressBook: new AddressBookStore.IndexedDB()
-}
+// Storage
+var store: Interfaces.StoreCollection;
 
-// Preferences
+// User Preferences
 var preferences: Preferences;
 
 // Private key
@@ -226,7 +224,15 @@ contextMenuId = chrome.contextMenus.create({
 
 //############################################################################
 
+// Main
 preferences = new Preferences(function(){
+
+    store = {
+        privateKey: new PrivateKeyStore.Local(),
+        message: new MessageStore.RemoteService(),
+        addressBook: new AddressBookStore.IndexedDB()
+    }
+
     store.privateKey.get((pk) => {
         if ( pk ) {
             privateKey = pk;
