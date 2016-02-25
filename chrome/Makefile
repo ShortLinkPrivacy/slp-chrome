@@ -6,7 +6,7 @@ help:
 	@echo "install                 install all dependencies"
 	@echo "clean                   delete all generated Js files"
 	@echo "modules                 compile all module files"
-	@echo "coffee                  compile all coffee files"
+	@echo "tests                   compile all unit test files"
 	@echo "admin                   compile all admin files"
 	@echo "browser                 compile all browser files"
 	@echo "content                 compile all content files"
@@ -49,8 +49,9 @@ modules:
 
 #------------------------------------------------------------------
 
-coffee:
-	coffee -c ./ unittests/
+tests:
+	coffee -c unittests/
+	tsc unittests/*.ts
 
 admin:
 	tsc --out src/admin.js \
@@ -77,7 +78,7 @@ less:
 	lessc css/content.less css/content.css
 	lessc css/admin.less css/admin.css
 
-build: modules coffee admin browser content background less
+build: modules tests admin browser content background less
 
 dist:
 	mkdir -pv dist/{src,css,fonts,lib}
