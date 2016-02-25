@@ -48,12 +48,6 @@ module Interfaces {
         privateKey: PrivateKeyStore.Interface;
         message: MessageStore.Interface;
         addressBook: AddressBookStore.Interface;
-        preferences: PrefsStore;
-    }
-
-    export interface Preferences {
-        publicKeyUrl: string;
-        publicKeySaveTime: Date;
     }
 
     export interface BackgroundPage extends Window {

@@ -6,12 +6,11 @@ var config = new Config();
 var store: Interfaces.StoreCollection = {
     privateKey:  new PrivateKeyStore.Local(config),
     message:     new MessageStore.RemoteService(config),
-    addressBook: new AddressBookStore.IndexedDB(config),
-    preferences: new PrefsStore(config)
+    addressBook: new AddressBookStore.IndexedDB(config)
 }
 
 // Preferences
-var preferences: Interfaces.Preferences;
+var preferences: Preferences;
 
 // Private key
 var privateKey: Keys.PrivateKey;
@@ -227,8 +226,7 @@ contextMenuId = chrome.contextMenus.create({
 
 //############################################################################
 
-store.preferences.load(() => {
-    preferences = store.preferences.data;
+preferences = new Preferences(function(){
     store.privateKey.get((pk) => {
         if ( pk ) {
             privateKey = pk;

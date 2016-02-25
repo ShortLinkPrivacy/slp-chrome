@@ -1,26 +1,40 @@
 /// <reference path="../../typings/chrome/chrome.d.ts" />
 /// <reference path="interfaces.ts" />
 
-class PrefsStore extends LocalStorage {
+class Preferences extends LocalStorage {
 
-    label: string;
-    data: Interfaces.Preferences;
+    // Configuration
+    protected static label = 'preferences';
+    protected static store = chrome.storage.sync;
 
-    constructor(config: Config) {
-        super(config.prefsStore.local.store);
-        this.label = config.prefsStore.local.label;
+    // Preferences
+    //---------------------------------------------------------
+    publicKeyUrl: string;
+    //---------------------------------------------------------
+
+    constructor(callback: Interfaces.Callback) {
+        super(Preferences.store);
+        this.load(callback);
     }
 
     load(callback: Interfaces.Callback) {
-        this._get_single(this.label, (result) => {
-            this.data = result || {};
+        this._get_single(Preferences.label, (str: string) => {
+            var json;
+            try {
+                json = JSON.parse(str);
+            } catch (e) {
+                json = {};
+            }
+            Object.keys(json).forEach((k) => {
+                this[k] = json[k];
+            });
             callback();
         })
     }
 
     // Save all changes back to store
     save(): void {
-        this._set_single(this.label, this.data, ()=>{});
+        this._set_single(Preferences.label, JSON.stringify(this), ()=>{});
     }
 
 }

@@ -80,12 +80,4 @@ class Config {
         }
     };
 
-    // Preferences store
-    prefsStore = {
-        local: {
-            store: chrome.storage.sync,
-            label: 'preferences'
-        }
-    };
-
 }
