@@ -22,7 +22,7 @@ describe("Messages :: RemoteService", () => {
         var result: Interfaces.Success & { value?: Messages.Id },
             message: Messages.ClearType = {
                 body: "test",
-                expiration: tomorrow.toDate()
+                timeToLive: 86400
             };
 
         before((done) => {
@@ -49,7 +49,7 @@ describe("Messages :: RemoteService", () => {
 
         describe("current message", () => {
             before((done) => {
-                saveMessage({ body: "test1", expiration: tomorrow.toDate() }, (r) => {
+                saveMessage({ body: "test1", timeToLive: 86400 }, (r) => {
                     id = r.value;
                     store.load( id, (r2) => {
                         result = r2;
@@ -74,7 +74,7 @@ describe("Messages :: RemoteService", () => {
 
         describe("expired message", () => {
             before((done) => {
-                saveMessage({ body: "test2", expiration: yesterday.toDate() }, (r) => {
+                saveMessage({ body: "test2", timeToLive: -1 }, (r) => {
                     id = r.value;
                     store.load( id, (r2) => {
                         result = r2;
