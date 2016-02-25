@@ -12,6 +12,7 @@ module Messages {
         body: T;
         createdDate?: string;    // It goes thru JSON too many times
         timeToLive?: number;
+        extVersion?: string;
     }
 
     // Clear and Armor message types

@@ -35,6 +35,10 @@ module MessageStore {
                     callback({ success: true, value: json.id });
                 }
             }
+    
+            // Add generic values to armor
+            armor.extVersion = chrome.runtime.getManifest()["version"];
+
             r.setRequestHeader('Content-Type', 'application/json');
             r.send(JSON.stringify(armor));
         }
