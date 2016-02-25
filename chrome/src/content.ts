@@ -97,6 +97,11 @@ class Editable {
         return this.hasLastMessage() && !this.isAlreadyEncrypted();
     }
 
+    // Is the element a TEXTAREA?
+    isTextarea(): boolean {
+        return this.element.tagName == "TEXTAREA";
+    }
+
     // Does the editable contain a magic url?
     isAlreadyEncrypted(): boolean {
         return this.getText() && this.getText().match(urlRe) ? true : false;
@@ -144,7 +149,7 @@ class Editable {
     // Get the text value of the editable
     getText(): string {
         if ( !this.element ) return;
-        return this.element.tagName == "TEXTAREA"
+        return this.isTextarea() == true
             ? (<HTMLTextAreaElement>this.element).value
             : this.element.textContent;
     }
@@ -152,13 +157,18 @@ class Editable {
     // Selects the contents of the element. Needed to paste 
     // the new value
     private selectTextInElement(): void {
-        // http://jsfiddle.net/zAZyy/
-        if (window.getSelection) {
-            var selection = window.getSelection();        
-            var range = document.createRange();
-            range.selectNodeContents(this.element);
-            selection.removeAllRanges();
-            selection.addRange(range);
+        if ( this.isTextarea() == true ) {
+            this.element.focus();
+            document.execCommand('selectAll', false, null);
+        } else {
+            // http://jsfiddle.net/zAZyy/
+            if (window.getSelection) {
+                var selection = window.getSelection();        
+                var range = document.createRange();
+                range.selectNodeContents(this.element);
+                selection.removeAllRanges();
+                selection.addRange(range);
+            }
         }
     }
 
