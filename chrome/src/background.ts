@@ -4,9 +4,9 @@
 var config = new Config();
 
 var store: Interfaces.StoreCollection = {
-    privateKey:  new PrivateKeyStore.Local(config),
-    message:     new MessageStore.RemoteService(config),
-    addressBook: new AddressBookStore.IndexedDB(config)
+    privateKey:  new PrivateKeyStore.Local(),
+    message:     new MessageStore.RemoteService(),
+    addressBook: new AddressBookStore.IndexedDB()
 }
 
 // Preferences

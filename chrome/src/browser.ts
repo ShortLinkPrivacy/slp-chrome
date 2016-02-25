@@ -55,8 +55,7 @@ function encryptPublicKey(callback: Interfaces.SuccessCallback<string>): void {
             // Get the url of the public key and store it in the prefs
             url = bg.store.message.getURL(result.value);
             bg.preferences.publicKeyUrl = url;
-            bg.preferences.publicKeySaveTime = new Date();
-            bg.store.preferences.save();
+            bg.preferences.save();
 
             // Then return success
             callback({ success: true, value: url });

@@ -1,9 +1,8 @@
 
 #############################################################
 
-config = new Config()
-config.addressBookStore.indexedDb.dbName = "Test"
-addressBook = new AddressBookStore.IndexedDB(config)
+AddressBookStore.IndexedDB.dbName = "Test"
+addressBook = new AddressBookStore.IndexedDB()
 
 alice = TestKeys.alice
 bob = TestKeys.bob

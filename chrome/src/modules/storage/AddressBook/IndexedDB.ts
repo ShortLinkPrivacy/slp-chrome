@@ -7,24 +7,25 @@ module AddressBookStore {
 
     export class IndexedDB implements Interface {
 
-        private config: any;
+        private static dbName = "AddressBook";
+        private static dbVersion = 1;
+
         private onerror: { (e: any): void };
 
-        constructor(config: Config) {
-            this.config = config.addressBookStore.indexedDb;
+        constructor() {
             this.onerror = function(e){
                 throw Error(e.target.request.error);
             }.bind(this);
         }
 
         private initialize(callback: Interfaces.ResultCallback<any>): void {
-            var request = indexedDB.open(this.config.dbName, this.config.dbVersion);
+            var request = indexedDB.open(IndexedDB.dbName, IndexedDB.dbVersion);
 
             request.onupgradeneeded = ()=> {
                 var db = request.result;
                 db.createObjectStore("ids", {keyPath: "userId"});
                 db.createObjectStore("armor", {keyPath: "fingerprint"});
-                console.log("DB initialized: ", this.config.dbVersion);
+                console.log("DB initialized: ", IndexedDB.dbVersion);
             };
 
             request.onsuccess = ()=> {

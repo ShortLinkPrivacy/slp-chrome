@@ -42,42 +42,5 @@ class Config {
     // elements.
     pgpEnchanted = '__pgp_enchanted';
 
-    //######################################################
-    // Storages
-    //######################################################
-
-    // Private Key types
-    privateKeyStore = {
-        local: {
-            store: chrome.storage.sync,
-            label: 'privateKey'
-        }
-    };
-
-    // AddressBook storage types
-    addressBookStore = {
-        local: {
-            store: chrome.storage.local,
-            label: 'directory',
-        },
-
-        indexedDb: {
-            dbName: "AddressBook",
-            dbVersion: 1
-        }
-    };
-
-    // Message storage types
-    messageStore = {
-        localHost: {
-            url: 'http://localhost:5000',
-            path: '/x'
-        },
-
-        remoteService: {
-            url: 'http://slp.li',
-            path: '/x'
-        }
-    };
 
 }

@@ -8,11 +8,11 @@ module PrivateKeyStore {
 
     export class Local extends LocalStorage implements Interface {
 
-        label: string;
+        private static label = 'privateKey';
+        private static store = chrome.storage.sync;
 
-        constructor(config: Config) {
-            this.label = config.privateKeyStore.local.label;
-            super(config.privateKeyStore.local.store);
+        constructor() {
+            super(Local.store);
         }
 
         set(key: Keys.PrivateKey|string, callback: PrivateKeyCallback): void {
@@ -25,13 +25,13 @@ module PrivateKeyStore {
             else
                 _key = <Keys.PrivateKey>key
 
-            this._set_single(this.label, _key.armored(), () => {
+            this._set_single(Local.label, _key.armored(), () => {
                 callback(_key);
             })
         }
 
         getArmored(callback: {(armored: string): void}) {
-            this._get_single(this.label, callback);
+            this._get_single(Local.label, callback);
         }
 
         get(callback: PrivateKeyCallback): void {
@@ -48,7 +48,7 @@ module PrivateKeyStore {
         }
 
         remove(callback: Interfaces.Callback): void {
-            this._remove_single(this.label, callback);
+            this._remove_single(Local.label, callback);
         }
     }
 }

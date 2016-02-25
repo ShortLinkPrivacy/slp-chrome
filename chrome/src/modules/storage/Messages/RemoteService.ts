@@ -6,21 +6,15 @@
 module MessageStore {
 
     export class RemoteService implements Interface {
-        url: string;
-        path: string;
-
-        constructor(config: Config) {
-            var c = config.messageStore.remoteService;
-            this.url = c.url;
-            this.path = c.path;
-        }
+        private static url: string = 'http://slp.li';
+        private static path: string = '/x';
 
         save(armor: Messages.ArmorType, callback: IdCallback): void {
             var r: XMLHttpRequest,
                 json: Interfaces.Success & { id: Messages.Id };
 
             r = new XMLHttpRequest();
-            r.open('POST', this.url + this.path, true);
+            r.open('POST', RemoteService.url + RemoteService.path, true);
             r.onreadystatechange = function() {
                 if (r.readyState == 4) {
                     try {
@@ -78,11 +72,11 @@ module MessageStore {
         }
 
         getURL(id: string): string {
-            return this.url + this.path + '/' + id;
+            return RemoteService.url + RemoteService.path + '/' + id;
         }
 
         getReStr(): string {
-            return this.url + this.path + "/([0-9,a-f]+)";
+            return RemoteService.url + RemoteService.path + "/([0-9,a-f]+)";
         }
     }
 }
