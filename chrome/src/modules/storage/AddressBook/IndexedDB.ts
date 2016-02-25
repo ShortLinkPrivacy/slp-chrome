@@ -7,8 +7,8 @@ module AddressBookStore {
 
     export class IndexedDB implements Interface {
 
-        private static dbName = "AddressBook";
-        private static dbVersion = 1;
+        static dbName = "AddressBook";
+        static dbVersion = 1;
 
         private onerror: { (e: any): void };
 
