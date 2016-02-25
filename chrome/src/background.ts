@@ -53,6 +53,41 @@ function encryptMessage(msg: Messages.ClearType, keyList: Array<openpgp.key.Key>
         });
 }
 
+// Encrypt own public key and create a crypted url
+function encryptPublicKey(callback: Interfaces.SuccessCallback<string>): void {
+    var armoredMessage: Messages.ArmorType,
+        url: string;
+
+    // If the url is already in the prefs, then use it DISABLED
+    /*
+    if ( url = bg.preferences.publicKeyUrl ) {
+        callback({ success: true, value: url });
+        return;
+    }
+    */
+
+    armoredMessage = {
+        body: privateKey.toPublic().armored()
+    };
+
+    store.message.save(armoredMessage, (result) => {
+        if ( result.success ) {
+            // Get the url of the public key and store it in the prefs
+            url = store.message.getURL(result.value);
+            preferences.publicKeyUrl = url;
+            preferences.save();
+
+            // Then return success
+            callback({ success: true, value: url });
+        } else {
+
+            // Return error
+            callback({ success: false, error: result.error })
+        }
+    });
+}
+
+
 function lockDown(callback?: Interfaces.Callback): void {
     var i: number;
     chrome.tabs.query({}, (tabs) => {

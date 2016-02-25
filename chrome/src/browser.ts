@@ -31,42 +31,6 @@ function sendElementMessage(msg: ElementMessage, callback?: Interfaces.ResultCal
     chrome.tabs.sendMessage(tab.id, msg, callback);
 }
 
-//---------------------------------------------------------------------------
-// Encrypt own public key and create a crypted url
-//---------------------------------------------------------------------------
-function encryptPublicKey(callback: Interfaces.SuccessCallback<string>): void {
-    var armoredMessage: Messages.ArmorType,
-        url: string;
-
-    // If the url is already in the prefs, then use it DISABLED
-    /*
-    if ( url = bg.preferences.publicKeyUrl ) {
-        callback({ success: true, value: url });
-        return;
-    }
-    */
-
-    armoredMessage = {
-        body: bg.privateKey.toPublic().armored()
-    };
-
-    bg.store.message.save(armoredMessage, (result) => {
-        if ( result.success ) {
-            // Get the url of the public key and store it in the prefs
-            url = bg.store.message.getURL(result.value);
-            bg.preferences.publicKeyUrl = url;
-            bg.preferences.save();
-
-            // Then return success
-            callback({ success: true, value: url });
-        } else {
-
-            // Return error
-            callback({ success: false, error: result.error })
-        }
-    });
-}
-
 module Components {
     export class TextInput {
         value: string;
@@ -89,7 +53,7 @@ module Components {
 
         sendPublicKey(): void {
             this.wait = true;
-            encryptPublicKey((result) => {
+            bg.encryptPublicKey((result) => {
                 this.wait = false;
                 if ( result.success ) {
                     sendElementMessage({ setElementText: result.value });
