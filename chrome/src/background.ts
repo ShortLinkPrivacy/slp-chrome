@@ -43,7 +43,7 @@ function encryptMessage(msg: Messages.ClearType, keyList: Array<openpgp.key.Key>
             msg.body = armoredText;
             store.message.save(<Messages.ArmorType>msg, (result) => {
                 if ( result.success ) {
-                    callback({ success: true, value: store.message.getURL(result.value) });
+                    callback({ success: true, value: store.message.getURL(result.value.id) });
                 } else {
                     callback({ success: false, error: result.error });
                 }
@@ -73,7 +73,7 @@ function encryptPublicKey(callback: Interfaces.SuccessCallback<string>): void {
     store.message.save(armoredMessage, (result) => {
         if ( result.success ) {
             // Get the url of the public key and store it in the prefs
-            url = store.message.getURL(result.value);
+            url = store.message.getURL(result.value.id);
             preferences.publicKeyUrl = url;
             preferences.save();
 
