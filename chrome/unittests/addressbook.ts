@@ -54,7 +54,9 @@ describe("Key Storage :: LocalStore", function() {
             addressBook.save(alice, function() {
                 addressBook.save(bob, function() {
                     addressBook.save(charlie, function() {
-                        addressBook.save(stefan, done);
+                        addressBook.save(stefan, () => {
+                            done();
+                        });
                     });
                 });
             });

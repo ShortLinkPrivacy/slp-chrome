@@ -9,7 +9,9 @@ var secret = TestKeys.secret;
 
 describe("PrivateKeyStore :: LocalStore", function() {
     before(function(done) {
-        pks.remove(done);
+        pks.remove(() => {
+            done();
+        });
     });
 
     describe('Prerequisites', function() {
@@ -20,7 +22,9 @@ describe("PrivateKeyStore :: LocalStore", function() {
 
     describe('set', function() {
         beforeEach(function(done) {
-            pks.remove(done);
+            pks.remove(() => {
+                done();
+            });
         });
 
         it('saves a private key armored text', function(done) {
@@ -39,12 +43,12 @@ describe("PrivateKeyStore :: LocalStore", function() {
 
         it('throws when the armored text is corrupted', function(done) {
             var fn = function() { pks.set("alabama", () => {}) };
-            assert.throws(fn, done);
+            assert.throws(fn, () => { done() });
         });
 
         it('throws when the armored text is missing', function(done) {
             var fn = function() { pks.set("", () => {}) };
-            assert.throws(fn, done);
+            assert.throws(fn, () => { done() });
         });
     });
 
@@ -78,14 +82,16 @@ describe("PrivateKeyStore :: LocalStore", function() {
     describe('remove', function() {
         beforeEach(function(done) {
             pks.remove(function() {
-                pks.set(secret, done);
+                pks.set(secret, ()=>{
+                    done();
+                });
             });
         });
 
         it('deletes the key', function(done) {
             pks.remove(function() {
                 pks.get(function(k) {
-                    assert(k, void 0);
+                    assert.equal(k, void 0);
                     done();
                 });
             });
