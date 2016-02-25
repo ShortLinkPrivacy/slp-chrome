@@ -2,15 +2,8 @@
 /// <reference path="../typings/assert/assert.d.ts" />
 /// <reference path="../typings/chrome/chrome.d.ts" />
 /// <reference path="../src/modules.d.ts" />
+/// <reference path="lib/testkeys.ts" />
 
-
-declare var TestKeys: {
-    alice: Keys.PublicKey;
-    bob: Keys.PublicKey;
-    charlie: Keys.PublicKey;
-    stefan: Keys.PublicKey;
-    secret: Keys.PrivateKey;
-}
 
 var bg: Interfaces.BackgroundPage = <Interfaces.BackgroundPage>chrome.extension.getBackgroundPage();
 

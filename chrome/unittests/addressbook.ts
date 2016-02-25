@@ -1,14 +1,7 @@
 /// <reference path="../typings/mocha/mocha.d.ts" />
 /// <reference path="../typings/assert/assert.d.ts" />
 /// <reference path="../src/modules.d.ts" />
-
-declare var TestKeys: {
-    alice: Keys.PublicKey;
-    bob: Keys.PublicKey;
-    charlie: Keys.PublicKey;
-    stefan: Keys.PublicKey;
-    secret: Keys.PrivateKey;
-}
+/// <reference path="lib/testkeys.ts" />
 
 AddressBookStore.IndexedDB.dbName = "Test";
 

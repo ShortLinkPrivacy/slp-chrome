@@ -50,7 +50,7 @@ modules:
 #------------------------------------------------------------------
 
 tests:
-	coffee -c unittests/
+	tsc unittests/lib/*.ts
 	tsc unittests/*.ts
 
 admin:
