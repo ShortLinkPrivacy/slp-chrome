@@ -16,7 +16,10 @@ module MessageStore {
         }
 
         load(id: Messages.Id, callback: ArmoredCallback): void {
-            httpGet(this.getURL(id), {}, callback);
+            httpGet(this.getURL(id), {}, (result) => {
+                if ( result.success ) result.value = new Messages.Armored(result.value);
+                callback(result);
+            });
         }
 
         getURL(id: string): string {

@@ -13,7 +13,7 @@ function saveMessage(msg: Messages.ClearType, callback: MessageStore.IdCallback)
 
 describe("Messages :: RemoteService", () => {
     describe("save", () => {
-        var result: Interfaces.Success & { value?: Messages.Id },
+        var result: Interfaces.Success & { value?: MessageStore.IdResponse },
             message: Messages.ClearType = {
                 body: "test",
                 timeToLive: 86400
@@ -31,7 +31,7 @@ describe("Messages :: RemoteService", () => {
         })
 
         it("returns the id of the message in value", () => {
-            assert.ok(typeof result.value == "string")
+            assert.ok(typeof result.value.id == "string")
         })
     });
 

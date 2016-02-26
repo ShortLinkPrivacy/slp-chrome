@@ -4,8 +4,8 @@
 class Preferences extends LocalStorage {
 
     // Configuration
-    protected static label = 'preferences';
-    protected static store = chrome.storage.sync;
+    static label = 'preferences';
+    static store = chrome.storage.sync;
 
     // Preferences
     //---------------------------------------------------------
@@ -26,15 +26,21 @@ class Preferences extends LocalStorage {
                 json = {};
             }
             Object.keys(json).forEach((k) => {
-                this[k] = json[k];
+                if ( k != 'store' ) this[k] = json[k];
             });
             callback();
         })
     }
 
     // Save all changes back to store
-    save(): void {
-        this._set_single(Preferences.label, JSON.stringify(this), ()=>{});
+    save(callback?: Interfaces.ResultCallback<any>): void {
+        var setter = {}
+        Object.keys(this).forEach((k) => {
+            if (this.hasOwnProperty(k)) setter[k] = this[k];
+        });
+        this._set_single(Preferences.label, JSON.stringify(setter), () => {
+            if ( callback ) callback(setter);
+        });
     }
 
 }
