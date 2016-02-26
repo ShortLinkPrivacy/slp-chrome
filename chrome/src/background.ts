@@ -10,6 +10,9 @@ var store: Interfaces.StoreCollection;
 // User Preferences
 var preferences: Preferences;
 
+// Short link privacy API
+var slp: API.ShortLinkPrivacy;
+
 // Private key
 var privateKey: Keys.PrivateKey;
 
@@ -41,9 +44,9 @@ function encryptMessage(msg: Messages.ClearType, keyList: Array<openpgp.key.Key>
     openpgp.encryptMessage( keyList, msg.body )
         .then((armoredText) => {
             msg.body = armoredText;
-            store.message.save(<Messages.ArmorType>msg, (result) => {
+            slp.saveItem(<Messages.ArmorType>msg, (result) => {
                 if ( result.success ) {
-                    callback({ success: true, value: store.message.getURL(result.value.id) });
+                    callback({ success: true, value: slp.getItemUrl(result.value.id) });
                 } else {
                     callback({ success: false, error: result.error });
                 }
@@ -70,10 +73,10 @@ function encryptPublicKey(callback: Interfaces.SuccessCallback<string>): void {
         body: privateKey.toPublic().armored()
     };
 
-    store.message.save(armoredMessage, (result) => {
+    slp.saveItem(armoredMessage, (result) => {
         if ( result.success ) {
             // Get the url of the public key and store it in the prefs
-            url = store.message.getURL(result.value.id);
+            url = slp.getItemUrl(result.value.id);
             preferences.publicKeyUrl = url;
             preferences.save();
 
@@ -115,7 +118,7 @@ class Message {
     initVars(): void {
         var result: Interfaces.InitVars = {};
 
-        result.linkRe = store.message.getReStr();
+        result.linkRe = slp.itemRegExp;
         result.hasPrivateKey = privateKey ? true : false;
         result.isDecrypted = privateKey ? privateKey.isDecrypted() : false;
         result.config = config;
@@ -135,7 +138,7 @@ class Message {
             return;
         }
 
-        store.message.load( messageId, (result) => {
+        slp.loadItem( messageId, (result) => {
             if ( !result.success ) {
                this.sendResponse({ success: false, error: 'decode', value: messageId });
                return;
@@ -164,7 +167,7 @@ class Message {
             messageId: Messages.Id = this.request.messageId,
             armored: Messages.Armored;
 
-        store.message.load( messageId, (result) => {
+        slp.loadItem( messageId, (result) => {
             if ( !result.success ) {
                this.sendResponse({ success: false, error: 'decode', value: messageId });
                return;
@@ -262,9 +265,10 @@ contextMenuId = chrome.contextMenus.create({
 // Main
 preferences = new Preferences(function(){
 
+    slp = new API.ShortLinkPrivacy();
+
     store = {
         privateKey: new PrivateKeyStore.Local(),
-        message: new MessageStore.RemoteService(),
         addressBook: new AddressBookStore.IndexedDB()
     }
 

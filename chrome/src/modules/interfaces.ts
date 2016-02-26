@@ -46,7 +46,6 @@ module Interfaces {
 
     export interface StoreCollection {
         privateKey: PrivateKeyStore.Interface;
-        message: MessageStore.Interface;
         addressBook: AddressBookStore.Interface;
     }
 
@@ -56,6 +55,7 @@ module Interfaces {
         privateKey: Keys.PrivateKey;
         elementLocatorDict: ElementLocatorDict;
         preferences: Preferences;
+        slp: API.ShortLinkPrivacy;
 
         initialize(): InitVars;
         encryptMessage(msg: Messages.ClearType, keyList: Array<openpgp.key.Key>, callback: Interfaces.SuccessCallback<string>): void;

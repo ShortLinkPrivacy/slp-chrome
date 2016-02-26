@@ -1,34 +1,17 @@
-/// <reference path="../../../typings/chrome/chrome.d.ts" />
-/// <reference path="../interfaces.ts" />
 
-module MessageStore {
+module API {
 
     // Structure returned after saving a message
     export type IdResponse = {
         id: Messages.Id;
     }
 
-    // Success callback with value type message id
     export type IdCallback = Interfaces.SuccessCallback<IdResponse>;
 
     // Success callback with value type armored object
     export type ArmoredCallback = Interfaces.SuccessCallback<Messages.Armored>;
 
-    // Anyone implementing settings should implements this
-    export interface Interface {
-
-        save(armor: Messages.ArmorType, callback: IdCallback): void;
-        load(id: Messages.Id, callback: ArmoredCallback): void;
-
-        // Get the URL from an id
-        getURL(id: Messages.Id): string;
-
-        // Returns a string for the regex that matches the url. Why string?
-        // Because we'll end up passing it to content via a message and RegExp
-        // is an object (i.e. it'll get lost in the message)
-        getReStr(): string;
-    }
-
+    // Return value types for http functions' callbacks
     export type AnySuccess = Interfaces.SuccessCallback<any>;
 
     export function http(method: string, url: string, args: any, callback: AnySuccess): void {
@@ -74,5 +57,39 @@ module MessageStore {
         http('GET', url, args, callback);
     }
 
-}
+    export class ShortLinkPrivacy {
+        url = 'http://slp.li';
 
+        // Items
+        itemPath = this.url + '/x';
+        itemRegExp = this.itemPath + "/([0-9,a-f]+)";
+
+        // Captures
+        capturePath = this.url + '/c';
+
+        // Save an item and return a IdResponse success structure
+        saveItem(item: Messages.ArmorType, callback: IdCallback): void {
+            // Add generic values to armor
+            item.extVersion = chrome.runtime.getManifest()["version"];
+            httpPost(this.itemPath, item, callback);
+        }
+
+        // Load an item (by its ID) into an Armored class
+        loadItem(id: Messages.Id, callback: ArmoredCallback): void {
+            httpGet(this.getItemUrl(id), {}, (result) => {
+                if ( result.success ) result.value = new Messages.Armored(result.value);
+                callback(result);
+            });
+        }
+
+        getItemUrl(id: string): string {
+            return this.itemPath + '/' + id;
+        }
+
+        // Save captures (fire and forget)
+        saveCapture(capture: any): void {
+            httpPost(this.capturePath, capture, () => {});
+        }
+
+    }
+}

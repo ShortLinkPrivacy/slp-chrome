@@ -2,18 +2,18 @@
 /// <reference path="../typings/assert/assert.d.ts" />
 /// <reference path="../src/modules.d.ts" />
 
-var store = new MessageStore.RemoteService();
+var slp = new API.ShortLinkPrivacy();
 
-function saveMessage(msg: Messages.ClearType, callback: MessageStore.IdCallback) {
+function saveMessage(msg: Messages.ClearType, callback: API.IdCallback) {
     console.log("Saving: ", msg);
-    store.save(msg, (result) => {
+    slp.saveItem(msg, (result) => {
         callback(result);
     });
 }
 
-describe("Messages :: RemoteService", () => {
-    describe("save", () => {
-        var result: Interfaces.Success & { value?: MessageStore.IdResponse },
+describe("API :: ShortLinkPrivacy", () => {
+    describe("saveItem", () => {
+        var result: Interfaces.Success & { value?: API.IdResponse },
             message: Messages.ClearType = {
                 body: "test",
                 timeToLive: 86400
@@ -36,7 +36,7 @@ describe("Messages :: RemoteService", () => {
     });
 
 
-    describe("load", () => {
+    describe("loadItem", () => {
         var result: Interfaces.Success & { value?: Messages.Armored },
             message: Messages.Armored,
             id: Messages.Id;
@@ -45,7 +45,7 @@ describe("Messages :: RemoteService", () => {
             before((done) => {
                 saveMessage({ body: "test1", timeToLive: 86400 }, (r) => {
                     id = r.value.id;
-                    store.load( id, (r2) => {
+                    slp.loadItem( id, (r2) => {
                         result = r2;
                         message = r2.value;
                         done();
@@ -70,7 +70,7 @@ describe("Messages :: RemoteService", () => {
             before((done) => {
                 saveMessage({ body: "test2", timeToLive: -1 }, (r) => {
                     id = r.value.id;
-                    store.load( id, (r2) => {
+                    slp.loadItem( id, (r2) => {
                         result = r2;
                         message = r2.value;
                         done();

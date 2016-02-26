@@ -209,7 +209,7 @@ class App {
         var re: RegExp, text: string, lastMessage: Interfaces.LastMessage,
             i: number;
 
-        re = new RegExp(bg.store.message.getReStr());
+        re = new RegExp(bg.slp.itemRegExp);
 
         sendElementMessage({ getElementText: true }, (response) => {
             if ( !response ) return;

@@ -31,19 +31,19 @@ clean:
 
 #------------------------------------------------------------------
 
+# TODO: add a header file
 modules:
 	tsc --out src/modules.js --declaration \
-	src/modules/application.ts \
 	src/modules/config.ts \
 	src/modules/interfaces.ts \
 	src/modules/keys.ts \
 	src/modules/messages.ts \
 	src/modules/storage.ts \
 	src/modules/preferences.ts \
+	src/modules/api.ts \
+	src/modules/application.ts \
 	src/modules/storage/AddressBook/IndexedDB.ts \
 	src/modules/storage/AddressBook.ts \
-	src/modules/storage/Messages/RemoteService.ts \
-	src/modules/storage/Messages.ts \
 	src/modules/storage/PrivateKey/Local.ts \
 	src/modules/storage/PrivateKey.ts
 
