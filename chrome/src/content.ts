@@ -21,6 +21,10 @@ function idGenerator (prefix: string) {
     return Math.random().toString(36).substr(2, 16);
 };
 
+function isOSX(): boolean {
+    return window.navigator.platform.match(/mac/i) != null;
+}
+
 interface BgPageArgs {
     frameId?: string;
     elementId?: string;
@@ -87,8 +91,18 @@ class Editable {
         // Quick encrypt shortcut
         this.element.addEventListener('keydown', (e: KeyboardEvent) => {
             var trigger: boolean;
-            trigger = e.keyCode == 76 && e.metaKey == true && e.altKey == true;
-            if (trigger == true) this.encryptLast();
+            if ( isOSX() ) {
+                // Mac: Command-Option-L
+                trigger = e.keyCode == 76 && e.metaKey == true && e.altKey == true;
+            } else {
+                // PC: Shift-Ctrl-L
+                trigger = e.keyCode == 76 && e.ctrlKey == true && e.shiftKey == true;
+            }
+            if (trigger == true) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.encryptLast();
+            }
         })
     }
 
@@ -109,7 +123,7 @@ class Editable {
 
     // Do we have the last keys used to encrypt?
     hasLastMessage(): boolean {
-        return this.lastMessage 
+        return this.lastMessage
             && this.lastMessage.body
             && this.lastMessage.body.length > 0 ? true : false;
     }
@@ -124,8 +138,8 @@ class Editable {
 
     // Update the context menu based on the contents of the editable
     updateContextMenu(): void {
-        messageBgPage('updateContextMenu', { 
-            properties: { enabled: this.okToUseLast() } 
+        messageBgPage('updateContextMenu', {
+            properties: { enabled: this.okToUseLast() }
         });
     }
 
@@ -134,8 +148,8 @@ class Editable {
         if ( this.okToUseLast() == false ) return;
 
         var args = {
-            text: this.getText(), 
-            lastMessage: this.lastMessage 
+            text: this.getText(),
+            lastMessage: this.lastMessage
         };
 
         messageBgPage('encryptLikeLastMessage', args, (result) => {
@@ -154,7 +168,7 @@ class Editable {
             : this.element.textContent;
     }
 
-    // Selects the contents of the element. Needed to paste 
+    // Selects the contents of the element. Needed to paste
     // the new value
     private selectTextInElement(): void {
         if ( this.isTextarea() == true ) {
@@ -163,7 +177,7 @@ class Editable {
         } else {
             // http://jsfiddle.net/zAZyy/
             if (window.getSelection) {
-                var selection = window.getSelection();        
+                var selection = window.getSelection();
                 var range = document.createRange();
                 range.selectNodeContents(this.element);
                 selection.removeAllRanges();
@@ -187,9 +201,9 @@ class Editable {
         this.selectTextInElement();
 
         // Create a text event with the new value (it's like pasting it over the selection)
-        var ev = document.createEvent('TextEvent'); 
+        var ev = document.createEvent('TextEvent');
         ev.initTextEvent('textInput', true, true, window, text, 0, 'en_US');  // XXX: Chrome only
-        this.element.dispatchEvent(ev); 
+        this.element.dispatchEvent(ev);
     }
 
 
@@ -249,7 +263,7 @@ var hotlinkPublicKeys = (function() {
 })();
 
 var traverseNodes = (function(){
-    
+
     // Tells if the A element is a match for decryption. Most A elements will
     // have the URL in the href attribute, but Twitter (and possibly others)
     // will have it in the 'data-expanded-url' and such. Returns the magic URL
@@ -281,7 +295,7 @@ var traverseNodes = (function(){
     }
 
     // Finds all links that point to magic urls and replaces them with text
-    // nodes, so they can be found by getNodeList. 
+    // nodes, so they can be found by getNodeList.
     function fixLinks(root: HTMLElement): void {
         if ((<Node>root).nodeType != Node.ELEMENT_NODE) return;
 
@@ -319,7 +333,7 @@ var traverseNodes = (function(){
         if ( !node.parentElement ) return;
 
         parentEl = node.parentElement;
-        
+
         // We will be creating element, so we must stop the observer
         stopObserver();
 
@@ -435,7 +449,7 @@ var traverseNodes = (function(){
             enchantNode(nodeList[i]);
         }
 
-        // Find all echanted elements and decode them. 
+        // Find all echanted elements and decode them.
         decodeEnchanted(root, () => {
             // Look for the public key class and bind onclick events
             hotlinkPublicKeys(root);
@@ -459,9 +473,9 @@ function bindEditables(root: HTMLElement): void {
         i: number,
         last: Editable;
 
-    for (i = 0; i < textareas.length; i++) 
+    for (i = 0; i < textareas.length; i++)
         last = new Editable(<HTMLElement>textareas[i]);
-    for (i = 0; i < editables.length; i++) 
+    for (i = 0; i < editables.length; i++)
         last = new Editable(<HTMLElement>editables[i]);
 
     // Set the last one found as the active one
@@ -526,9 +540,9 @@ function listenToMessages() {
     // ------------------------------------------------------------
     var getElementText = function(msg: ContentMessage, sendResponse) {
         if (!editable) return;
-        sendResponse({ 
-            value: editable.getText(), 
-            lastMessage: editable.lastMessage 
+        sendResponse({
+            value: editable.getText(),
+            lastMessage: editable.lastMessage
         });
     }
 
