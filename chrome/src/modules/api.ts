@@ -9,7 +9,7 @@ module API {
     export type IdCallback = Interfaces.SuccessCallback<IdResponse>;
 
     // Success callback with value type armored object
-    export type ArmoredCallback = Interfaces.SuccessCallback<Messages.Armored>;
+    export type ArmoredCallback = Interfaces.SuccessCallback<Messages.ArmorType>;
 
     // Return value types for http functions' callbacks
     export type AnySuccess = Interfaces.SuccessCallback<any>;
@@ -76,10 +76,7 @@ module API {
 
         // Load an item (by its ID) into an Armored class
         loadItem(id: Messages.Id, callback: ArmoredCallback): void {
-            httpGet(this.getItemUrl(id), {}, (result) => {
-                if ( result.success ) result.value = new Messages.Armored(result.value);
-                callback(result);
-            });
+            httpGet(this.getItemUrl(id), {}, callback);
         }
 
         getItemUrl(id: string): string {
