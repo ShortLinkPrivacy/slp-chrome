@@ -11,17 +11,6 @@ module Keys {
     export type FingerprintArray = Array<Fingerprint>;
     export type ArmorArray = Array<Armor>;
 
-    export class KeyError extends Error {
-        code: string;
-        data: any;
-
-        constructor(code: string, data?: any) {
-            super();
-            this.code = 'key.' + code;
-            this.data = data;
-        }
-    }
-
     export class Key {
         key: openpgp.key.Key;
 
@@ -33,7 +22,7 @@ module Keys {
 
         constructor(armoredText: Armor) {
             if (!armoredText) {
-                throw new KeyError('missing');
+                throw new Error('The key armored text is required');
             }
 
             this.key = this.fromArmored(armoredText);
@@ -64,11 +53,11 @@ module Keys {
             result = openpgp.key.readArmored(<string>armoredText);
 
             if (result.err && result.err.length) {
-                throw new KeyError('error', result.err);
+                throw new Error('This does not look like a valid key');
             }
 
             if (result.keys && !result.keys.length) {
-                throw new KeyError('error', 'unknown');
+                throw new Error('This does not look like a valid key');
             }
 
             return result.keys[0];
