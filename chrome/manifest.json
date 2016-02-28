@@ -36,7 +36,7 @@
     "storage",
     "activeTab",
     "contextMenus",
-    "<all_urls>"
+    "http://slp.li/"
   ],
 
   "content_scripts": [
