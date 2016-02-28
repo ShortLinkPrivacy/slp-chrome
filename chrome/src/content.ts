@@ -612,9 +612,14 @@ function listenToMessages() {
                 return;
 
             // At this point, we have determined that the element and frame ID
-            // provided in the locator match the document we're running in.
+            // provided in the locator match the document we're running in.  If
+            // the element can not be found, then bail. Gmail (and possibly
+            // others do some frame trickery that confuses the shit out of the
+            // content script)
             if (element = document.getElementById(eloc.elementId)) {
                 editable = $data(element, init.config.pgpElAttr);
+            } else {
+                return;
             }
         } else {
             editable = null;
