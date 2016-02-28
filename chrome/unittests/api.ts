@@ -37,8 +37,8 @@ describe("API :: ShortLinkPrivacy", () => {
 
 
     describe("loadItem", () => {
-        var result: Interfaces.Success & { value?: Messages.Armored },
-            message: Messages.Armored,
+        var result: Interfaces.Success & { value?: Messages.ArmorType },
+            message: Messages.ArmorType,
             id: Messages.Id;
 
         describe("current message", () => {
@@ -57,12 +57,8 @@ describe("API :: ShortLinkPrivacy", () => {
                 assert.ok(result.success);
             })
 
-            it("returns the right object in value", () => {
-                assert.ok(message instanceof Messages.Armored)
-            })
-
             it("returns the right message", () => {
-                assert.equal(message.body(), "test1")
+                assert.equal(message.body, "test1")
             })
         })
 

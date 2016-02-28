@@ -97,7 +97,7 @@ module Messages {
     }
 
     export function decrypt(m: ArmorType, privateKey: Keys.PrivateKey, callback: Interfaces.SuccessCallback<string> ): void {
-        var message = openpgp.message.readArmored(<string>this.body());
+        var message = openpgp.message.readArmored(<string>m.body);
         openpgp.decryptMessage( privateKey.key, message )
            .then((clearText: string) => {
                callback({ success: true, value: clearText });

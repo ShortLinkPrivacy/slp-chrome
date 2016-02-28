@@ -129,7 +129,7 @@ class Message {
     decryptLink(): void {
         var re: RegExp,
             messageId: Messages.Id,
-            armored: Messages.Armored;
+            armored: Messages.ArmorType;
 
         messageId = this.request.messageId;
 
@@ -145,10 +145,10 @@ class Message {
             }
 
             armored = result.value;
-            if ( armored.isMessage() == true ) {
-                armored.decrypt( privateKey, (r) => this.sendResponse(r) );
-            } else if ( armored.isPublicKey() == true ) {
-                makePublicKeyText(armored.body(), messageId, (html) => {
+            if ( Messages.isMessage(armored) == true ) {
+                Messages.decrypt( armored, privateKey, (r) => this.sendResponse(r) );
+            } else if ( Messages.isPublicKey(armored) == true ) {
+                makePublicKeyText(armored.body, messageId, (html) => {
                     this.sendResponse({ success: true, value: html });
                 });
             }
@@ -165,7 +165,7 @@ class Message {
     addPublicKey(): void {
         var key: Keys.PublicKey,
             messageId: Messages.Id = this.request.messageId,
-            armored: Messages.Armored;
+            armored: Messages.ArmorType;
 
         slp.loadItem( messageId, (result) => {
             if ( !result.success ) {
@@ -175,7 +175,7 @@ class Message {
 
             armored = result.value;
             try {
-                key = new Keys.PublicKey(armored.body());
+                key = new Keys.PublicKey(armored.body);
             } catch (err) {
                 this.sendResponse({ success: false, error: err });
                 return;
