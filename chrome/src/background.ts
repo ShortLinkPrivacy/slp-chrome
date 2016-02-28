@@ -240,12 +240,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse: Interfaces.
     return true;
 });
 
-chrome.runtime.onInstalled.addListener((reason) => {
-    store.privateKey.get((pk) => {
-        if (!pk) chrome.runtime.openOptionsPage();
-    });
-});
-
 contextMenuId = chrome.contextMenus.create({
     title: "Encrypt for Last Recepient",
     contexts: ["editable"],
@@ -275,6 +269,8 @@ preferences = new Preferences(function(){
     store.privateKey.get((pk) => {
         if ( pk ) {
             privateKey = pk;
+        } else {
+            chrome.runtime.openOptionsPage();
         }
     });
 });
