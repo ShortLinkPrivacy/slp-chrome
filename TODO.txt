@@ -7,6 +7,8 @@ content
 - add timeout to expire messages in the DOM
 - on install the content script should prompt the tab to get reloaded, so it takes the new code
 - think about a more general SLP url scheme, so it can scale with other urls
+- Command-Option-L should show a message if no last recepient
+- Windows and Linux shortcut needed
 
 background
 ==================================
