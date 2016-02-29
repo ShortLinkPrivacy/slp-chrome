@@ -105,4 +105,15 @@ module Messages {
                callback({ success: false, error: error });
            });
     }
+
+    export function encrypt(m: Messages.ClearType, keyList: Array<openpgp.key.Key>, callback: Interfaces.SuccessCallback<ArmorType>): void {
+        openpgp.encryptMessage( keyList, m.body )
+            .then((armoredText) => {
+                var a = <ArmorType>m;
+                a.body = armoredText;
+                callback({success: true, value: a});
+            })["catch"]((err) => {
+                callback({ success: false, error: "OpenPGP Error: " + err });
+            });
+    }
 }

@@ -41,19 +41,20 @@ function makePublicKeyText(armor: Keys.Armor, messageId: Messages.Id, callback: 
 }
 
 function encryptMessage(msg: Messages.ClearType, keyList: Array<openpgp.key.Key>, callback: Interfaces.SuccessCallback<string>): void {
-    openpgp.encryptMessage( keyList, msg.body )
-        .then((armoredText) => {
-            msg.body = armoredText;
-            slp.saveItem(<Messages.ArmorType>msg, (result) => {
+    Messages.encrypt(msg, keyList, (result) => {
+        if ( result.success == true ) {
+            var armor = result.value;
+            slp.saveItem(armor, (result) => {
                 if ( result.success ) {
                     callback({ success: true, value: slp.getItemUrl(result.value.id) });
                 } else {
                     callback({ success: false, error: result.error });
                 }
             });
-        })["catch"]((err) => {
-            callback({ success: false, error: "OpenPGP Error: " + err });
-        });
+        } else {
+            callback({ success: false, error: result.error })
+        }
+    })
 }
 
 // Encrypt own public key and create a crypted url
