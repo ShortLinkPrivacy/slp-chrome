@@ -13,7 +13,7 @@ function saveMessage(msg: Messages.ClearType, callback: API.IdCallback) {
 
 describe("API :: ShortLinkPrivacy", () => {
     describe("saveItem", () => {
-        var result: Interfaces.Success & { value?: API.IdResponse },
+        var result: Interfaces.Success<API.IdResponse>,
             message: Messages.ClearType = {
                 body: "test",
                 timeToLive: 86400
@@ -37,7 +37,7 @@ describe("API :: ShortLinkPrivacy", () => {
 
 
     describe("loadItem", () => {
-        var result: Interfaces.Success & { value?: Messages.Armored },
+        var result: Interfaces.Success<Messages.Armored>,
             message: Messages.Armored,
             id: Messages.Id;
 
