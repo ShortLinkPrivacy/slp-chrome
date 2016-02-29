@@ -43,7 +43,7 @@ function messageBgPage(command: string, args: BgPageArgs, callback?: Interfaces.
 
 interface ContentMessage {
     getElementText?: boolean;
-    setElementText?: string;
+    setElementText?: Messages.UrlType;
     traverse?: boolean;
     lock?: boolean;
     restoreElementText?: boolean;
@@ -152,10 +152,11 @@ class Editable {
             lastMessage: this.lastMessage
         };
 
-        messageBgPage('encryptLikeLastMessage', args, (result) => {
+        messageBgPage('encryptLikeLastMessage', args, (result: Interfaces.Success<Messages.UrlType>) => {
             if ( result.success ) {
-                this.setText(result.value);
-                if ( callback ) callback(result.value);
+                var umsg = result.value;
+                this.setText(umsg.body);
+                if ( callback ) callback(umsg.body);
             }
         });
     }
@@ -229,7 +230,7 @@ var hotlinkPublicKeys = (function() {
         return function(e: MouseEvent): void {
             e.preventDefault();
             e.stopPropagation();
-            messageBgPage('addPublicKey', { messageId: el.getAttribute('rel') }, (result) => {
+            messageBgPage('addPublicKey', { messageId: el.getAttribute('rel') }, (result: Interfaces.Success<Messages.Id>) => {
                 if ( result.success ) {
                     el.classList.add(init.config.pgpPKAdded);
                     el.removeEventListener('click', _bindOnClick(el));
@@ -369,6 +370,20 @@ var traverseNodes = (function(){
         startObserver();
     }
 
+    function setElementExpiration(el: HTMLElement, amsg: Messages.ClearType): void {
+        var now, cre: Date, ttl: number;
+
+        if (!amsg.timeToLive) return;
+
+        now = new Date();
+        cre = amsg.createdDate ? new Date(amsg.createdDate) : now;
+        ttl = now.getTime() - cre.getTime() + amsg.timeToLive * 1000;
+        setTimeout(() => { 
+            el.innerHTML = "Expired private message";
+            el.classList.add("__pgp_expired");
+        }, Math.max(0, ttl));
+    }
+
     // Gathers a list of all enchanted elements and decodes them one by one
     function decodeEnchanted(root: HTMLElement, callback: Interfaces.Callback): void {
         var els = root.getElementsByClassName(init.config.pgpEnchanted),
@@ -382,10 +397,14 @@ var traverseNodes = (function(){
             if (!messageId) return;
 
             count++;
-            messageBgPage( 'decryptLink', { messageId: messageId }, (result: Interfaces.Success & { value: Messages.ClearType }) => {
+            messageBgPage( 'decryptLink', { messageId: messageId }, (result: Interfaces.Success<Messages.ClearType>) => {
                 if ( result.success ) {
-                    element.innerHTML = result.value.body;
+                    var amsg: Messages.ClearType = result.value;
+                    element.innerHTML = amsg.body;
                     element.classList.add("__pgp_decrypted");
+
+                    // Expiring?
+                    setElementExpiration(element, amsg);
                 } else {
                     element.innerText = "Can not decrypt";
                     element.classList.add("__pgp_error");
@@ -511,7 +530,7 @@ function startObserver() {
 // Retrieves variables indicating the status of the background page, such as
 // 'isDecrypted' (the private key) and others.
 function getInitVars(callback: Interfaces.Callback): void {
-    messageBgPage('initVars', {}, (result) => {
+    messageBgPage('initVars', {}, (result: Interfaces.Success<Interfaces.InitVars>) => {
         init = result.value;
         urlRe = new RegExp(init.linkRe);
         urlReg = new RegExp(init.linkRe, 'g');
@@ -553,7 +572,7 @@ function listenToMessages() {
             sendResponse({ success: false });
             return;
         };
-        editable.setText(msg.setElementText);
+        editable.setText(msg.setElementText.body);
         editable.lastMessage = msg.lastMessage;
         sendResponse({ success: true });
     }
