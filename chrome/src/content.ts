@@ -382,9 +382,9 @@ var traverseNodes = (function(){
             if (!messageId) return;
 
             count++;
-            messageBgPage( 'decryptLink', { messageId: messageId }, (result) => {
+            messageBgPage( 'decryptLink', { messageId: messageId }, (result: Interfaces.Success & { value: Messages.ClearType }) => {
                 if ( result.success ) {
-                    element.innerHTML = result.value;
+                    element.innerHTML = result.value.body;
                     element.classList.add("__pgp_decrypted");
                 } else {
                     element.innerText = "Can not decrypt";

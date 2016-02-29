@@ -40,13 +40,15 @@ function makePublicKeyText(armor: Keys.Armor, messageId: Messages.Id, callback: 
     });
 }
 
-function encryptMessage(msg: Messages.ClearType, keyList: Array<openpgp.key.Key>, callback: Interfaces.SuccessCallback<string>): void {
+function encryptMessage(msg: Messages.ClearType, keyList: Array<openpgp.key.Key>, callback: Interfaces.SuccessCallback<Messages.UrlType>): void {
     Messages.encrypt(msg, keyList, (result) => {
         if ( result.success == true ) {
             var armor = result.value;
             slp.saveItem(armor, (result) => {
                 if ( result.success ) {
-                    callback({ success: true, value: slp.getItemUrl(result.value.id) });
+                    var umsg = <Messages.UrlType>armor;
+                    umsg.body = slp.getItemUrl(result.value.id);
+                    callback({ success: true, value: umsg });
                 } else {
                     callback({ success: false, error: result.error });
                 }
@@ -150,7 +152,9 @@ class Message {
                 Messages.decrypt( armored, privateKey, (r) => this.sendResponse(r) );
             } else if ( Messages.isPublicKey(armored) == true ) {
                 makePublicKeyText(armored.body, messageId, (html) => {
-                    this.sendResponse({ success: true, value: html });
+                    var umsg = <Messages.UrlType>armored;
+                    umsg.body = html;
+                    this.sendResponse({ success: true, value: umsg });
                 });
             }
         });

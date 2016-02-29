@@ -6,6 +6,7 @@ module Messages {
 
     export type Id = string;
     export type Armor = string;
+    export type Url = string;
 
     // Messsage structure
     export interface Record<T> {
@@ -18,6 +19,7 @@ module Messages {
     // Clear and Armor message types
     export type ClearType = Record<string>;
     export type ArmorType = Record<Armor>;
+    export type UrlType = Record<Armor>;
 
     export enum ArmorTextType {
         None, MultipartSection, MultipartLast,
@@ -96,22 +98,24 @@ module Messages {
         return armorType == ArmorTextType.PrivateKey;
     }
 
-    export function decrypt(m: ArmorType, privateKey: Keys.PrivateKey, callback: Interfaces.SuccessCallback<string> ): void {
+    export function decrypt(m: ArmorType, privateKey: Keys.PrivateKey, callback: Interfaces.SuccessCallback<ClearType> ): void {
         var message = openpgp.message.readArmored(<string>m.body);
         openpgp.decryptMessage( privateKey.key, message )
            .then((clearText: string) => {
-               callback({ success: true, value: clearText });
+               var cmsg = <ClearType>m;
+               cmsg.body = clearText;
+               callback({ success: true, value: cmsg });
            })["catch"]((error) => {
                callback({ success: false, error: error });
            });
     }
 
-    export function encrypt(m: Messages.ClearType, keyList: Array<openpgp.key.Key>, callback: Interfaces.SuccessCallback<ArmorType>): void {
+    export function encrypt(m: ClearType, keyList: Array<openpgp.key.Key>, callback: Interfaces.SuccessCallback<ArmorType>): void {
         openpgp.encryptMessage( keyList, m.body )
             .then((armoredText) => {
-                var a = <ArmorType>m;
-                a.body = armoredText;
-                callback({success: true, value: a});
+                var amsg = <ArmorType>m;
+                amsg.body = armoredText;
+                callback({success: true, value: amsg});
             })["catch"]((err) => {
                 callback({ success: false, error: "OpenPGP Error: " + err });
             });
