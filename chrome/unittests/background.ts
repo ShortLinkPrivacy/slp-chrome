@@ -10,7 +10,7 @@ bg.privateKey = secret;
 
 describe("Background Page", () => {
     var msg: Messages.ClearType = { body: "test1" },
-        result: Interfaces.Success & { value?: string };
+        result: Interfaces.Success<string>;
 
     describe("encryptMessage", () => {
         before((done) => {

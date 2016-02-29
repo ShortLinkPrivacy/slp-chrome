@@ -18,13 +18,14 @@ module Interfaces {
         (result: T): void;
     }
 
-    export interface Success {
+    export interface Success<T> {
         success: boolean;
         error?: string;
+        value?: T;
     }
 
     export interface SuccessCallback<T> {
-        (result: Success & { value?: T }): void;
+        (result: Success<T>): void;
     }
 
     export interface InitVars {
