@@ -80,7 +80,7 @@
           <div rv-hide="alreadyEncrypted">
             <textinput value="clearText"></textinput>
             <div rv-show="clearText">
-              <label for="filter">Recepients:</label>
+              <label for="filter">Recipients:</label>
               <ul class="selected-keys" rv-on-click="recepients.focus">
                 <li class="bead" rv-each-item="recepients.selected"><div class="name">{ item.getPrimaryUser }</div><div class="remove" rv-on-click="recepients.removeFromSelected">✖</div></li>
                 <li><input id="ftr" class="filter" rv-value="recepients.filter" rv-on-keyup="recepients.search"></li>
