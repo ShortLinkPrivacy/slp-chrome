@@ -370,8 +370,10 @@ function loadComponents(): void {
     })
 }
 
-window.onload = function() {
+function run(): void {
     loadComponents();
     app = window["app"] = new App();
     app.run();
-};
+}
+
+window.onload = run;

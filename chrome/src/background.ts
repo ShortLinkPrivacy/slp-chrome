@@ -246,7 +246,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse: Interfaces.
 });
 
 contextMenuId = chrome.contextMenus.create({
-    title: "Encrypt for Last Recepient",
+    title: "Encrypt for Last Recipient",
     contexts: ["editable"],
     enabled: false,
     onclick: (info, tab) => {
