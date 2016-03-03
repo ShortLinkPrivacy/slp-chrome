@@ -37,10 +37,12 @@ module Admin {
                     var key = bg.privateKey = new Keys.PrivateKey(generated.privateKeyArmored);
                     bg.store.privateKey.set(key, () => {
                         this.spinner = false;
+                        bg._ga('admin', 'Generate new private key');
                         window.location.hash = "#/key/view";
                     })
                })["catch"]((error)=>{
                    this.spinner = false;
+                   bg._ga('error', error);
                    app.notify.error = "Can not create a new key - " + error;
                })
         }

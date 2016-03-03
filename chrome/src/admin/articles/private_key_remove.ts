@@ -13,6 +13,7 @@ module Admin {
                 bg.preferences.setupNagCount = 0;
                 bg.preferences.save();
                 view.hasPrivateKey = false;
+                bg._ga('admin', 'Remove private key');
                 window.location.hash = '#/key/view';
             });
         }

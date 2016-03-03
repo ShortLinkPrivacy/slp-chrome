@@ -49,4 +49,7 @@ class Config {
 
     // How many times to nag about setup
     maxSetupNag = 3;
+
+    // Allow Google Analytics
+    allowGoogleAnalytics = true;
 }

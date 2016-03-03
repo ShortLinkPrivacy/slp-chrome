@@ -16,6 +16,10 @@ module Admin {
             };
         }
 
+        onBind() {
+            bg._ga('admin', 'Show address book');
+        }
+
         doFilter(): void {
             if ( this.filter == "" || this.filter == null ) {
                 this.foundKeys = [];

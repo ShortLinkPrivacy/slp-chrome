@@ -260,9 +260,32 @@ contextMenuId = chrome.contextMenus.create({
 });
 
 //############################################################################
+// Google Analytics
+//----------------------------------------------------------------------------
+declare function ga(a?, b?, c?, d?);
+var _ga = function(category: string, action: string): void {};
+function googleAnalytics() {
+    (function(i?,s?,o?,g?,r?,a?,m?){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=(new Date()).getTime();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-74656221-1', 'auto');
+    ga('send', 'event', 'background');
+}
+
+//############################################################################
 
 // Main
 preferences = new Preferences(function(){
+
+    // Google Analytics
+    if ( config.allowGoogleAnalytics && preferences.allowGoogleAnalytics ) {
+        googleAnalytics();
+        _ga = function(category: string, action: string): void {
+            ga('send', 'event', category, action);
+        };
+    }
 
     slp = new API.ShortLinkPrivacy();
 
@@ -274,7 +297,9 @@ preferences = new Preferences(function(){
     store.privateKey.get((pk) => {
         if ( pk ) {
             privateKey = pk;
+            _ga('background', 'Private key loaded');
         } else if (preferences.setupNagCount < config.maxSetupNag) {
+            _ga('background', 'No private key');
             preferences.setupNagCount++;
             preferences.save();
             chrome.runtime.openOptionsPage();

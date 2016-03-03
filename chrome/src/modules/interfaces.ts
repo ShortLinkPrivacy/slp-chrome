@@ -62,6 +62,7 @@ module Interfaces {
         encryptMessage(msg: Messages.ClearType, keyList: Array<openpgp.key.Key>, callback: Interfaces.SuccessCallback<string>): void;
         encryptPublicKey(callback: SuccessCallback<string>): void;
         lockDown(callback?: Callback): void;
+        _ga(category: string, action: string): void;
 
         Message: any;
     }

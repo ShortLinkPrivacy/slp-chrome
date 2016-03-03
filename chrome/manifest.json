@@ -36,8 +36,11 @@
     "storage",
     "activeTab",
     "contextMenus",
-    "http://slp.li/"
+    "http://slp.li/",
+    "https://www.google-analytics.com/"
   ],
+
+  "content_security_policy": "script-src 'self' https://www.google-analytics.com; object-src 'self'",
 
   "content_scripts": [
     {

@@ -117,6 +117,7 @@ module Admin {
         });
 
         app.run();
+        bg._ga('admin', 'run');
     }
 }
 
