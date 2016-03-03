@@ -9,7 +9,13 @@ class Preferences extends LocalStorage {
 
     // Preferences
     //---------------------------------------------------------
+
+    // Cached public key url (not used)
     publicKeyUrl: string;
+
+    // Do not use Google Analytics
+    noGA: boolean;
+
     //---------------------------------------------------------
 
     constructor(callback: Interfaces.Callback) {

@@ -38,7 +38,7 @@ module Admin {
             this.registerArticle( new PrivateKeyView() );
             this.registerArticle( new PublicKeyImport() );
             this.registerArticle( new PublicKeyList() );
-            this.registerArticle( new Advanced() );
+            this.registerArticle( new Preferences() );
 
             this.initRouter();
         }
@@ -72,8 +72,8 @@ module Admin {
                 this.loadArticle('publicKeyList');
             });
 
-            Path.map("#/advanced").to(() => {
-                this.loadArticle('advanced');
+            Path.map("#/prefs").to(() => {
+                this.loadArticle('preferences');
             });
         }
 

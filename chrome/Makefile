@@ -62,7 +62,7 @@ admin:
 		src/admin/articles/private_key_view.ts \
 		src/admin/articles/public_key_import.ts \
 		src/admin/articles/public_key_list.ts \
-		src/admin/articles/advanced.ts
+		src/admin/articles/preferences.ts
 
 browser:
 	tsc --out src/browser.js src/browser.ts
