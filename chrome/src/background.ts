@@ -274,7 +274,9 @@ preferences = new Preferences(function(){
     store.privateKey.get((pk) => {
         if ( pk ) {
             privateKey = pk;
-        } else {
+        } else if (preferences.setupNagCount < config.maxSetupNag) {
+            preferences.setupNagCount++;
+            preferences.save();
             chrome.runtime.openOptionsPage();
         }
     });

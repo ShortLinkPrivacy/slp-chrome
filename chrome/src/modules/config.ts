@@ -43,4 +43,10 @@ class Config {
     pgpEnchanted = '__pgp_enchanted';
 
 
+    //######################################################
+    // Background page
+    //######################################################
+
+    // How many times to nag about setup
+    maxSetupNag = 3;
 }
