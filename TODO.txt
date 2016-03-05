@@ -1,3 +1,8 @@
+immediate
+==================================
+- Move message types to different types, e.g. armored, clear, url, publickey
+- Add fingerprints of keys used to encrypt messages to the store
+
 browser
 ==================================
 - show "please wait" when the private key is being unlocked
