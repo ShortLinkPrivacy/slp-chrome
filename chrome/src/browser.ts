@@ -10,7 +10,7 @@ var app: App,
 interface ElementMessage {
     elementLocator?: Interfaces.ElementLocator;
     getElementText?: boolean;
-    setElementText?: string;
+    setElementText?: Messages.UrlType;
     restoreElementText?: boolean;
 
     // A record holding the params sent with the last message, but this time
@@ -53,7 +53,7 @@ module Components {
 
         sendPublicKey(): void {
             this.wait = true;
-            bg.encryptPublicKey((result) => {
+            bg.encryptPublicKey((result: Interfaces.Success<Messages.UrlType>) => {
                 this.wait = false;
                 if ( result.success ) {
                     sendElementMessage({ setElementText: result.value });
@@ -265,7 +265,7 @@ class App {
         clearMessage = { body: this.clearText, timeToLive: this.timeToLive };
 
         this.wait = true;
-        bg.encryptMessage(clearMessage, keyList, (result) => {
+        bg.encryptMessage(clearMessage, keyList, (result: Interfaces.Success<Messages.UrlType>) => {
             this.wait = false;
             if ( result.success ) {
                 sendElementMessage({ setElementText: result.value, lastMessage: lastMessage }, (result) => {

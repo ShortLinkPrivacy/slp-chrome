@@ -10,7 +10,7 @@ bg.privateKey = secret;
 
 describe("Background Page", () => {
     var msg: Messages.ClearType = { body: "test1" },
-        result: Interfaces.Success<string>;
+        result: Interfaces.Success<Messages.UrlType>;
 
     describe("encryptMessage", () => {
         before((done) => {
@@ -26,7 +26,7 @@ describe("Background Page", () => {
         })
 
         it("returns the url in value", () => {
-            assert.ok(result.value.match(/slp/))
+            assert.ok(result.value.body.match(/slp/))
         })
     });
 
@@ -44,7 +44,7 @@ describe("Background Page", () => {
         })
 
         it("returns the url of the pub key", () => {
-            assert.ok(result.value.match(/slp/))
+            assert.ok(result.value.body.match(/slp/))
         })
     })
 
