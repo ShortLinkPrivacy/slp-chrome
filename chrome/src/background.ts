@@ -60,9 +60,9 @@ function encryptMessage(msg: Messages.ClearType, keyList: Array<openpgp.key.Key>
 }
 
 // Encrypt own public key and create a crypted url
-function encryptPublicKey(callback: Interfaces.SuccessCallback<string>): void {
+function encryptPublicKey(callback: Interfaces.SuccessCallback<Messages.UrlType>): void {
     var armoredMessage: Messages.ArmorType,
-        url: string;
+        url: Messages.Url;
 
     // If the url is already in the prefs, then use it DISABLED
     /*
@@ -77,14 +77,15 @@ function encryptPublicKey(callback: Interfaces.SuccessCallback<string>): void {
     };
 
     slp.saveItem(armoredMessage, (result) => {
-        if ( result.success ) {
+        if ( result.success == true ) {
+
             // Get the url of the public key and store it in the prefs
             url = slp.getItemUrl(result.value.id);
             preferences.publicKeyUrl = url;
             preferences.save();
 
             // Then return success
-            callback({ success: true, value: url });
+            callback({ success: true, value: { body: url } });
         } else {
 
             // Return error

@@ -59,8 +59,8 @@ module Interfaces {
         slp: API.ShortLinkPrivacy;
 
         initialize(): InitVars;
-        encryptMessage(msg: Messages.ClearType, keyList: Array<openpgp.key.Key>, callback: Interfaces.SuccessCallback<string>): void;
-        encryptPublicKey(callback: SuccessCallback<string>): void;
+        encryptMessage(msg: Messages.ClearType, keyList: Array<openpgp.key.Key>, callback: Interfaces.SuccessCallback<Messages.UrlType>): void;
+        encryptPublicKey(callback: SuccessCallback<Messages.UrlType>): void;
         lockDown(callback?: Callback): void;
         _ga(category: string, action: string): void;
 
