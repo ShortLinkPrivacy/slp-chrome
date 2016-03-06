@@ -1,9 +1,15 @@
+immediate
+==================================
+- Move message types to different types, e.g. armored, clear, url, publickey
+- Add fingerprints of keys used to encrypt messages to the store
+
 browser
 ==================================
 - show "please wait" when the private key is being unlocked
 
 content
 ==================================
+- BUG: If there are magic links and we don't have a key, when we create the key there is an openpgp error
 - BUG: Restore original message does not work on Facebook (possibly others)
 - add timeout to expire messages in the DOM
 - on install the content script should prompt the tab to get reloaded, so it takes the new code

@@ -73,7 +73,7 @@
       <div rv-show="hasPrivateKey">
         <div class="middle short" rv-hide="isDecrypted">
           <input id="pwd" rv-value="password" rv-on-keyup="enterPassword" type="password" placeholder="secret key password">
-          <div class="weak">(Press Enter when you're done)</div>
+          <div class="weak" rv-show="password">Press Enter when you're done</div>
         </div>
 
         <article rv-show="isDecrypted">
