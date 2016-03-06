@@ -543,7 +543,7 @@ class MessageListener {
     editable: Editable;
 
     constructor() {
-        chrome.runtime.onMessage.addListener((msg: Interfaces.ContentMessage, sender, sendResponse) => {
+        chrome.runtime.onMessage.addListener((msg: Interfaces.ContentMessage<any>, sender, sendResponse) => {
             var eloc: Interfaces.ElementLocator,
                 element: HTMLElement;
 
@@ -576,7 +576,7 @@ class MessageListener {
             }
 
             try {
-                this[msg.action](msg, sendResponse);
+                this[msg.action](sendResponse, msg);
             } catch(e) {
                 // TODO: report error
                 sendResponse({success: false, error: e});
@@ -585,7 +585,7 @@ class MessageListener {
     }
 
     // Get the active element and its value
-    getElementText(msg: Interfaces.ContentMessage, sendResponse) {
+    getElementText(sendResponse) {
         if (!this.editable) return;
         sendResponse({
             value: this.editable.getText(),
@@ -594,7 +594,7 @@ class MessageListener {
     }
 
     // Set the active element and mark it as encrypted
-    setElementText(msg: Interfaces.ContentMessage, sendResponse) {
+    setElementText(sendResponse, msg: Interfaces.ContentMessage<Messages.UrlType>) {
         if (!this.editable) {
             sendResponse({ success: false });
             return;
@@ -605,20 +605,20 @@ class MessageListener {
     }
 
     // Restore the original text of the textarea
-    restoreElementText(msg: Interfaces.ContentMessage, sendResponse) {
+    restoreElementText(sendResponse) {
         if (!this.editable) return;
         var result = this.editable.restoreText();
         sendResponse({ success: result });
     }
 
     // Encrypt using the last used keys
-    encryptLast(msg: Interfaces.ContentMessage, sendResponse) {
+    encryptLast() {
         if (!this.editable) return;
         this.editable.encryptLast();
     }
 
     // Return all decrypted nodes to their original values
-    lock(msg: Interfaces.ContentMessage, sendResponse) {
+    lock() {
         var els = document.getElementsByClassName(init.config.pgpClassName),
             i: number,
             parentEl: HTMLElement,
@@ -642,7 +642,7 @@ class MessageListener {
     }
 
     // Decrypt all nodes
-    traverse(msg: Interfaces.ContentMessage, sendResponse) {
+    traverse() {
         getInitVars(() => { traverseNodes(document.body) });
     }
 

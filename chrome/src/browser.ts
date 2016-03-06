@@ -14,7 +14,7 @@ interface BoolFunc {
 //---------------------------------------------------------------------------
 // Sends messages to the active element in the content script of the current tab
 //---------------------------------------------------------------------------
-function sendElementMessage(msg: Interfaces.ContentMessage, callback?: Interfaces.ResultCallback<any>): void {
+function sendElementMessage(msg: Interfaces.ContentMessage<any>, callback?: Interfaces.ResultCallback<any>): void {
     msg.elementLocator = bg.elementLocatorDict[tab.id];
     chrome.tabs.sendMessage(tab.id, msg, callback);
 }
