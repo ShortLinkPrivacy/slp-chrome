@@ -7,18 +7,6 @@ var app: App,
     bg: Interfaces.BackgroundPage = <Interfaces.BackgroundPage>chrome.extension.getBackgroundPage(),
     tab: chrome.tabs.Tab;   // current open tab
 
-interface ElementMessage {
-    elementLocator?: Interfaces.ElementLocator;
-    getElementText?: boolean;
-    setElementText?: Messages.UrlType;
-    restoreElementText?: boolean;
-
-    // A record holding the params sent with the last message, but this time
-    // `body` in an array of the keys (fingerprints) used to encrypt the
-    // message.
-    lastMessage?: Interfaces.LastMessage;
-}
-
 interface BoolFunc {
     (): boolean;
 }
