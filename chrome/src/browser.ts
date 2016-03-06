@@ -26,7 +26,7 @@ interface BoolFunc {
 //---------------------------------------------------------------------------
 // Sends messages to the active element in the content script of the current tab
 //---------------------------------------------------------------------------
-function sendElementMessage(msg: ElementMessage, callback?: Interfaces.ResultCallback<any>): void {
+function sendElementMessage(msg: Interfaces.ContentMessage, callback?: Interfaces.ResultCallback<any>): void {
     msg.elementLocator = bg.elementLocatorDict[tab.id];
     chrome.tabs.sendMessage(tab.id, msg, callback);
 }
@@ -56,7 +56,7 @@ module Components {
             bg.encryptPublicKey((result: Interfaces.Success<Messages.UrlType>) => {
                 this.wait = false;
                 if ( result.success ) {
-                    sendElementMessage({ setElementText: result.value });
+                    sendElementMessage({ action: 'setElementText', value: result.value });
                     window.close();
                 } else {
                     app.error = result.error;
@@ -211,7 +211,7 @@ class App {
 
         re = new RegExp(bg.slp.itemRegExp);
 
-        sendElementMessage({ getElementText: true }, (response) => {
+        sendElementMessage({ action: 'getElementText' }, (response) => {
             if ( !response ) return;
 
             text = response.value;
@@ -268,7 +268,7 @@ class App {
         bg.encryptMessage(clearMessage, keyList, (result: Interfaces.Success<Messages.UrlType>) => {
             this.wait = false;
             if ( result.success ) {
-                sendElementMessage({ setElementText: result.value, lastMessage: lastMessage }, (result) => {
+                sendElementMessage({ action: 'setElementText', value: result.value, lastMessage: lastMessage }, (result) => {
                     if ( result.success ) {
                         window.close();
                     } else {
@@ -285,7 +285,7 @@ class App {
     // Restore the original message back in the textarea
     //---------------------------------------------------------------------------
     restoreMessage(e: Event) {
-        sendElementMessage({ restoreElementText: true }, (result) => {
+        sendElementMessage({ action: 'restoreElementText' }, (result) => {
             if ( result.success ) {
                 window.close();
             } else {
@@ -308,7 +308,7 @@ class App {
             if ( bg.privateKey.decrypt(this.password) ) {
                 chrome.tabs.query({currentWindow: true}, (tabs) => {
                     tabs.forEach((tab) => {
-                        chrome.tabs.sendMessage(tab.id, { traverse: true });
+                        chrome.tabs.sendMessage(tab.id, { action: 'traverse' });
                     });
                 });
                 chrome.browserAction.setBadgeText({text: ""});

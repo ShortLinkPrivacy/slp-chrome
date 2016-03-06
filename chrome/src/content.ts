@@ -41,18 +41,6 @@ function messageBgPage(command: string, args: BgPageArgs, callback?: Interfaces.
     chrome.runtime.sendMessage(message, callback);
 }
 
-interface ContentMessage {
-    getElementText?: boolean;
-    setElementText?: Messages.UrlType;
-    traverse?: boolean;
-    lock?: boolean;
-    restoreElementText?: boolean;
-    encryptLast: boolean;
-
-    elementLocator?: Interfaces.ElementLocator;
-    lastMessage?: Interfaces.LastMessage;
-}
-
 // Installs listeners for 'input' and 'click' to all editable and textareas
 class Editable {
     element: HTMLElement = null;
@@ -378,7 +366,7 @@ var traverseNodes = (function(){
         now = new Date();
         cre = amsg.createdDate ? new Date(amsg.createdDate) : now;
         ttl = now.getTime() - cre.getTime() + amsg.timeToLive * 1000;
-        setTimeout(() => { 
+        setTimeout(() => {
             el.innerHTML = "Expired private message";
             el.classList.add("__pgp_expired");
         }, Math.max(0, ttl));
@@ -551,51 +539,86 @@ function $data(el: HTMLElement, name: string, value?: any): any {
 
 // Listen for messages from the extension
 // TODO: maybe convert it to class, like background
-function listenToMessages() {
+class MessageListener {
+    editable: Editable;
 
-    var editable: Editable;
+    constructor() {
+        chrome.runtime.onMessage.addListener((msg: Interfaces.ContentMessage, sender, sendResponse) => {
+            var eloc: Interfaces.ElementLocator,
+                element: HTMLElement;
+
+            // If element locator element is provided in the message, then we're
+            // dealing with an editable and we need to first locate it.
+            if ( eloc = msg.elementLocator ) {
+
+                // If we're in a frame and the id of the frame does not match the
+                // one provided in the locator, then no.
+                if ( window.frameElement && window.frameElement.id != eloc.frameId )
+                    return;
+
+                // If we're in the top window and the id of the frame in the
+                // locator is not null, then no.
+                if ( !window.frameElement && eloc.frameId != null )
+                    return;
+
+                // At this point, we have determined that the element and frame ID
+                // provided in the locator match the document we're running in.  If
+                // the element can not be found, then bail. Gmail (and possibly
+                // others do some frame trickery that confuses the shit out of the
+                // content script)
+                if (element = document.getElementById(eloc.elementId)) {
+                    this.editable = $data(element, init.config.pgpElAttr);
+                } else {
+                    return;
+                }
+            } else {
+                this.editable = null;
+            }
+
+            try {
+                this[msg.action](msg, sendResponse);
+            } catch(e) {
+                // TODO: report error
+                sendResponse({success: false, error: e});
+            }
+        });
+    }
 
     // Get the active element and its value
-    // ------------------------------------------------------------
-    var getElementText = function(msg: ContentMessage, sendResponse) {
-        if (!editable) return;
+    getElementText(msg: Interfaces.ContentMessage, sendResponse) {
+        if (!this.editable) return;
         sendResponse({
-            value: editable.getText(),
-            lastMessage: editable.lastMessage
+            value: this.editable.getText(),
+            lastMessage: this.editable.lastMessage
         });
     }
 
     // Set the active element and mark it as encrypted
-    // ------------------------------------------------------------
-    var setElementText = function(msg: ContentMessage, sendResponse) {
-        if (!editable) {
+    setElementText(msg: Interfaces.ContentMessage, sendResponse) {
+        if (!this.editable) {
             sendResponse({ success: false });
             return;
         };
-        editable.setText(msg.setElementText.body);
-        editable.lastMessage = msg.lastMessage;
+        this.editable.setText(msg.value.body);
+        this.editable.lastMessage = msg.lastMessage;
         sendResponse({ success: true });
     }
 
     // Restore the original text of the textarea
-    // ------------------------------------------------------------
-    var restoreElementText = function(msg: ContentMessage, sendResponse) {
-        if (!editable) return;
-        var result = editable.restoreText();
+    restoreElementText(msg: Interfaces.ContentMessage, sendResponse) {
+        if (!this.editable) return;
+        var result = this.editable.restoreText();
         sendResponse({ success: result });
     }
 
-
     // Encrypt using the last used keys
-    // ------------------------------------------------------------
-    var encryptLast = function(msg: ContentMessage, sendResponse) {
-        if (!editable) return;
-        editable.encryptLast();
+    encryptLast(msg: Interfaces.ContentMessage, sendResponse) {
+        if (!this.editable) return;
+        this.editable.encryptLast();
     }
 
     // Return all decrypted nodes to their original values
-    // ------------------------------------------------------------
-    var lock = function(msg: ContentMessage, sendResponse) {
+    lock(msg: Interfaces.ContentMessage, sendResponse) {
         var els = document.getElementsByClassName(init.config.pgpClassName),
             i: number,
             parentEl: HTMLElement,
@@ -619,58 +642,10 @@ function listenToMessages() {
     }
 
     // Decrypt all nodes
-    // ------------------------------------------------------------
-    var traverse = function(msg: ContentMessage, sendResponse) {
+    traverse(msg: Interfaces.ContentMessage, sendResponse) {
         getInitVars(() => { traverseNodes(document.body) });
     }
 
-    // Message listener
-    // ============================================================
-    chrome.runtime.onMessage.addListener((msg: ContentMessage, sender, sendResponse) => {
-        var eloc: Interfaces.ElementLocator,
-            element: HTMLElement;
-
-        // If element locator element is provided in the message, then we're
-        // dealing with an editable and we need to first locate it.
-        if ( eloc = msg.elementLocator ) {
-
-            // If we're in a frame and the id of the frame does not match the
-            // one provided in the locator, then no.
-            if ( window.frameElement && window.frameElement.id != eloc.frameId )
-                return;
-
-            // If we're in the top window and the id of the frame in the
-            // locator is not null, then no.
-            if ( !window.frameElement && eloc.frameId != null )
-                return;
-
-            // At this point, we have determined that the element and frame ID
-            // provided in the locator match the document we're running in.  If
-            // the element can not be found, then bail. Gmail (and possibly
-            // others do some frame trickery that confuses the shit out of the
-            // content script)
-            if (element = document.getElementById(eloc.elementId)) {
-                editable = $data(element, init.config.pgpElAttr);
-            } else {
-                return;
-            }
-        } else {
-            editable = null;
-        }
-
-        if ( msg.getElementText )
-            getElementText(msg, sendResponse)
-        else if ( msg.setElementText)
-            setElementText(msg, sendResponse)
-        else if ( msg.traverse )
-            traverse(msg, sendResponse)
-        else if ( msg.lock )
-            lock(msg, sendResponse)
-        else if ( msg.restoreElementText )
-            restoreElementText(msg, sendResponse)
-        else if ( msg.encryptLast )
-            encryptLast(msg, sendResponse)
-    });
 }
 
 // Bootstrap
@@ -683,7 +658,7 @@ getInitVars(() => {
     }
 
     if ( init.hasPrivateKey ) {
-        listenToMessages();
+        new MessageListener();
         eventObserver();
         traverseNodes(document.body);
         bindEditables(document.body);

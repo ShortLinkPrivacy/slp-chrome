@@ -99,7 +99,7 @@ function lockDown(callback?: Interfaces.Callback): void {
     var i: number;
     chrome.tabs.query({}, (tabs) => {
         for (i = 0; i < tabs.length; i++) {
-            chrome.tabs.sendMessage(tabs[i].id, { lock: true });
+            chrome.tabs.sendMessage(tabs[i].id, { action: 'lock' });
         }
         if ( callback ) callback();
     });
@@ -254,7 +254,7 @@ contextMenuId = chrome.contextMenus.create({
         var eloc = elementLocatorDict[tab.id];
         if (!eloc) return;
         chrome.tabs.sendMessage(tab.id, {
-            encryptLast: true,
+            action: 'encryptLast',
             elementLocator: eloc
         });
     }

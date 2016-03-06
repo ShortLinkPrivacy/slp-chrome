@@ -50,6 +50,13 @@ module Interfaces {
         addressBook: AddressBookStore.Interface;
     }
 
+    export interface ContentMessage {
+        action: string;
+        elementLocator?: ElementLocator;
+        lastMessage?: LastMessage;
+        value?: any;
+    }
+
     export interface BackgroundPage extends Window {
         config: Config;
         store: StoreCollection;
