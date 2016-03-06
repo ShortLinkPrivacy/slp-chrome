@@ -9,6 +9,7 @@ browser
 
 content
 ==================================
+- BUG: If there are magic links and we don't have a key, when we create the key there is an openpgp error
 - BUG: Restore original message does not work on Facebook (possibly others)
 - add timeout to expire messages in the DOM
 - on install the content script should prompt the tab to get reloaded, so it takes the new code
