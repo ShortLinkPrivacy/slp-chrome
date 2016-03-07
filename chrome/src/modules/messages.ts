@@ -8,11 +8,12 @@ module Messages {
     export type Armor = string;
     export type Url = string;
 
-    // Messsage structure
+    // Message structure
     export interface Record<T> {
         body: T;
-        createdDate?: string;    // It goes thru JSON too many times
+        createdDate?: string;
         timeToLive?: number;
+        fingerprints?: Keys.FingerprintArray;
         extVersion?: string;
     }
 
@@ -117,9 +118,10 @@ module Messages {
         }
         openpgp.encryptMessage( keyList, m.body )
             .then((armoredText) => {
-                var amsg = <ArmorType>m;
-                amsg.body = armoredText;
-                callback({success: true, value: amsg});
+                var armorMsg = <ArmorType>m;
+                armorMsg.body = armoredText;
+                armorMsg.fingerprints = keyList.map((k) => { return k.primaryKey.getFingerprint() });
+                callback({success: true, value: armorMsg});
             })["catch"]((err) => {
                 callback({ success: false, error: "OpenPGP Error: " + err });
             });
