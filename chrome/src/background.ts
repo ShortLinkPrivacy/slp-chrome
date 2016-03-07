@@ -41,6 +41,9 @@ function makePublicKeyText(armor: Keys.Armor, messageId: Messages.Id, callback: 
 }
 
 function encryptMessage(msg: Messages.ClearType, keyList: Array<openpgp.key.Key>, callback: Interfaces.SuccessCallback<Messages.UrlType>): void {
+    // Add own key to the key list
+    keyList.push(privateKey.toPublic().openpgpKey());
+
     Messages.encrypt(msg, keyList, (result) => {
         if ( result.success == true ) {
             var armor = result.value;
@@ -218,14 +221,11 @@ class Message {
             if ( lastMessage.body && lastMessage.body.length ) {
                 store.addressBook.load(lastMessage.body, (foundKeys) => {
                     keyList = foundKeys.map( k => { return k.openpgpKey() });
-                    keyList.push(privateKey.key.toPublic());
 
                     // The new message is like the old message, but using the new text
                     clearMessage = { body: text, timeToLive: lastMessage.timeToLive };
 
-                    encryptMessage(clearMessage, keyList, (result) => {
-                        this.sendResponse(result);
-                    })
+                    encryptMessage(clearMessage, keyList, this.sendResponse);
                 });
             }
     }

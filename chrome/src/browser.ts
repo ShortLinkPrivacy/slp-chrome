@@ -246,9 +246,6 @@ class App {
             lastMessage.body.push(item.key.fingerprint());
         })
 
-        // Also push our own key, so we can read our own message
-        keyList.push(bg.privateKey.key.toPublic());
-
         // The clear message is a record
         clearMessage = { body: this.clearText, timeToLive: this.timeToLive };
 

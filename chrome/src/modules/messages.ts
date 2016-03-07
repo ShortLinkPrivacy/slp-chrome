@@ -111,6 +111,10 @@ module Messages {
     }
 
     export function encrypt(m: ClearType, keyList: Array<openpgp.key.Key>, callback: Interfaces.SuccessCallback<ArmorType>): void {
+        if ( !keyList || keyList.length == 0 ) {
+            callback({ success: false, error: "No public keys selected" });
+            return;
+        }
         openpgp.encryptMessage( keyList, m.body )
             .then((armoredText) => {
                 var amsg = <ArmorType>m;
