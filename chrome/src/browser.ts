@@ -44,8 +44,13 @@ module Components {
             bg.encryptPublicKey((result: Interfaces.Success<Messages.UrlType>) => {
                 this.wait = false;
                 if ( result.success ) {
-                    sendElementMessage({ action: 'setElementText', value: result.value });
-                    window.close();
+                    sendElementMessage({ action: 'setElementText', value: result.value }, (result) => {
+                        if (result.success == true) {
+                            window.close();
+                        } else {
+                            app.error = result.error;
+                        }
+                    });
                 } else {
                     app.error = result.error;
                 }
@@ -194,7 +199,9 @@ class App {
     }
 
     private getElementText(): void {
-        var re: RegExp, text: string, lastMessage: Interfaces.LastMessage,
+        var re: RegExp,
+            text: string,
+            lastMessage: Interfaces.LastMessage,
             i: number;
 
         re = new RegExp(bg.slp.itemRegExp);
@@ -208,17 +215,19 @@ class App {
             this.alreadyEncrypted = re.exec(text) ? true : false;
             this.clearText = text;
 
-            // lastMessage.body actually contains an array of fingerprints, so we
-            // have to look them up in the address book and translate them into
-            // keys
-            if ( lastMessage.body.length ) {
-                bg.store.addressBook.load(lastMessage.body, (keys) => {
-                    this.recepients.setFromKeys(keys);
-                });
-            }
+            if ( lastMessage ) {
+                // lastMessage.body actually contains an array of fingerprints, so we
+                // have to look them up in the address book and translate them into
+                // keys
+                if ( lastMessage.fingerprints.length ) {
+                    bg.store.addressBook.load(lastMessage.fingerprints, (keys) => {
+                        this.recepients.setFromKeys(keys);
+                    });
+                }
 
-            if ( lastMessage.timeToLive ) {
-                this.timeToLive = lastMessage.timeToLive;
+                if ( lastMessage.timeToLive ) {
+                    this.timeToLive = lastMessage.timeToLive;
+                }
             }
 
         });
@@ -229,35 +238,33 @@ class App {
     //---------------------------------------------------------------------------
     sendMessage(e: Event) {
         var keyList: Array<openpgp.key.Key> = [],
-            lastMessage: Interfaces.LastMessage,
             clearMessage: Messages.ClearType;
 
         // This should never happen because we don't show the submit button
         if (this.recepients.hasSelected() == false) return;
-
-        // Figure out the lastMessage
-        lastMessage = { body: [], timeToLive: this.timeToLive };
 
         // Collect a list of keys and fingerprints. The keys are used to encrypt
         // the message, and the fingerprints are saved in the editable so they
         // can be reused again with a shortcut
         this.recepients.forEach((item) => {
             keyList.push(item.key.openpgpKey());
-            lastMessage.body.push(item.key.fingerprint());
         })
 
         // The clear message is a record
-        clearMessage = { body: this.clearText, timeToLive: this.timeToLive };
+        clearMessage = {
+            body: this.clearText,
+            timeToLive: this.timeToLive
+        };
 
         this.wait = true;
         bg.encryptMessage(clearMessage, keyList, (result: Interfaces.Success<Messages.UrlType>) => {
             this.wait = false;
             if ( result.success ) {
-                sendElementMessage({ action: 'setElementText', value: result.value, lastMessage: lastMessage }, (result) => {
+                sendElementMessage({ action: 'setElementText', value: result.value }, (result) => {
                     if ( result.success ) {
                         window.close();
                     } else {
-                        this.error = "No input field was found on the page";
+                        this.error = result.error;
                     }
                 });
             } else {

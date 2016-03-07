@@ -215,19 +215,22 @@ class Message {
             keyList: Array<openpgp.key.Key> = [],
             clearMessage: Messages.ClearType;
 
-            lastMessage = this.request.lastMessage;
-            text = this.request.text;
+        lastMessage = this.request.lastMessage;
+        text = this.request.text;
 
-            if ( lastMessage.body && lastMessage.body.length ) {
-                store.addressBook.load(lastMessage.body, (foundKeys) => {
-                    keyList = foundKeys.map( k => { return k.openpgpKey() });
+        if ( lastMessage && lastMessage.fingerprints && lastMessage.fingerprints.length ) {
+            store.addressBook.load(lastMessage.fingerprints, (foundKeys) => {
+                keyList = foundKeys.map( k => { return k.openpgpKey() });
 
-                    // The new message is like the old message, but using the new text
-                    clearMessage = { body: text, timeToLive: lastMessage.timeToLive };
+                // The new message is like the old message, but using the new text
+                clearMessage = <Messages.ClearType>lastMessage;
+                clearMessage.body = text;
 
-                    encryptMessage(clearMessage, keyList, this.sendResponse);
-                });
-            }
+                encryptMessage(clearMessage, keyList, this.sendResponse);
+            });
+        } else {
+            this.sendResponse({ success: false, error: "No previous message in this editable" })
+        }
     }
 
     // Send updates to the context menu. Most cases enable and disable it.

@@ -96,7 +96,9 @@ class Editable {
 
     // Tells if it's OK to encrypt for the last recepient
     private okToUseLast(): boolean {
-        return this.hasLastMessage() && !this.isAlreadyEncrypted();
+        return this.getText()
+            && this.hasLastMessage()
+            && !this.isAlreadyEncrypted() ? true : false;
     }
 
     // Is the element a TEXTAREA?
@@ -112,8 +114,8 @@ class Editable {
     // Do we have the last keys used to encrypt?
     hasLastMessage(): boolean {
         return this.lastMessage
-            && this.lastMessage.body
-            && this.lastMessage.body.length > 0 ? true : false;
+            && this.lastMessage.fingerprints
+            && this.lastMessage.fingerprints.length > 0 ? true : false;
     }
 
     // Set this editable as the active one for this tab
@@ -595,12 +597,23 @@ class MessageListener {
 
     // Set the active element and mark it as encrypted
     setElementText(sendResponse, msg: Interfaces.ContentMessage<Messages.UrlType>) {
+        var urlMsg: Messages.UrlType;
+
         if (!this.editable) {
-            sendResponse({ success: false });
+            sendResponse({ success: false, error: "No editable input fields found" });
             return;
         };
-        this.editable.setText(msg.value.body);
-        this.editable.lastMessage = msg.lastMessage;
+
+        urlMsg = msg.value;
+
+        this.editable.setText(urlMsg.body);
+
+        // Only set the last message if it has fingerprints. Otherwise it
+        // will be a public key link or other non-message type.
+        if ( urlMsg.fingerprints && urlMsg.fingerprints.length ) {
+            this.editable.lastMessage = urlMsg;
+        }
+
         sendResponse({ success: true });
     }
 

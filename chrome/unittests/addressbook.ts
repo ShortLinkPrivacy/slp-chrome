@@ -47,6 +47,13 @@ describe("Key Storage :: LocalStore", function() {
             assert.equal(key.fingerprint(), alice.fingerprint());
         });
 
+        it('does not load non-existing keys', (done) => {
+            addressBook.load(["boza", "halva", alice.fingerprint()], (arr) => {
+                assert.equal(arr.length, 1);
+                done();
+            })
+        })
+
     });
 
     describe('search', function() {

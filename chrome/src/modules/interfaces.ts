@@ -1,10 +1,8 @@
 module Interfaces {
 
-    // The LastMessage structure is like a message
-    // structure, but the `body` attribute is an array
-    // of keys (fingerprints) which were used to
-    // encrypt the previous message
-    export type LastMessage = Messages.Record<Keys.FingerprintArray>;
+    // The last message is just a regular UrlType message. We define its own
+    // type just for the hell of it.
+    export type LastMessage = Messages.UrlType;
 
     export interface Dictionary extends Object {
         [index: string]: any;
@@ -53,7 +51,6 @@ module Interfaces {
     export interface ContentMessage<T> {
         action: string;
         elementLocator?: ElementLocator;
-        lastMessage?: LastMessage;
         value?: T;
     }
 
