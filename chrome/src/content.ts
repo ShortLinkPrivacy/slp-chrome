@@ -360,14 +360,14 @@ var traverseNodes = (function(){
         startObserver();
     }
 
-    function setElementExpiration(el: HTMLElement, amsg: Messages.ClearType): void {
+    function setElementExpiration(el: HTMLElement, clearMsg: Messages.ClearType): void {
         var now, cre: Date, ttl: number;
 
-        if (!amsg.timeToLive) return;
+        if (!clearMsg.timeToLive) return;
 
         now = new Date();
-        cre = amsg.createdDate ? new Date(amsg.createdDate) : now;
-        ttl = now.getTime() - cre.getTime() + amsg.timeToLive * 1000;
+        cre = clearMsg.createdDate ? new Date(clearMsg.createdDate) : now;
+        ttl = now.getTime() - cre.getTime() + clearMsg.timeToLive * 1000;
         setTimeout(() => {
             el.innerHTML = "Expired private message";
             el.classList.add("__pgp_expired");
@@ -389,12 +389,12 @@ var traverseNodes = (function(){
             count++;
             messageBgPage( 'decryptLink', { messageId: messageId }, (result: Interfaces.Success<Messages.ClearType>) => {
                 if ( result.success ) {
-                    var amsg: Messages.ClearType = result.value;
-                    element.innerHTML = amsg.body;
+                    var clearMsg: Messages.ClearType = result.value;
+                    element.innerHTML = clearMsg.body;
                     element.classList.add("__pgp_decrypted");
 
                     // Expiring?
-                    setElementExpiration(element, amsg);
+                    setElementExpiration(element, clearMsg);
                 } else {
                     element.innerText = result.error;
                     element.classList.add("__pgp_error");
