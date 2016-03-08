@@ -108,8 +108,8 @@ function broadcast(message: Interfaces.ContentMessage<any>, callback?: Interface
     });
 }
 
-function lockDown(callback?: Interfaces.Callback): void {
-    broadcast({action: 'lock'}, callback);
+function lockDown(): void {
+    broadcast({action: 'lock'});
 }
 
 //############################################################################
