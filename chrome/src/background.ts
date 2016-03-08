@@ -116,6 +116,7 @@ function lockDown(): void {
 // Returns true if the key was successfuly unlocked.
 function unlockKey(password: string): boolean {
     if ( privateKey.decrypt(password) ) {
+        broadcast({ action: 'windowMessage', value: 'slp_key_unlocked' });
         broadcast({ action: 'traverse' });
         chrome.browserAction.setBadgeText({text: ""});
         return true;
