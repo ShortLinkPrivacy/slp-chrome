@@ -97,15 +97,19 @@ function encryptPublicKey(callback: Interfaces.SuccessCallback<Messages.UrlType>
     });
 }
 
-
-function lockDown(callback?: Interfaces.Callback): void {
+// Broadcasts a message to all tabs
+function broadcast(message: Interfaces.ContentMessage<any>, callback?: Interfaces.Callback): void {
     var i: number;
     chrome.tabs.query({}, (tabs) => {
         for (i = 0; i < tabs.length; i++) {
-            chrome.tabs.sendMessage(tabs[i].id, { action: 'lock' });
+            chrome.tabs.sendMessage(tabs[i].id, message);
         }
         if ( callback ) callback();
     });
+}
+
+function lockDown(callback?: Interfaces.Callback): void {
+    broadcast({action: 'lock'}, callback);
 }
 
 //############################################################################
