@@ -297,13 +297,7 @@ class App {
 
         if ( this.password ) {
             this.wait = true;
-            if ( bg.privateKey.decrypt(this.password) ) {
-                chrome.tabs.query({currentWindow: true}, (tabs) => {
-                    tabs.forEach((tab) => {
-                        chrome.tabs.sendMessage(tab.id, { action: 'traverse' });
-                    });
-                });
-                chrome.browserAction.setBadgeText({text: ""});
+            if ( bg.unlockKey(this.password) ) {
                 window.close();
             } else {
                 this.error = "Wrong password";

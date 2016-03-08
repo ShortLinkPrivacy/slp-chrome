@@ -112,6 +112,18 @@ function lockDown(): void {
     broadcast({action: 'lock'});
 }
 
+// Unlocks the private key and sends a 'traverse' broadcast.
+// Returns true if the key was successfuly unlocked.
+function unlockKey(password: string): boolean {
+    if ( privateKey.decrypt(password) ) {
+        broadcast({ action: 'traverse' });
+        chrome.browserAction.setBadgeText({text: ""});
+        return true;
+    }
+
+    return false;
+}
+
 //############################################################################
 
 class Message {
