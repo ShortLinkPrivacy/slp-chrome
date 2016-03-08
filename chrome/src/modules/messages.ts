@@ -100,6 +100,13 @@ module Messages {
     }
 
     export function decrypt(m: ArmorType, privateKey: Keys.PrivateKey, callback: Interfaces.SuccessCallback<ClearType> ): void {
+        // If we have a fingerprints array, then check if our key is in it
+        if ( m.fingerprints && m.fingerprints.length > 0 ) {
+            if ( m.fingerprints.indexOf(privateKey.fingerprint()) < 0 ) {
+                callback({success: false, error: "Message encrypted for another recipient"});
+                return;
+            }
+        }
         var message = openpgp.message.readArmored(<string>m.body);
         openpgp.decryptMessage( privateKey.key, message )
            .then((clearText: string) => {

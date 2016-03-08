@@ -15,7 +15,7 @@ module API {
     export type AnySuccess = Interfaces.SuccessCallback<any>;
 
     export function http(method: string, url: string, args: any, callback: AnySuccess): void {
-        var r = new XMLHttpRequest(), 
+        var r = new XMLHttpRequest(),
             json: any,
             okStatus: number;
 
@@ -26,7 +26,8 @@ module API {
         r.onreadystatechange = function() {
             if (r.readyState == 4) {
                 if (r.status != okStatus) {
-                    callback({ success: false, error: r.responseText || "No response from server" });
+                    callback({ success: false, error: "SLP server error" });
+                    //TODO: log
                     return;
                 }
 
@@ -34,6 +35,7 @@ module API {
                     json = JSON.parse(r.responseText);
                 } catch (e) {
                     callback({ success: false, error: "JSON parse error" });
+                    //TODO: log
                     return;
                 }
 

@@ -134,8 +134,7 @@ class Message {
     }
 
     decryptLink(): void {
-        var re: RegExp,
-            messageId: Messages.Id,
+        var messageId: Messages.Id,
             armorMsg: Messages.ArmorType;
 
         messageId = this.request.messageId;
@@ -147,7 +146,7 @@ class Message {
 
         slp.loadItem( messageId, (result) => {
             if ( !result.success ) {
-               this.sendResponse({ success: false, error: 'decode', value: messageId });
+               this.sendResponse(result);
                return;
             }
 

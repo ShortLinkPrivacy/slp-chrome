@@ -396,7 +396,7 @@ var traverseNodes = (function(){
                     // Expiring?
                     setElementExpiration(element, amsg);
                 } else {
-                    element.innerText = "Can not decrypt";
+                    element.innerText = result.error;
                     element.classList.add("__pgp_error");
                 }
                 count--;
