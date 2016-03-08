@@ -540,7 +540,6 @@ function $data(el: HTMLElement, name: string, value?: any): any {
 }
 
 // Listen for messages from the extension
-// TODO: maybe convert it to class, like background
 class MessageListener {
     editable: Editable;
 
