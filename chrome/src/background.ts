@@ -136,7 +136,7 @@ class Message {
     decryptLink(): void {
         var re: RegExp,
             messageId: Messages.Id,
-            armored: Messages.ArmorType;
+            armorMsg: Messages.ArmorType;
 
         messageId = this.request.messageId;
 
@@ -151,14 +151,14 @@ class Message {
                return;
             }
 
-            armored = result.value;
-            if ( Messages.isMessage(armored) == true ) {
-                Messages.decrypt( armored, privateKey, (r) => this.sendResponse(r) );
-            } else if ( Messages.isPublicKey(armored) == true ) {
-                makePublicKeyText(armored.body, messageId, (html) => {
-                    var umsg = <Messages.UrlType>armored;
-                    umsg.body = html;
-                    this.sendResponse({ success: true, value: umsg });
+            armorMsg = result.value;
+            if ( Messages.isMessage(armorMsg) == true ) {
+                Messages.decrypt( armorMsg, privateKey, this.sendResponse );
+            } else if ( Messages.isPublicKey(armorMsg) == true ) {
+                makePublicKeyText(armorMsg.body, messageId, (html) => {
+                    var urlMsg = <Messages.UrlType>armorMsg;
+                    urlMsg.body = html;
+                    this.sendResponse({ success: true, value: urlMsg });
                 });
             }
         });
