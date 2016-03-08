@@ -26,8 +26,13 @@ module API {
         r.onreadystatechange = function() {
             if (r.readyState == 4) {
                 if (r.status != okStatus) {
-                    callback({ success: false, error: "SLP server error" });
-                    //TODO: log
+                    var error: string;
+                    if ( r.status == 404 || r.status == 410 ) {
+                        error = "Expired private message"
+                    } else {
+                        error = "Message server error"
+                    }
+                    callback({ success: false, error: error });
                     return;
                 }
 
@@ -35,7 +40,6 @@ module API {
                     json = JSON.parse(r.responseText);
                 } catch (e) {
                     callback({ success: false, error: "JSON parse error" });
-                    //TODO: log
                     return;
                 }
 
