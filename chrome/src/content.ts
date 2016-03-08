@@ -658,7 +658,7 @@ class MessageListener {
         getInitVars(() => { traverseNodes(document.body) });
     }
 
-    // Send a window message to self (mostly used for testing a debugging)
+    // Send a window message to self (mostly used for testing and debugging)
     windowMessage(sendResponse, msg: Interfaces.ContentMessage<string>) {
         window.postMessage(msg.value, document.location.href);
     }
