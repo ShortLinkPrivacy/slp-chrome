@@ -14,7 +14,7 @@ class Preferences extends LocalStorage {
     publicKeyUrl: string;
 
     // Do not use Google Analytics
-    noGA: boolean = false;
+    allowCollectData: boolean = true;
 
     // How many times we've nagged about setup
     setupNagCount: number = 0;

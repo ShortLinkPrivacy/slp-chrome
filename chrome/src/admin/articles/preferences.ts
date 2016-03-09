@@ -4,14 +4,14 @@ module Admin {
 
         filename = "preferences.html";
         articleId = "preferences";
-        allowGA: boolean;
+        allowCollectData: boolean;
 
         onBind() {
-            this.allowGA = !bg.preferences.noGA;
+            this.allowCollectData = bg.preferences.allowCollectData;
         }
 
-        toggleGA(e: Event) {
-            bg.preferences.noGA = !(<HTMLInputElement>e.target).checked;
+        toggleCollectData(e: Event) {
+            bg.preferences.allowCollectData = (<HTMLInputElement>e.target).checked;
             bg.preferences.save();
         }
 
