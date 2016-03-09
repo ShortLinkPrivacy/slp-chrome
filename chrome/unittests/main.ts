@@ -24,7 +24,9 @@ var message: Messages.UrlType;
 bg.privateKey = TestKeys.secret;
 bg.privateKey.decrypt("asdfasdfasdf");
 
-describe("Content and Background", ()=> {
+describe("Main", ()=> {
+
+    /*
 
     describe("Simple message", () => {
         tab = null;
@@ -55,13 +57,28 @@ describe("Content and Background", ()=> {
         saneLink();
     })
 
+    */
+
 
     describe("Expired messages", () => {
+        var message2: Messages.UrlType,
+            json: { url0: string; url1: string };
+
         tab = null;
         message = null;
 
         before((done) => {
-            makeMessage( { body: "test", timeToLive: -1 }, "/content_expire/index.html", done );
+            bg.encryptMessage( { body: "test", timeToLive: 1 }, [alice.key], (res) => {
+                message2 = res.value;
+                bg.encryptMessage( { body: "test", timeToLive: -1 }, [alice.key], (res) => {
+                    message = res.value;
+                    json = { url0: message.body, url1: message2.body };
+                    chrome.tabs.create({ url: baseUrl + "/content_expire/index.html?" + escape(JSON.stringify(json)) }, (t) => {
+                        tab = t;
+                        done();
+                    })
+                });
+            })
         })
 
         saneLink();

@@ -5,13 +5,20 @@ var hasRun = false;
 
 describe("Expired Messages", () => {
   it("Shows expired message", () => {
-    assert.ok(document.getElementById('m1').innerHTML.match(/expired/i));
+    assert.ok(document.getElementById('m1').innerText.match(/expired/i));
   })
 })
 
-window.addEventListener("message", (e) => {
-  if ( e.data == "slp_done_decoding" && !hasRun ) {
-    mocha.run();
-    hasRun = true;
-  }
+describe("Message to expire in 1 second", () => {
+
+    it("shows the clear text in the beginning", () => {
+        assert.equal(document.getElementById('m2').innerText, "test");
+    });
+
+    it("expires in 1 second", (done) => {
+        setTimeout(() => {
+            assert.ok(document.getElementById('m2').innerText.match(/expired/i));
+            done();
+        }, 1200);
+    })
 })

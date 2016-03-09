@@ -361,17 +361,15 @@ var traverseNodes = (function(){
     }
 
     function setElementExpiration(el: HTMLElement, clearMsg: Messages.ClearType): void {
-        var now, cre: Date, ttl: number;
+        var now: Date,
+            ttl: number;
 
         if (!clearMsg.timeToLive) return;
 
-        now = new Date();
-        cre = clearMsg.createdDate ? new Date(clearMsg.createdDate) : now;
-        ttl = now.getTime() - cre.getTime() + clearMsg.timeToLive * 1000;
         setTimeout(() => {
             el.innerHTML = "Expired private message";
             el.classList.add("__pgp_expired");
-        }, Math.max(0, ttl));
+        }, Math.max(0, clearMsg.timeToLive * 1000));
     }
 
     // Gathers a list of all enchanted elements and decodes them one by one

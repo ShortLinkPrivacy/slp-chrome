@@ -85,12 +85,3 @@ describe("Editable links", () => {
     assert.ok(document.getElementById('el1').innerHTML.match(/\<a/i));
   })
 })
-
-window.addEventListener("message", (e) => {
-  if ( e.data == "slp_done_decoding" && !hasRun ) {
-    mocha.run();
-    hasRun = true;
-  }
-})
-
-

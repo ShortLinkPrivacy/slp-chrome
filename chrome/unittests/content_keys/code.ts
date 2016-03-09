@@ -8,10 +8,3 @@ describe("Public keys", () => {
     assert.ok(document.getElementById('pk1').innerHTML.match(/_pk/i));
   })
 })
-
-window.addEventListener("message", (e) => {
-  if ( e.data == "slp_done_decoding" && !hasRun ) {
-    mocha.run();
-    hasRun = true;
-  }
-})
