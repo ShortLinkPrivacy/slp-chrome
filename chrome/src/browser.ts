@@ -114,9 +114,18 @@ class Recepients {
     }
 
     setFromKeys(list: Array<Keys.PublicKey>): void {
-        this.selected = list.map( k => {
-            return new Keys.KeyItem(k)
-        });
+        var i: number,
+            result: Keys.KeyItemList = [];
+
+        // Move all keys, except own key so it doesn't show up in the list
+        for (i = 0; i < list.length; i++) {
+            var k = list[i];
+            if ( k.fingerprint() != bg.privateKey.fingerprint() ) {
+                result.push(new Keys.KeyItem(k))
+            }
+        }
+
+        this.selected = result;
     }
 
     forEach(func: { (item: Keys.KeyItem): void }): void {
