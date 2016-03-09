@@ -1,8 +1,8 @@
-/// <reference path="../typings/mocha/mocha.d.ts" />
-/// <reference path="../typings/assert/assert.d.ts" />
-/// <reference path="../typings/chrome/chrome.d.ts" />
-/// <reference path="../src/modules.d.ts" />
-/// <reference path="lib/testkeys.ts" />
+/// <reference path="../../typings/mocha/mocha.d.ts" />
+/// <reference path="../../typings/assert/assert.d.ts" />
+/// <reference path="../../typings/chrome/chrome.d.ts" />
+/// <reference path="../../src/modules.d.ts" />
+/// <reference path="../lib/testkeys.ts" />
 
 var bg: Interfaces.BackgroundPage = <Interfaces.BackgroundPage>chrome.extension.getBackgroundPage();
 var secret = TestKeys.secret;

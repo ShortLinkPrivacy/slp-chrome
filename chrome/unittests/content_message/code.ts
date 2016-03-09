@@ -1,5 +1,5 @@
-/// <reference path="../typings/mocha/mocha.d.ts" />
-/// <reference path="../typings/assert/assert.d.ts" />
+/// <reference path="../../typings/mocha/mocha.d.ts" />
+/// <reference path="../../typings/assert/assert.d.ts" />
 
 var hasRun = false;
 
@@ -46,10 +46,10 @@ describe("Connected text", () => {
 
 describe("404", () => {
   it("Shows an error", () => {
-    assert.equal(document.getElementById('e1').innerText, 'Can not decrypt');
+    assert.equal(document.getElementById('e1').innerText, 'Expired private message');
   })
   it("Shows an error with connected text", () => {
-    assert.equal(document.getElementById('e2').innerText, 'Can not decryptzzz');
+    assert.equal(document.getElementById('e2').innerText, 'Expired private messagezzz');
   })
 })
 
@@ -83,12 +83,6 @@ describe("Editable links", () => {
   })
   it("Preserves the A tag at level 1", () => {
     assert.ok(document.getElementById('el1').innerHTML.match(/\<a/i));
-  })
-})
-
-describe("Public keys", () => {
-  it("Adds the public key class", () => {
-    assert.ok(document.getElementById('pk1').innerHTML.match(/_pk/i));
   })
 })
 

@@ -1,7 +1,7 @@
-/// <reference path="../typings/mocha/mocha.d.ts" />
-/// <reference path="../typings/assert/assert.d.ts" />
-/// <reference path="../src/modules.d.ts" />
-/// <reference path="lib/testkeys.ts" />
+/// <reference path="../../typings/mocha/mocha.d.ts" />
+/// <reference path="../../typings/assert/assert.d.ts" />
+/// <reference path="../../src/modules.d.ts" />
+/// <reference path="../lib/testkeys.ts" />
 
 AddressBookStore.IndexedDB.dbName = "Test";
 
@@ -84,7 +84,7 @@ describe("Key Storage :: LocalStore", function() {
         });
 
         it('finds other userIds', function(done) {
-            addressBook.search('stefanguen', function(result) {
+            addressBook.search('sge@ifnx.com', function(result) {
                 assert.equal(result.length, 1);
                 done();
             });

@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Pretty Good Plugin (Unit Tests)</title>
+    <link href="../../bower_components/mocha/mocha.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="mocha"></div>
+
+    <!-- Vendors JS -->
+    <script src="../../bower_components/openpgp/dist/openpgp.min.js"></script>
+    <script src="../../bower_components/mocha/mocha.js"></script>
+    <script src="../../bower_components/expect/index.js"></script>
+    <script src="../../bower_components/moment/min/moment.min.js"></script>
+    <script src="../../bower_components/assert/assert.js"></script>
+
+    <!-- Code -->
+    <script src="../../src/modules.js"></script>
+
+    <!-- Tests -->
+    <script src="../lib/init.js"></script>
+    <script src="../lib/testkeys.js"></script>
+
+    <script src="addressbook.js"></script>
+    <script src="privatekey.js"></script>
+    <script src="api.js"></script>
+    <script src="preferences.js"></script>
+    <script src="background.js"></script>
+
+    <script src="../lib/run.js"></script>
+  </body>
+</html>
