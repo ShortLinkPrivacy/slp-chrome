@@ -118,7 +118,7 @@ function unlockKey(password: string): boolean {
     if ( privateKey.decrypt(password) ) {
         broadcast({ action: 'windowMessage', value: 'slp_key_unlocked' });
         broadcast({ action: 'traverse' });
-        chrome.browserAction.setBadgeText({text: ""});
+        //chrome.browserAction.setBadgeText({text: ""});
         return true;
     }
 
@@ -181,7 +181,7 @@ class Message {
     }
 
     needPassword(): void {
-        chrome.browserAction.setBadgeText({text: '*'});
+        //chrome.browserAction.setBadgeText({text: '*'});
     }
 
     // Called by the content script when the user clicks a button with public
