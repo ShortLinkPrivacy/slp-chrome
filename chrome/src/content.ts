@@ -395,7 +395,7 @@ var traverseNodes = (function(){
                     setElementExpiration(element, clearMsg);
                 } else {
                     element.innerText = result.error;
-                    element.classList.add("__pgp_error");
+                    element.classList.add("__pgp_expired");
                 }
                 count--;
                 if ( count <= 0) done();
