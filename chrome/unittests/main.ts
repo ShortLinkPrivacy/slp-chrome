@@ -17,51 +17,34 @@ var alice = TestKeys.alice,
     stefan = TestKeys.stefan,
     secret = TestKeys.secret;
 
+var tab: chrome.tabs.Tab;
+
+var message: Messages.UrlType;
+
 bg.privateKey = TestKeys.secret;
 bg.privateKey.decrypt("asdfasdfasdf");
 
 describe("Content and Background", ()=> {
 
     describe("Simple message", () => {
-        var tab: chrome.tabs.Tab,
-            m: Messages.UrlType;
-
-        var message = { body: "test" };
+        tab = null;
+        message = null;
 
         before((done) => {
-            bg.encryptMessage(message,[alice.key], (res) => {
-                m = res.value;
-                var json = { url: m.body };
-                chrome.tabs.create({url: baseUrl + "/content_message/index.html?" + escape(JSON.stringify(json))}, (t) => {
-                    tab = t;
-                    done();
-                })
-            });
+            makeMessage({ body: "test" }, "/content_message/index.html", done);
         })
 
-        it("opens a tab with tests", () => {
-            assert.ok(tab);
-        });
-
-        it("creates an encrypted message", () => {
-            assert.ok(m);
-        })
-
-        it("returns an SLP url in the message", () => {
-            assert.ok(m.body.match(/slp\.li/));
-        })
+        saneLink();
     })
 
     describe("Public key", () => {
-        var tab: chrome.tabs.Tab,
-            p: Messages.UrlType;
-
-        var message = { body: "test" };
+        message = null;
+        tab = null;
 
         before((done) => {
             bg.encryptPublicKey((res) => {
-                p = res.value;
-                var json = { url: p.body };
+                message = res.value;
+                var json = { url: message.body };
                 chrome.tabs.create({url: baseUrl + "/content_keys/index.html?" + escape(JSON.stringify(json))}, (t) => {
                     tab = t;
                     done();
@@ -69,18 +52,49 @@ describe("Content and Background", ()=> {
             });
         })
 
-        it("opens a tab with tests", () => {
-            assert.ok(tab);
-        });
+        saneLink();
+    })
 
-        it("creates an encrypted message with a public key", () => {
-            assert.ok(p);
+
+    describe("Expired messages", () => {
+        tab = null;
+        message = null;
+
+        before((done) => {
+            makeMessage( { body: "test", timeToLive: -1 }, "/content_expire/index.html", done );
         })
 
-        it("returns an SLP url in the message", () => {
-            assert.ok(p.body.match(/slp\.li/));
-        })
+        saneLink();
+
     })
 
 })
 
+
+//---------------------------------------------------------------------------------------
+
+function makeMessage(msg: Messages.ClearType, url: string, done: any): void {
+    bg.encryptMessage(msg, [alice.key], (res) => {
+        assert.ok(res.success);
+        message = res.value;
+        var json = { url: message.body };
+        chrome.tabs.create({ url: baseUrl + "/" + url + "?" + escape(JSON.stringify(json)) }, (t) => {
+            tab = t;
+            done();
+        })
+    });
+}
+
+function saneLink() {
+    it("opens a tab with tests", () => {
+        assert.ok(tab);
+    });
+
+    it("creates an encrypted message", () => {
+        assert.ok(message);
+    })
+
+    it("returns an SLP url in the message", () => {
+        assert.ok(message.body.match(/slp\.li/));
+    })
+}
