@@ -45,14 +45,14 @@ module Components {
                 this.wait = false;
                 if ( result.success ) {
                     sendElementMessage({ action: 'setElementText', value: result.value }, (result) => {
-                        if (result.success == true) {
+                        if (result.success) {
                             window.close();
                         } else {
-                            app.error = result.error;
+                            app.setError(result.error);
                         }
                     });
                 } else {
-                    app.error = result.error;
+                    app.setError(result.error);
                 }
             })
         }
@@ -242,6 +242,11 @@ class App {
         });
     }
 
+    setError(msg: string): void {
+        bg._ga('browser_error', msg);
+        this.error = msg;
+    }
+
     //---------------------------------------------------------------------------
     // Encrypt the message and paste the url back to the textarea
     //---------------------------------------------------------------------------
@@ -273,11 +278,11 @@ class App {
                     if ( result.success ) {
                         window.close();
                     } else {
-                        this.error = result.error;
+                        this.setError(result.error);
                     }
                 });
             } else {
-                this.error = result.error;
+                this.setError(result.error);
             }
         })
     }
@@ -290,7 +295,7 @@ class App {
             if ( result.success ) {
                 window.close();
             } else {
-                this.error = "There was an error";
+                this.setError("There was an error");
             }
         })
     }
@@ -321,6 +326,7 @@ class App {
     lock(): void {
         bg.privateKey.lock();
         bg.lockDown();
+        bg._ga('browser', 'lock');
         window.close();
     }
 
@@ -328,6 +334,7 @@ class App {
     // Go to the settings page
     //---------------------------------------------------------------------------
     goSettings(e: MouseEvent): void {
+        bg._ga('browser', 'goSettings');
         chrome.runtime.openOptionsPage(() => {});
     }
 
@@ -346,6 +353,8 @@ class App {
         if (this.isDecrypted() == false) {
             document.getElementById('pwd').focus();
         }
+
+        bg._ga('browser', 'run');
     }
 }
 
