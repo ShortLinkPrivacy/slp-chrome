@@ -368,7 +368,7 @@ var traverseNodes = (function(){
 
         setTimeout(() => {
             el.innerHTML = "Expired private message";
-            el.classList.add("__pgp_expired");
+            el.classList.add("__pgp_error");
         }, Math.max(0, clearMsg.timeToLive * 1000));
     }
 
@@ -395,7 +395,7 @@ var traverseNodes = (function(){
                     setElementExpiration(element, clearMsg);
                 } else {
                     element.innerText = result.error;
-                    element.classList.add("__pgp_expired");
+                    element.classList.add("__pgp_error");
                 }
                 count--;
                 if ( count <= 0) done();
