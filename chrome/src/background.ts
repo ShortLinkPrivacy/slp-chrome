@@ -303,7 +303,7 @@ function googleAnalytics() {
     m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
     })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-    ga('create', 'UA-74656221-1', 'auto');
+    ga('create', config.googleAnalyticsId, 'auto');
     ga('set', 'checkProtocolTask', function(){}); // Removes failing protocol check. @see: http://stackoverflow.com/a/22152353/1958200
     ga('require', 'displayfeatures');
     ga('send', 'pageview', '/background.html');

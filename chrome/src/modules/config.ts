@@ -47,9 +47,12 @@ class Config {
     // Background page
     //######################################################
 
-    // How many times to nag about setup
+    // How many times to nag about setup before it stops
     maxSetupNag = 3;
 
     // Central switch for data collection
     allowCollectData = true;
+
+    // Own GA code
+    googleAnalyticsId = 'UA-74656221-1';
 }
