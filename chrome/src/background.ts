@@ -318,7 +318,10 @@ preferences = new Preferences(function(){
     if ( config.allowCollectData && preferences.allowCollectData ) {
         googleAnalytics();
         _ga = function(category: string, action: string): void {
-            ga('send', 'event', category, action);
+            // In case the user turns this off in the Preferences tab ...
+            if ( preferences.allowCollectData ) {
+                ga('send', 'event', category, action);
+            }
         };
     }
 
