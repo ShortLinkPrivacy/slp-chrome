@@ -32,7 +32,7 @@ module Admin {
 
         toggleShowKey(e: Event) {
             e.preventDefault();
-            bg._ga('admin', 'Show advanced key');
+            bg._ga('admin', 'show advanced key');
             this.showAdvanced = !this.showAdvanced;
         }
 
