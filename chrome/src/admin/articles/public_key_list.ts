@@ -17,7 +17,7 @@ module Admin {
         }
 
         onBind() {
-            bg._ga('admin', 'show address book');
+            bg._ga('admin', 'PublicKeyList');
         }
 
         doFilter(): void {

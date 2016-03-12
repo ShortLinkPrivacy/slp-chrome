@@ -11,13 +11,13 @@ module Admin {
 
             try {
                 bg.store.privateKey.set(this.key, (pk) => {
-                    bg._ga('admin', 'import private key');
+                    bg._ga('admin', 'PrivateKeyImport');
                     bg.privateKey = pk;
                     this.key = "";
                     window.location.hash = "#/key/view"
                 });
             } catch (err) {
-                bg._ga('error', err);
+                bg._ga('error', 'PrivateKeyImport: ' + err);
                 app.notify.error = err;
             }
 

@@ -19,13 +19,13 @@ module Admin {
 
             try {
                 bg.store.addressBook.save(publicKey, () => {
-                    bg._ga('admin', 'import public key');
+                    bg._ga('admin', 'PublicKeyImport');
                     app.notify.info = "Key for " + publicKey.getPrimaryUser() + " added successfully";
                     this.key = "";
                 });
             } catch ( err ) {
                 app.notify.error = err;
-                bg._ga('error', err);
+                bg._ga('error', 'PublicKeyImport: ' + err);
             }
         }
     }
