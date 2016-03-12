@@ -1,10 +1,8 @@
 module Interfaces {
 
-    // The LastMessage structure is like a message
-    // structure, but the `body` attribute is an array
-    // of keys (fingerprints) which were used to
-    // encrypt the previous message
-    export type LastMessage = Messages.Record<Keys.FingerprintArray>;
+    // The last message is just a regular UrlType message. We define its own
+    // type just for the hell of it.
+    export type LastMessage = Messages.UrlType;
 
     export interface Dictionary extends Object {
         [index: string]: any;
@@ -50,6 +48,12 @@ module Interfaces {
         addressBook: AddressBookStore.Interface;
     }
 
+    export interface ContentMessage<T> {
+        action: string;
+        elementLocator?: ElementLocator;
+        value?: T;
+    }
+
     export interface BackgroundPage extends Window {
         config: Config;
         store: StoreCollection;
@@ -61,7 +65,8 @@ module Interfaces {
         initialize(): InitVars;
         encryptMessage(msg: Messages.ClearType, keyList: Array<openpgp.key.Key>, callback: Interfaces.SuccessCallback<Messages.UrlType>): void;
         encryptPublicKey(callback: SuccessCallback<Messages.UrlType>): void;
-        lockDown(callback?: Callback): void;
+        lockDown(): void;
+        unlockKey(password: string): boolean;
         _ga(category: string, action: string): void;
 
         Message: any;

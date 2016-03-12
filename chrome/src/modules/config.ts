@@ -50,6 +50,6 @@ class Config {
     // How many times to nag about setup
     maxSetupNag = 3;
 
-    // Allow Google Analytics
-    allowGoogleAnalytics = true;
+    // Central switch for data collection
+    allowCollectData = true;
 }

@@ -4,14 +4,14 @@ module Admin {
 
         filename = "preferences.html";
         articleId = "preferences";
-        allowGoogleAnalytics: boolean;
+        allowCollectData: boolean;
 
         onBind() {
-            this.allowGoogleAnalytics = bg.preferences.allowGoogleAnalytics;
+            this.allowCollectData = bg.preferences.allowCollectData;
         }
 
-        toggleGoogleAnalytics(e: Event) {
-            bg.preferences.allowGoogleAnalytics = this.allowGoogleAnalytics;
+        toggleCollectData(e: Event) {
+            bg.preferences.allowCollectData = (<HTMLInputElement>e.target).checked;
             bg.preferences.save();
         }
 

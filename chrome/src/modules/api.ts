@@ -15,7 +15,7 @@ module API {
     export type AnySuccess = Interfaces.SuccessCallback<any>;
 
     export function http(method: string, url: string, args: any, callback: AnySuccess): void {
-        var r = new XMLHttpRequest(), 
+        var r = new XMLHttpRequest(),
             json: any,
             okStatus: number;
 
@@ -26,7 +26,13 @@ module API {
         r.onreadystatechange = function() {
             if (r.readyState == 4) {
                 if (r.status != okStatus) {
-                    callback({ success: false, error: r.responseText || "No response from server" });
+                    var error: string;
+                    if ( r.status == 404 || r.status == 410 ) {
+                        error = "Expired private message"
+                    } else {
+                        error = "Message server error"
+                    }
+                    callback({ success: false, error: error });
                     return;
                 }
 

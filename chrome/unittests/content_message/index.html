@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Messages</title>
+    <style type="text/css">
+      #content { padding: 20px }
+    </style>
+    <link href="/bower_components/mocha/mocha.css" rel="stylesheet" />
+    <script src="/bower_components/mocha/mocha.js"></script>
+    <script src="/bower_components/assert/assert.js"></script>
+
+  </head>
+  <body>
+    <div id="mocha"></div>
+    <div id="content">
+      <div class="row">
+        <div class="col c7">
+          <div>
+            <h3>Simple paragraph</h3>
+            <p id="p1" class="test">{url}</p>
+            <h3>Link with other text</h3>
+            <p id="p2" class="test">{url} two</p>
+            <p id="p3" class="test">one {url}</p>
+            <p id="p4" class="test">one {url} two</p>
+            <h3>Multiple links in the same element</h3>
+            <p id="p5" class="test">{url} {url}</p>
+            <p id="p6" class="test">{url}|{url}</p>
+            <h3>Connected text</h3>
+            <p id="c1" class="test">front{url}</p>
+            <p id="c2" class="test">{url}zzz</p>
+            <h3>404</h3>
+            <p id="e1" class="test">http://slp.li/x/56b53ddee365a2380c111111</p>
+            <p id="e2" class="test">http://slp.li/x/56b53ddee365a2380c111111zzz</p>
+            <h3>Links</h3>
+            <p id="l1" class="test"><a href="{url}">{url}</a></p>
+            <p id="l2" class="test"><a href="{url}">http://slp.li/x/56b5</a></p>
+            <p id="l3" class="test"><a href="{url}">http://slp.li/x/<wbr>56cbf15f16ebdd550aac2ea0</a></p>
+            <p id="l4" class="test"><a href="http://twitter.com" data-expanded-url="{url}">click here</a></p>
+            <p id="l5" class="test"><a href="{url}">one</a><a href="{url}">two</a></p>
+            <p id="l6" class="test"><a href="{url}">one</a>two</p>
+            <h3>Editable links</h3>
+            <p id="el1" class="test" contenteditable="true"><a href="{url}">{url}</a></p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <script src="../lib/params.js"></script>
+    <script src="../lib/init.js"></script>
+    <script src="code.js"></script>
+    <script src="../lib/signal_run.js"></script>
+  </body>
+</html>

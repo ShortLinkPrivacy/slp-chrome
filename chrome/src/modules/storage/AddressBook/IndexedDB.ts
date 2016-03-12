@@ -41,7 +41,7 @@ module AddressBookStore {
                     fingerprint: key.fingerprint(),
                     armor: key.armored()
                 });
-                
+
                 request.onsuccess = ()=> {
                     var tx = db.transaction("ids", "readwrite"), ids = tx.objectStore("ids");
                     key.userIds().forEach((userId) => {
@@ -78,7 +78,7 @@ module AddressBookStore {
 
             var _load = function(idx: number, done: PublicKeySearchCallback): void {
                 this.loadSingle(fingerprints[idx], (key) => {
-                    result.push(key);
+                    if (key) result.push(key);
                     if ( idx < fingerprints.length - 1 ) {
                         _load(idx + 1, done);
                     } else {
@@ -112,7 +112,7 @@ module AddressBookStore {
                         userId = cursor.value.userId;
                         fingerprint = cursor.value.fingerprint;
                         searchRe = new RegExp(searchTerm.replace(/\\/g, ""), 'i');
-                        if (userId.search(searchRe) >= 0 
+                        if (userId.search(searchRe) >= 0
                             && fingerprints.indexOf(fingerprint) < 0) {
                             fingerprints.push(fingerprint);
                         }

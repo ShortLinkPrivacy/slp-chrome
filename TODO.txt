@@ -1,7 +1,9 @@
 immediate
 ==================================
-- Move message types to different types, e.g. armored, clear, url, publickey
-- Add fingerprints of keys used to encrypt messages to the store
+- Display the following messages for undecryptable texts;
+    1. If the fingerprints array does not contain own key fingerprint - "This message can not be decrypted with your key".
+    2. If it's 404 - "Expired or removed message"
+    3. If it's 410 - "Expired or removed message"
 
 browser
 ==================================
@@ -40,3 +42,12 @@ Development
 Testing
 ===================================
 Rethink the name and content of the message that gets sent when the encoding is over
+
+Promo
+===================================
+- Post to OpenPGP as a project using it
+- Post to Prism
+- lobste.rs
+- hacker news
+- reddit
+- security forums

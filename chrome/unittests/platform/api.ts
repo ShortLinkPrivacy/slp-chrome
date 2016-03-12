@@ -1,6 +1,6 @@
-/// <reference path="../typings/mocha/mocha.d.ts" />
-/// <reference path="../typings/assert/assert.d.ts" />
-/// <reference path="../src/modules.d.ts" />
+/// <reference path="../../typings/mocha/mocha.d.ts" />
+/// <reference path="../../typings/assert/assert.d.ts" />
+/// <reference path="../../src/modules.d.ts" />
 
 var slp = new API.ShortLinkPrivacy();
 

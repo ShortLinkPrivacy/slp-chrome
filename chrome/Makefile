@@ -50,8 +50,7 @@ modules:
 #------------------------------------------------------------------
 
 tests:
-	tsc unittests/lib/*.ts
-	tsc unittests/*.ts
+	find ./unittests -name "*.ts" -print -exec tsc {} \;
 
 admin:
 	tsc --out src/admin.js \

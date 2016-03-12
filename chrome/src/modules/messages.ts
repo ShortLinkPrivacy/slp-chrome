@@ -8,11 +8,12 @@ module Messages {
     export type Armor = string;
     export type Url = string;
 
-    // Messsage structure
+    // Message structure
     export interface Record<T> {
         body: T;
-        createdDate?: string;    // It goes thru JSON too many times
+        createdDate?: string;
         timeToLive?: number;
+        fingerprints?: Keys.FingerprintArray;
         extVersion?: string;
     }
 
@@ -99,6 +100,13 @@ module Messages {
     }
 
     export function decrypt(m: ArmorType, privateKey: Keys.PrivateKey, callback: Interfaces.SuccessCallback<ClearType> ): void {
+        // If we have a fingerprints array, then check if our key is in it
+        if ( m.fingerprints && m.fingerprints.length > 0 ) {
+            if ( m.fingerprints.indexOf(privateKey.fingerprint()) < 0 ) {
+                callback({success: false, error: "Message encrypted for another recipient"});
+                return;
+            }
+        }
         var message = openpgp.message.readArmored(<string>m.body);
         openpgp.decryptMessage( privateKey.key, message )
            .then((clearText: string) => {
@@ -111,11 +119,16 @@ module Messages {
     }
 
     export function encrypt(m: ClearType, keyList: Array<openpgp.key.Key>, callback: Interfaces.SuccessCallback<ArmorType>): void {
+        if ( !keyList || keyList.length == 0 ) {
+            callback({ success: false, error: "No public keys selected" });
+            return;
+        }
         openpgp.encryptMessage( keyList, m.body )
             .then((armoredText) => {
-                var amsg = <ArmorType>m;
-                amsg.body = armoredText;
-                callback({success: true, value: amsg});
+                var armorMsg = <ArmorType>m;
+                armorMsg.body = armoredText;
+                armorMsg.fingerprints = keyList.map((k) => { return k.primaryKey.getFingerprint() });
+                callback({success: true, value: armorMsg});
             })["catch"]((err) => {
                 callback({ success: false, error: "OpenPGP Error: " + err });
             });

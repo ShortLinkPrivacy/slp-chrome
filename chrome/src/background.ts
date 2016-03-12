@@ -41,6 +41,9 @@ function makePublicKeyText(armor: Keys.Armor, messageId: Messages.Id, callback: 
 }
 
 function encryptMessage(msg: Messages.ClearType, keyList: Array<openpgp.key.Key>, callback: Interfaces.SuccessCallback<Messages.UrlType>): void {
+    // Add own key to the key list
+    keyList.push(privateKey.toPublic().openpgpKey());
+
     Messages.encrypt(msg, keyList, (result) => {
         if ( result.success == true ) {
             var armor = result.value;
@@ -94,15 +97,32 @@ function encryptPublicKey(callback: Interfaces.SuccessCallback<Messages.UrlType>
     });
 }
 
-
-function lockDown(callback?: Interfaces.Callback): void {
+// Broadcasts a message to all tabs
+function broadcast(message: Interfaces.ContentMessage<any>, callback?: Interfaces.Callback): void {
     var i: number;
     chrome.tabs.query({}, (tabs) => {
         for (i = 0; i < tabs.length; i++) {
-            chrome.tabs.sendMessage(tabs[i].id, { lock: true });
+            chrome.tabs.sendMessage(tabs[i].id, message);
         }
         if ( callback ) callback();
     });
+}
+
+function lockDown(): void {
+    broadcast({action: 'lock'});
+}
+
+// Unlocks the private key and sends a 'traverse' broadcast.
+// Returns true if the key was successfuly unlocked.
+function unlockKey(password: string): boolean {
+    if ( privateKey.decrypt(password) ) {
+        broadcast({ action: 'windowMessage', value: 'slp_key_unlocked' });
+        broadcast({ action: 'traverse' });
+        //chrome.browserAction.setBadgeText({text: ""});
+        return true;
+    }
+
+    return false;
 }
 
 //############################################################################
@@ -131,9 +151,8 @@ class Message {
     }
 
     decryptLink(): void {
-        var re: RegExp,
-            messageId: Messages.Id,
-            armored: Messages.ArmorType;
+        var messageId: Messages.Id,
+            armorMsg: Messages.ArmorType;
 
         messageId = this.request.messageId;
 
@@ -144,25 +163,25 @@ class Message {
 
         slp.loadItem( messageId, (result) => {
             if ( !result.success ) {
-               this.sendResponse({ success: false, error: 'decode', value: messageId });
+               this.sendResponse(result);
                return;
             }
 
-            armored = result.value;
-            if ( Messages.isMessage(armored) == true ) {
-                Messages.decrypt( armored, privateKey, (r) => this.sendResponse(r) );
-            } else if ( Messages.isPublicKey(armored) == true ) {
-                makePublicKeyText(armored.body, messageId, (html) => {
-                    var umsg = <Messages.UrlType>armored;
-                    umsg.body = html;
-                    this.sendResponse({ success: true, value: umsg });
+            armorMsg = result.value;
+            if ( Messages.isMessage(armorMsg) == true ) {
+                Messages.decrypt( armorMsg, privateKey, this.sendResponse );
+            } else if ( Messages.isPublicKey(armorMsg) == true ) {
+                makePublicKeyText(armorMsg.body, messageId, (html) => {
+                    var urlMsg = <Messages.UrlType>armorMsg;
+                    urlMsg.body = html;
+                    this.sendResponse({ success: true, value: urlMsg });
                 });
             }
         });
     }
 
     needPassword(): void {
-        chrome.browserAction.setBadgeText({text: '*'});
+        //chrome.browserAction.setBadgeText({text: '*'});
     }
 
     // Called by the content script when the user clicks a button with public
@@ -212,22 +231,22 @@ class Message {
             keyList: Array<openpgp.key.Key> = [],
             clearMessage: Messages.ClearType;
 
-            lastMessage = this.request.lastMessage;
-            text = this.request.text;
+        lastMessage = this.request.lastMessage;
+        text = this.request.text;
 
-            if ( lastMessage.body && lastMessage.body.length ) {
-                store.addressBook.load(lastMessage.body, (foundKeys) => {
-                    keyList = foundKeys.map( k => { return k.openpgpKey() });
-                    keyList.push(privateKey.key.toPublic());
+        if ( lastMessage && lastMessage.fingerprints && lastMessage.fingerprints.length ) {
+            store.addressBook.load(lastMessage.fingerprints, (foundKeys) => {
+                keyList = foundKeys.map( k => { return k.openpgpKey() });
 
-                    // The new message is like the old message, but using the new text
-                    clearMessage = { body: text, timeToLive: lastMessage.timeToLive };
+                // The new message is like the old message, but using the new text
+                clearMessage = <Messages.ClearType>lastMessage;
+                clearMessage.body = text;
 
-                    encryptMessage(clearMessage, keyList, (result) => {
-                        this.sendResponse(result);
-                    })
-                });
-            }
+                encryptMessage(clearMessage, keyList, this.sendResponse);
+            });
+        } else {
+            this.sendResponse({ success: false, error: "No previous message in this editable" })
+        }
     }
 
     // Send updates to the context menu. Most cases enable and disable it.
@@ -254,7 +273,7 @@ contextMenuId = chrome.contextMenus.create({
         var eloc = elementLocatorDict[tab.id];
         if (!eloc) return;
         chrome.tabs.sendMessage(tab.id, {
-            encryptLast: true,
+            action: 'encryptLast',
             elementLocator: eloc
         });
     }
@@ -281,7 +300,7 @@ function googleAnalytics() {
 preferences = new Preferences(function(){
 
     // Google Analytics
-    if ( config.allowGoogleAnalytics && preferences.allowGoogleAnalytics ) {
+    if ( config.allowCollectData && preferences.allowCollectData ) {
         googleAnalytics();
         _ga = function(category: string, action: string): void {
             ga('send', 'event', category, action);

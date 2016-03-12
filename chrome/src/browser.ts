@@ -7,18 +7,6 @@ var app: App,
     bg: Interfaces.BackgroundPage = <Interfaces.BackgroundPage>chrome.extension.getBackgroundPage(),
     tab: chrome.tabs.Tab;   // current open tab
 
-interface ElementMessage {
-    elementLocator?: Interfaces.ElementLocator;
-    getElementText?: boolean;
-    setElementText?: Messages.UrlType;
-    restoreElementText?: boolean;
-
-    // A record holding the params sent with the last message, but this time
-    // `body` in an array of the keys (fingerprints) used to encrypt the
-    // message.
-    lastMessage?: Interfaces.LastMessage;
-}
-
 interface BoolFunc {
     (): boolean;
 }
@@ -26,7 +14,7 @@ interface BoolFunc {
 //---------------------------------------------------------------------------
 // Sends messages to the active element in the content script of the current tab
 //---------------------------------------------------------------------------
-function sendElementMessage(msg: ElementMessage, callback?: Interfaces.ResultCallback<any>): void {
+function sendElementMessage(msg: Interfaces.ContentMessage<any>, callback?: Interfaces.ResultCallback<any>): void {
     msg.elementLocator = bg.elementLocatorDict[tab.id];
     chrome.tabs.sendMessage(tab.id, msg, callback);
 }
@@ -56,8 +44,13 @@ module Components {
             bg.encryptPublicKey((result: Interfaces.Success<Messages.UrlType>) => {
                 this.wait = false;
                 if ( result.success ) {
-                    sendElementMessage({ setElementText: result.value });
-                    window.close();
+                    sendElementMessage({ action: 'setElementText', value: result.value }, (result) => {
+                        if (result.success == true) {
+                            window.close();
+                        } else {
+                            app.error = result.error;
+                        }
+                    });
                 } else {
                     app.error = result.error;
                 }
@@ -121,9 +114,18 @@ class Recepients {
     }
 
     setFromKeys(list: Array<Keys.PublicKey>): void {
-        this.selected = list.map( k => {
-            return new Keys.KeyItem(k)
-        });
+        var i: number,
+            result: Keys.KeyItemList = [];
+
+        // Move all keys, except own key so it doesn't show up in the list
+        for (i = 0; i < list.length; i++) {
+            var k = list[i];
+            if ( k.fingerprint() != bg.privateKey.fingerprint() ) {
+                result.push(new Keys.KeyItem(k))
+            }
+        }
+
+        this.selected = result;
     }
 
     forEach(func: { (item: Keys.KeyItem): void }): void {
@@ -206,12 +208,14 @@ class App {
     }
 
     private getElementText(): void {
-        var re: RegExp, text: string, lastMessage: Interfaces.LastMessage,
+        var re: RegExp,
+            text: string,
+            lastMessage: Interfaces.LastMessage,
             i: number;
 
         re = new RegExp(bg.slp.itemRegExp);
 
-        sendElementMessage({ getElementText: true }, (response) => {
+        sendElementMessage({ action: 'getElementText' }, (response) => {
             if ( !response ) return;
 
             text = response.value;
@@ -220,17 +224,19 @@ class App {
             this.alreadyEncrypted = re.exec(text) ? true : false;
             this.clearText = text;
 
-            // lastMessage.body actually contains an array of fingerprints, so we
-            // have to look them up in the address book and translate them into
-            // keys
-            if ( lastMessage.body.length ) {
-                bg.store.addressBook.load(lastMessage.body, (keys) => {
-                    this.recepients.setFromKeys(keys);
-                });
-            }
+            if ( lastMessage ) {
+                // lastMessage.body actually contains an array of fingerprints, so we
+                // have to look them up in the address book and translate them into
+                // keys
+                if ( lastMessage.fingerprints.length ) {
+                    bg.store.addressBook.load(lastMessage.fingerprints, (keys) => {
+                        this.recepients.setFromKeys(keys);
+                    });
+                }
 
-            if ( lastMessage.timeToLive ) {
-                this.timeToLive = lastMessage.timeToLive;
+                if ( lastMessage.timeToLive ) {
+                    this.timeToLive = lastMessage.timeToLive;
+                }
             }
 
         });
@@ -241,38 +247,33 @@ class App {
     //---------------------------------------------------------------------------
     sendMessage(e: Event) {
         var keyList: Array<openpgp.key.Key> = [],
-            lastMessage: Interfaces.LastMessage,
             clearMessage: Messages.ClearType;
 
         // This should never happen because we don't show the submit button
         if (this.recepients.hasSelected() == false) return;
-
-        // Figure out the lastMessage
-        lastMessage = { body: [], timeToLive: this.timeToLive };
 
         // Collect a list of keys and fingerprints. The keys are used to encrypt
         // the message, and the fingerprints are saved in the editable so they
         // can be reused again with a shortcut
         this.recepients.forEach((item) => {
             keyList.push(item.key.openpgpKey());
-            lastMessage.body.push(item.key.fingerprint());
         })
 
-        // Also push our own key, so we can read our own message
-        keyList.push(bg.privateKey.key.toPublic());
-
         // The clear message is a record
-        clearMessage = { body: this.clearText, timeToLive: this.timeToLive };
+        clearMessage = {
+            body: this.clearText,
+            timeToLive: this.timeToLive
+        };
 
         this.wait = true;
         bg.encryptMessage(clearMessage, keyList, (result: Interfaces.Success<Messages.UrlType>) => {
             this.wait = false;
             if ( result.success ) {
-                sendElementMessage({ setElementText: result.value, lastMessage: lastMessage }, (result) => {
+                sendElementMessage({ action: 'setElementText', value: result.value }, (result) => {
                     if ( result.success ) {
                         window.close();
                     } else {
-                        this.error = "No input field was found on the page";
+                        this.error = result.error;
                     }
                 });
             } else {
@@ -285,7 +286,7 @@ class App {
     // Restore the original message back in the textarea
     //---------------------------------------------------------------------------
     restoreMessage(e: Event) {
-        sendElementMessage({ restoreElementText: true }, (result) => {
+        sendElementMessage({ action: 'restoreElementText' }, (result) => {
             if ( result.success ) {
                 window.close();
             } else {
@@ -305,13 +306,7 @@ class App {
 
         if ( this.password ) {
             this.wait = true;
-            if ( bg.privateKey.decrypt(this.password) ) {
-                chrome.tabs.query({currentWindow: true}, (tabs) => {
-                    tabs.forEach((tab) => {
-                        chrome.tabs.sendMessage(tab.id, { traverse: true });
-                    });
-                });
-                chrome.browserAction.setBadgeText({text: ""});
+            if ( bg.unlockKey(this.password) ) {
                 window.close();
             } else {
                 this.error = "Wrong password";
