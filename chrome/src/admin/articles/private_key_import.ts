@@ -11,7 +11,7 @@ module Admin {
 
             try {
                 bg.store.privateKey.set(this.key, (pk) => {
-                    bg._ga('admin', 'Import private key');
+                    bg._ga('admin', 'import private key');
                     bg.privateKey = pk;
                     this.key = "";
                     window.location.hash = "#/key/view"

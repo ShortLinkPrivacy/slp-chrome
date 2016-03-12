@@ -17,7 +17,7 @@ module Admin {
         }
 
         onBind() {
-            bg._ga('admin', 'Show address book');
+            bg._ga('admin', 'show address book');
         }
 
         doFilter(): void {

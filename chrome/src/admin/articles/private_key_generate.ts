@@ -37,7 +37,7 @@ module Admin {
                     var key = bg.privateKey = new Keys.PrivateKey(generated.privateKeyArmored);
                     bg.store.privateKey.set(key, () => {
                         this.spinner = false;
-                        bg._ga('admin', 'Generate new private key');
+                        bg._ga('admin', 'generate private key');
                         window.location.hash = "#/key/view";
                     })
                })["catch"]((error)=>{

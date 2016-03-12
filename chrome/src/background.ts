@@ -22,6 +22,19 @@ var elementLocatorDict: Interfaces.ElementLocatorDict = {};
 // Context menu
 var contextMenuId: any;
 
+function _err(e: string|Interfaces.Success<any>): Interfaces.Success<any> {
+    if ( typeof e == "string" ) {
+        _ga('error', <string>e);
+        return {
+            success: false,
+            error: <string>e
+        }
+    } else {
+        _ga('error', (<Interfaces.Success<any>>e).error);
+        return <Interfaces.Success<any>>e;
+    }
+}
+
 //############################################################################
 
 // Creates a HTML snippet with a button to replace a public key armored message
@@ -45,7 +58,7 @@ function encryptMessage(msg: Messages.ClearType, keyList: Array<openpgp.key.Key>
     keyList.push(privateKey.toPublic().openpgpKey());
 
     Messages.encrypt(msg, keyList, (result) => {
-        if ( result.success == true ) {
+        if ( result.success ) {
             var armor = result.value;
             slp.saveItem(armor, (result) => {
                 if ( result.success ) {
@@ -53,11 +66,11 @@ function encryptMessage(msg: Messages.ClearType, keyList: Array<openpgp.key.Key>
                     umsg.body = slp.getItemUrl(result.value.id);
                     callback({ success: true, value: umsg });
                 } else {
-                    callback({ success: false, error: result.error });
+                    callback(_err(result));
                 }
             });
         } else {
-            callback({ success: false, error: result.error })
+            callback(_err(result))
         }
     })
 }
@@ -92,7 +105,7 @@ function encryptPublicKey(callback: Interfaces.SuccessCallback<Messages.UrlType>
         } else {
 
             // Return error
-            callback({ success: false, error: result.error })
+            callback(_err(result))
         }
     });
 }
@@ -157,13 +170,13 @@ class Message {
         messageId = this.request.messageId;
 
         if (!messageId) {
-            this.sendResponse({ success: false, error: 'Wrong link ID' });
+            this.sendResponse(_err('Wrong link ID'));
             return;
         }
 
         slp.loadItem( messageId, (result) => {
             if ( !result.success ) {
-               this.sendResponse(result);
+               this.sendResponse(_err(result));
                return;
             }
 
@@ -194,15 +207,15 @@ class Message {
 
         slp.loadItem( messageId, (result) => {
             if ( !result.success ) {
-               this.sendResponse({ success: false, error: 'decode', value: messageId });
-               return;
+                this.sendResponse(_err(result));
+                return;
             }
 
             armored = result.value;
             try {
                 key = new Keys.PublicKey(armored.body);
             } catch (err) {
-                this.sendResponse({ success: false, error: err });
+                this.sendResponse(_err(err));
                 return;
             }
 
@@ -291,7 +304,9 @@ function googleAnalytics() {
     })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
     ga('create', 'UA-74656221-1', 'auto');
-    ga('send', 'event', 'background');
+    ga('set', 'checkProtocolTask', function(){}); // Removes failing protocol check. @see: http://stackoverflow.com/a/22152353/1958200
+    ga('require', 'displayfeatures');
+    ga('send', 'pageview', '/background.html');
 }
 
 //############################################################################
@@ -317,9 +332,9 @@ preferences = new Preferences(function(){
     store.privateKey.get((pk) => {
         if ( pk ) {
             privateKey = pk;
-            _ga('background', 'Private key loaded');
+            _ga('background', 'private key loaded');
         } else if (preferences.setupNagCount < config.maxSetupNag) {
-            _ga('background', 'No private key');
+            _ga('background', 'no private key');
             preferences.setupNagCount++;
             preferences.save();
             chrome.runtime.openOptionsPage();
