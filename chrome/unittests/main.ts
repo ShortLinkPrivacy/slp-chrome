@@ -26,7 +26,6 @@ bg.privateKey.decrypt("asdfasdfasdf");
 
 describe("Main", ()=> {
 
-    /*
 
     describe("Simple message", () => {
         tab = null;
@@ -56,8 +55,6 @@ describe("Main", ()=> {
 
         saneLink();
     })
-
-    */
 
 
     describe("Expired messages", () => {
