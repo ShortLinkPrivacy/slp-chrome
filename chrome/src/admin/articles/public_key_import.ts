@@ -20,7 +20,7 @@ module Admin {
             try {
                 bg.store.addressBook.save(publicKey, () => {
                     bg._ga('admin', 'PublicKeyImport');
-                    app.notify.info = "Key for " + publicKey.getPrimaryUser() + " added successfully";
+                    app.notify.info = chrome.i18n.getMessage('addPublicKey', publicKey.getPrimaryUser());
                     this.key = "";
                 });
             } catch ( err ) {

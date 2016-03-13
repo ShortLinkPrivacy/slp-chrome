@@ -14,6 +14,8 @@ module Admin {
                     bg._ga('admin', 'PrivateKeyImport');
                     bg.privateKey = pk;
                     this.key = "";
+                    app.notify.sticky = true;
+                    app.notify.info = chrome.i18n.getMessage("importKeySuccess");
                     window.location.hash = "#/key/view"
                 });
             } catch (err) {

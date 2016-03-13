@@ -1,0 +1,56 @@
+{
+    "extName": {
+        "message": "Short Link Privacy",
+        "description": "Extension name"
+    },
+
+    "extDescription": {
+        "message": "Browser to browser PGP encryption via short links.",
+        "description": "Extension description"
+    },
+
+    "contextMenu": {
+        "message": "Encrypt for Last Recipient ($1)",
+        "description": "Context menu item and it's keyboard shortcut"
+    },
+
+    "browserBadPassword": {
+        "message": "Incorrect password",
+        "description": "Shown in the browser popup if the password entered was incorrect"
+    },
+
+    "browserGenericError": {
+        "message": "There was an error",
+        "description": "Shown in the browser popup on a generic error"
+    },
+
+    "generateKeySuccess": {
+        "message": "Your key was successfully created. <b>Note!</b> You may have to refresh all browser tabs containing magic links in order to decrypt them with the new key.",
+        "description": "Message users see in the admin after they generate a new key"
+    },
+
+    "importKeySuccess": {
+        "message": "Your key was successfully imported. <b>Note!</b> You may have to refresh all browser tabs containing magic links in order to decrypt them with the new key.",
+        "description": "Message users see in the admin after they import a new key"
+    },
+
+    "removeKeySuccess": {
+        "message": "Your key was successfully removed.",
+        "description": "Message users see in the admin after they remove their private key"
+    },
+
+    "addPublicKey": {
+        "message": "The public key of <b>$1</b> was added successfully",
+        "description": "Message the users see after they successfully add someone's public key"
+    },
+
+    "passwordsDoNotMatch": {
+        "message": "The passphrase and the passphrase confirmation do not match",
+        "description": "Shown in the generate key form if the two passwords don't match"
+    },
+
+    "generateKeyError": {
+        "message": "Error creating a new key - $1",
+        "description": "Shown when creating a new key results in an error"
+    }
+}

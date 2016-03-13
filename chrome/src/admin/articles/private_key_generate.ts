@@ -20,7 +20,7 @@ module Admin {
             e.preventDefault();
 
             if (this.passphrase != this.confirm) {
-                app.notify.error = "The passphrase and the passphrase confirmation do not match";
+                app.notify.error = chrome.i18n.getMessage("passwordsDoNotMatch");
                 return;
             }
 
@@ -38,12 +38,14 @@ module Admin {
                     bg.store.privateKey.set(key, () => {
                         this.spinner = false;
                         bg._ga('admin', 'generateKeyPair');
+                        app.notify.sticky = true;
+                        app.notify.info = chrome.i18n.getMessage('generateKeySuccess');
                         window.location.hash = "#/key/view";
                     })
                })["catch"]((error)=>{
                    this.spinner = false;
                    bg._ga('error', 'generateKeyPair: ' + error);
-                   app.notify.error = "Can not create a new key - " + error;
+                   app.notify.error = chrome.i18n.getMessage("generateKeyError", error);
                })
         }
     }

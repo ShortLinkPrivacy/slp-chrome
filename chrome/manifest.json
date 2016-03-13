@@ -1,9 +1,10 @@
 {
   "manifest_version": 2,
+  "default_locale": "en",
 
-  "name": "Short Link Privacy",
+  "name": "__MSG_extName__",
   "short_name": "SLP",
-  "description": "Browser to browser PGP encryption via short links.",
+  "description": "__MSG_extDescription__",
   "version": "0.9.52",
   "options_page": "settings.html",
 

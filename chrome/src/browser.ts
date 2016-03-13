@@ -297,7 +297,7 @@ class App {
             if ( result.success ) {
                 window.close();
             } else {
-                this.setError("There was an error");
+                this.setError(chrome.i18n.getMessage("browserGenericError"));
             }
         })
     }
@@ -316,7 +316,7 @@ class App {
             if ( bg.unlockKey(this.password) ) {
                 window.close();
             } else {
-                this.error = "Wrong password";
+                this.error = chrome.i18n.getMessage("browserBadPassword")
             }
             this.wait = false;
         }
