@@ -22,7 +22,14 @@
     <script src="src/admin.js"></script>
   </head>
   <body>
-    <div id="container" >
+    <div id="critical" rv-show="critical">
+      <b>Something went wrong with this extension.</b>
+      <p>
+        Don't worry, it's probably nothing. Try restarting your browser and it should be fine.
+        If you still get that message after, please contact us for help.
+      </p>
+    </div>
+    <div id="container" rv-hide="critical">
       <nav class="pure-menu pure-menu-horizontal">
           <span href="#" class="pure-menu-heading"><b>short link privacy</b></span>
           <ul class="pure-menu-list">
