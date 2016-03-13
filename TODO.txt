@@ -1,13 +1,10 @@
 immediate
 ==================================
-- Display the following messages for undecryptable texts;
-    1. If the fingerprints array does not contain own key fingerprint - "This message can not be decrypted with your key".
-    2. If it's 404 - "Expired or removed message"
-    3. If it's 410 - "Expired or removed message"
 
 browser
 ==================================
 - show "please wait" when the private key is being unlocked
+- show a hit with the shortcut after they've added recepeints
 
 content
 ==================================
@@ -17,7 +14,6 @@ content
 - on install the content script should prompt the tab to get reloaded, so it takes the new code
 - think about a more general SLP url scheme, so it can scale with other urls
 - Command-Option-L should show a message if no last recepient
-- Windows and Linux shortcut needed
 
 background
 ==================================
@@ -41,7 +37,6 @@ Development
 
 Testing
 ===================================
-Rethink the name and content of the message that gets sent when the encoding is over
 
 Promo
 ===================================
@@ -51,3 +46,4 @@ Promo
 - hacker news
 - reddit
 - security forums
+- enphasis on the expiration of the messages
