@@ -34,8 +34,6 @@ module AddressBookStore {
         load(fingerprints: Keys.FingerprintArray, callback: PublicKeySearchCallback): void;
         search(searchTerm: string, callback: PublicKeySearchCallback): void;
         deleteAll(callback: Interfaces.Callback): void;
-        exportKeys(callback: ArmorArrayCallback): void;
-        importKeys(keys: Keys.ArmorArray, callback: Interfaces.Callback): void;
     }
 
 }

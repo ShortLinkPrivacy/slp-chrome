@@ -148,11 +148,5 @@ module AddressBookStore {
                 });
             })
         }
-
-        exportKeys(callback: ArmorArrayCallback): void {
-        }
-
-        importKeys(keys: Keys.ArmorArray, callback: Interfaces.Callback): void {
-        }
     }
 }
