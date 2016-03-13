@@ -23,8 +23,10 @@ module AddressBookStore {
 
             request.onupgradeneeded = ()=> {
                 var db = request.result;
-                db.createObjectStore("ids", {keyPath: "userId"});
-                db.createObjectStore("armor", {keyPath: "fingerprint"});
+                var ids = db.createObjectStore("ids", {keyPath: "userId"});
+                var armor = db.createObjectStore("armor", {keyPath: "fingerprint"});
+
+                ids.createIndex("fingerprint", "fingerprint", { unique: false });
                 console.log("DB initialized: ", IndexedDB.dbVersion);
             };
 
@@ -126,26 +128,30 @@ module AddressBookStore {
 
         }
 
-        deleteAll(callback: Interfaces.Callback): void {
-            var deleteStore = function(name: string, db: any, onsuccess: Interfaces.Callback) {
-                var request = db.transaction(name, "readwrite").objectStore(name).openCursor();
-                var cursor;
-
-                request.onsuccess = ()=> {
-                    if ( cursor = request.result ) {
-                        cursor["delete"]().onsuccess = ()=>{
-                            cursor["continue"]();
-                        }
-                    } else {
-                        onsuccess();
-                    }
-                };
-            }
-
+        deleteSingle(fingerprint: Keys.Fingerprint, callback: Interfaces.Callback): void {
             this.initialize((db) => {
-                deleteStore("ids", db, () => {
-                    deleteStore("armor", db, callback)
-                });
+                var armor = db.transaction("armor", "readwrite").objectStore("armor");
+
+                armor["delete"](fingerprint).onsuccess = function(){
+                    var keyRange = IDBKeyRange.only(fingerprint);
+                    var ids = db.transaction("ids", "readwrite").objectStore("ids");
+                    var req = ids.index("fingerprint").openCursor(keyRange);
+                    req.onsuccess = function() {
+                        if (req.result) {
+                            ids["delete"](req.result.value.userId).onsuccess = callback;
+                        }
+                    };
+                }
+            });
+        }
+
+        deleteAll(callback: Interfaces.Callback): void {
+            this.initialize((db) => {
+                var ids = db.transaction("ids", "readwrite").objectStore("ids").clear();
+                ids.onsuccess = ()=>{
+                    var armor = db.transaction("armor", "readwrite").objectStore("armor").clear();
+                    armor.onsuccess = callback;
+                }
             })
         }
     }

@@ -12,7 +12,7 @@ var alice = TestKeys.alice,
     charlie = TestKeys.charlie,
     stefan = TestKeys.stefan;
 
-describe("Key Storage :: LocalStore", function() {
+describe("AddressBook:: IndexedDB", function() {
 
     before(function(done) {
         addressBook.deleteAll(function() {
@@ -91,4 +91,50 @@ describe("Key Storage :: LocalStore", function() {
         });
 
     });
+
+    describe('deleteSingle', function() {
+        before(function(done) {
+            addressBook.save(alice, function() {
+                addressBook.save(bob, function() {
+                    addressBook.save(charlie, function() {
+                        addressBook.save(stefan, () => {
+                            addressBook.deleteSingle(charlie.fingerprint(), () => {
+                                done();
+                            });
+                        });
+                    });
+                });
+            });
+        });
+
+        it("can not find the deleted one - charlie", (done) => {
+            addressBook.search('charlie', function(result){
+                assert.equal(result.length, 0);
+                done();
+            })
+        })
+
+
+        it("can find alice", (done) => {
+            addressBook.search('alice', function(result){
+                assert.equal(result.length, 1);
+                done();
+            })
+        })
+
+        it("can find bob", (done) => {
+            addressBook.search('bob', function(result){
+                assert.equal(result.length, 1);
+                done();
+            })
+        })
+
+        it("can find stefan", (done) => {
+            addressBook.search('stefan', function(result){
+                assert.equal(result.length, 1);
+                done();
+            })
+        })
+
+    })
 });

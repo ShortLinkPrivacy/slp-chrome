@@ -33,6 +33,7 @@ module AddressBookStore {
         loadSingle(fingerprint: Keys.Fingerprint, callback: PublicKeyCallback): void;
         load(fingerprints: Keys.FingerprintArray, callback: PublicKeySearchCallback): void;
         search(searchTerm: string, callback: PublicKeySearchCallback): void;
+        deleteSingle(fingerprint: Keys.Fingerprint, callback: Interfaces.SuccessCallback<any>): void;
         deleteAll(callback: Interfaces.Callback): void;
     }
 
