@@ -16,13 +16,18 @@ module Admin {
     class Notify {
         error: string;
         info: string;
+        warning: string;
+        sticky: boolean = false;
 
         constructor() {
             this.clear = this.clear.bind(this);
         }
 
         clear(): void {
-            this.error = this.info = null;
+            if ( !this.sticky ) {
+                this.error = this.info = this.warning = null;
+            }
+            this.sticky = false;
         }
     }
 

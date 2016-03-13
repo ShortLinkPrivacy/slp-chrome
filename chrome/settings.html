@@ -39,8 +39,9 @@
           </ul>
       </nav>
       <div id="notify" rv-on-click="notify.clear">
-        <div class="warning" rv-if="notify.error">{ notify.error }</div>
-        <div class="info" rv-if="notify.info">{ notify.info }</div>
+        <div class="error" rv-if="notify.error" rv-html="notify.error"></div>
+        <div class="info" rv-if="notify.info" rv-html="notify.info"></div>
+        <div class="warning" rv-if="notify.warning" rv-html="notify.warning"></div>
       </div>
       <article>
       </article>
