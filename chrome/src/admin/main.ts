@@ -28,6 +28,7 @@ module Admin {
 
     export class App extends Application.Main {
         notify: Notify = new Notify();
+        critical: boolean = false;
 
         constructor(args: Application.AppConfig) {
             super(args);
@@ -110,6 +111,12 @@ module Admin {
             }
         }
     }
+
+    window.onerror = function(e) {
+        app.critical = true;
+        bg.console.log(e);
+        bg._ga('admin_critical', e);
+    };
 
     window.onload = function() {
         app = window["app"] = new App({
