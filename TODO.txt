@@ -4,7 +4,7 @@ immediate
 browser
 ==================================
 - show "please wait" when the private key is being unlocked
-- show a hit with the shortcut after they've added recepeints
+- show a hit with the shortcut after they've added recipients
 
 content
 ==================================
