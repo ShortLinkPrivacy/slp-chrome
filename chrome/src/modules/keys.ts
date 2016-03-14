@@ -10,6 +10,8 @@ module Keys {
     export type UserIdArray = Array<UserId>;
     export type FingerprintArray = Array<Fingerprint>;
     export type ArmorArray = Array<Armor>;
+    export type PublicKeyArray = Array<PublicKey>;
+    export type KeyItemList = Array<KeyItem>;
 
     export class Key {
         key: openpgp.key.Key;
@@ -129,6 +131,7 @@ module Keys {
         key: Key;
         getPrimaryUser: { (): UserId };
         fingerprint: { (): Fingerprint };
+        isRemote: boolean;
 
         // The constructor will optionally take a searched term, which will
         // be used to initialize the name to show for that key.
@@ -144,8 +147,6 @@ module Keys {
             }
         }
     }
-
-    export type KeyItemList = Array<KeyItem>;
 
     if ( typeof window == "undefined" ) {
         exports["Keys"] = Keys;

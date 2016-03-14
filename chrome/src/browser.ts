@@ -7,6 +7,8 @@ var app: App,
     bg: Interfaces.BackgroundPage = <Interfaces.BackgroundPage>chrome.extension.getBackgroundPage(),
     tab: chrome.tabs.Tab;   // current open tab
 
+var keybase = new API.Keybase();
+
 interface BoolFunc {
     (): boolean;
 }
@@ -136,6 +138,9 @@ class Recepients {
         var item = this.found[model.index];
         if ( this.isSelected(item) == false ) {
             this.selected.push(item);
+            if ( item.isRemote ) {
+                bg.store.addressBook.save(item.key, () => {});
+            }
         }
         this.filter = "";
         this.found= [];
@@ -165,7 +170,19 @@ class Recepients {
                 var keyItem = new Keys.KeyItem(keys[i], this.filter);
                 if ( this.isSelected(keyItem) == false ) found.push(keyItem);
             }
+
+            // Show the ones we have locally
             this.found = found;
+
+            // Search also in keybase
+            keybase.search(this.filter, (keys) => {
+                for (i = 0; i < keys.length; i++) {
+                    var keyItem = new Keys.KeyItem(keys[i]);
+                    keyItem.isRemote = true;
+                    if ( this.isSelected(keyItem) == false ) found.push(keyItem);
+                }
+                this.found = found;
+            });
         });
     }
 }

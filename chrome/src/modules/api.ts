@@ -1,3 +1,4 @@
+declare function escape(s: string): string;
 
 module API {
 
@@ -63,6 +64,8 @@ module API {
         http('GET', url, args, callback);
     }
 
+    //-------------------------------------------------------------------------------
+
     export class ShortLinkPrivacy {
         url = 'http://slp.li';
 
@@ -95,4 +98,47 @@ module API {
         }
 
     }
+
+    //-------------------------------------------------------------------------------
+
+    export class Keybase implements KeySource.RemoteStore {
+        lookupUrl = "https://keybase.io/_/api/1.0/user/lookup.json";
+
+        search(what: string, callback: Interfaces.ResultCallback<Keys.PublicKeyArray>): void {
+            var keys: Keys.PublicKeyArray = [];
+
+            if (what.length < 3) {
+                callback([]);
+                return;
+            }
+
+            httpGet(this.lookupUrl + "?usernames=" + escape(what), {}, (result) => {
+                var i: number,
+                    stat: { code: number },
+                    them: any;
+
+                if ( !result.success ) { callback([]); return; }
+
+                stat = result.value["status"];
+                if ( stat.code != 0 ) { callback([]); return; }
+
+                them = result.value.them;
+                if (!them || !them.length) { callback([]); return; }
+
+                for (i = 0; i < them.length; i++) {
+                    var v: any;
+
+                    if ( !(v = them[i]) ) continue;
+                    if ( !(v = v.public_keys) ) continue;
+                    if ( !(v = v.primary) ) continue;
+                    if ( !(v = v.bundle) ) continue;
+
+                    keys.push(new Keys.PublicKey(v));
+                }
+
+                callback(keys);
+            });
+        }
+    }
+
 }
