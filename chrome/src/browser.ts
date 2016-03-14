@@ -103,16 +103,25 @@ class Recepients {
         };
     }
 
-    // Checks if 'item' is already selected
-    private isSelected(item: Keys.KeyItem): boolean {
+    private isInArray(item: Keys.KeyItem, array: Keys.KeyItemList): boolean {
         var i: number;
-        for (i = 0; i < this.selected.length; i++) {
-            var testItem = this.selected[i];
+        for (i = 0; i < array.length; i++) {
+            var testItem = array[i];
             if ( item.key.fingerprint() == testItem.key.fingerprint())
                 return true;
         }
 
         return false;
+    }
+
+    // Checks if 'item' is already selected
+    private isSelected(item: Keys.KeyItem): boolean {
+        return this.isInArray(item, this.selected);
+    }
+
+
+    private isFound(item: Keys.KeyItem): boolean {
+        return this.isInArray(item, this.found);
     }
 
     setFromKeys(list: Array<Keys.PublicKey>): void {
@@ -144,6 +153,7 @@ class Recepients {
         }
         this.filter = "";
         this.found= [];
+        this.focus(<MouseEvent>e);
     }
 
     removeFromSelected(e: Event, model: {index: number}) {
@@ -158,31 +168,35 @@ class Recepients {
     }
 
     search(e: KeyboardEvent): void {
+        var found: Keys.KeyItemList = [],
+            i: number;
 
         if ( !this.filter ) {
             this.found = [];
             return;
         }
 
-        bg.store.addressBook.search(this.filter, (keys) => {
-            var found: Keys.KeyItemList = [], i: number;
+        // Get keys and move them to the local found array, then into this.found
+        var keysToItems = function(keys: Keys.PublicKeyArray, isRemote: boolean): void {
             for (i = 0; i < keys.length; i++) {
                 var keyItem = new Keys.KeyItem(keys[i], this.filter);
-                if ( this.isSelected(keyItem) == false ) found.push(keyItem);
+                keyItem.isRemote = isRemote;
+                if ( !this.isSelected(keyItem) && !this.isFound(keyItem) )
+                    found.push(keyItem);
             }
-
-            // Show the ones we have locally
             this.found = found;
+        }.bind(this);
+
+        // Search the local address book
+        bg.store.addressBook.search(this.filter, (keys) => {
+            keysToItems(keys, false);
 
             // Search also in keybase
-            keybase.search(this.filter, (keys) => {
-                for (i = 0; i < keys.length; i++) {
-                    var keyItem = new Keys.KeyItem(keys[i]);
-                    keyItem.isRemote = true;
-                    if ( this.isSelected(keyItem) == false ) found.push(keyItem);
-                }
-                this.found = found;
-            });
+            if ( bg.preferences.enableKeybase && bg.config.enableKeybase ) {
+                keybase.search(this.filter, (keys) => {
+                    keysToItems(keys, true);
+                });
+            }
         });
     }
 }

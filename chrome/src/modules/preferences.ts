@@ -19,6 +19,9 @@ class Preferences extends LocalStorage {
     // How many times we've nagged about setup
     setupNagCount: number = 0;
 
+    // Lookup keys in Keybase
+    enableKeybase: boolean = true;
+
     //---------------------------------------------------------
 
     constructor(callback: Interfaces.Callback) {

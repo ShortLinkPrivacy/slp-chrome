@@ -5,14 +5,16 @@ module Admin {
         filename = "preferences.html";
         articleId = "preferences";
         allowCollectData: boolean;
+        enableKeybase: boolean;
 
         onBind() {
             this.allowCollectData = bg.preferences.allowCollectData;
+            this.enableKeybase = bg.preferences.enableKeybase;
         }
 
-        toggleCollectData(e: Event) {
-            bg.preferences.allowCollectData = (<HTMLInputElement>e.target).checked;
-            bg.preferences.save();
+        toggle(e: Event): void {
+            var prop = (<HTMLElement>e.target).getAttribute('rv-checked');
+            bg.preferences[prop] = (<HTMLInputElement>e.target).checked;
         }
 
     }

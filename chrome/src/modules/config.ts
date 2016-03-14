@@ -55,4 +55,7 @@ class Config {
 
     // Own GA code
     googleAnalyticsId = 'UA-74656221-1';
+
+    // Enable Keybase lookup
+    enableKeybase = true;
 }
