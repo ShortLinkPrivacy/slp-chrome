@@ -39,6 +39,7 @@ module Admin {
             bg.store.addressBook.deleteSingle(keyItem.key.fingerprint(), () => {
                 this.foundKeys.splice(model.index, 1);
             });
+            bg._ga('admin', 'PublicKeyList.remove');
         }
 
     }
