@@ -18,14 +18,14 @@
     <tr>
       <th>User ID</th>
       <th>Fingerprint</th>
-      <th>x</th>
+      <th>&nbsp;</th>
     </tr>
   </thead>
   <tbody>
     <tr rv-each-key="foundKeys">
       <td>{ key.getPrimaryUser }</td>
       <td>{ key.fingerprint }</td>
-      <td><span class="remove" rv-click="remove">✖</span></td>
+      <td><span class="remove" rv-on-click="remove">✖</span></td>
     </tr>
   </tbody>
 </table>

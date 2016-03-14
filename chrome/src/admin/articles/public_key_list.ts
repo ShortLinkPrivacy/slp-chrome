@@ -33,6 +33,14 @@ module Admin {
             });
         }
 
+        remove(e: Event, model: {index: number}): void {
+            e.preventDefault();
+            var keyItem = this.foundKeys[model.index];
+            bg.store.addressBook.deleteSingle(keyItem.key.fingerprint(), () => {
+                this.foundKeys.splice(model.index, 1);
+            });
+        }
+
     }
 }
 
