@@ -145,7 +145,7 @@ module Keys {
         }
     }
 
-    export interface KeyItemList extends Array<KeyItem> {}
+    export type KeyItemList = Array<KeyItem>;
 
     if ( typeof window == "undefined" ) {
         exports["Keys"] = Keys;
