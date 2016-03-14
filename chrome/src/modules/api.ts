@@ -102,42 +102,52 @@ module API {
     //-------------------------------------------------------------------------------
 
     export class Keybase implements KeySource.RemoteStore {
-        lookupUrl = "https://keybase.io/_/api/1.0/user/lookup.json";
+        baseUrl = "https://keybase.io/_/api/1.0";
 
         search(what: string, callback: Interfaces.ResultCallback<Keys.PublicKeyArray>): void {
-            var keys: Keys.PublicKeyArray = [];
+            var keys: Keys.PublicKeyArray,
+                usernames: Array<string>,
+                fingerprints: Keys.FingerprintArray;
 
             if (what.length < 3) {
                 callback([]);
                 return;
             }
 
-            httpGet(this.lookupUrl + "?usernames=" + escape(what), {}, (result) => {
-                var i: number,
-                    stat: { code: number },
-                    them: any;
-
-                if ( !result.success ) { callback([]); return; }
-
-                stat = result.value["status"];
-                if ( stat.code != 0 ) { callback([]); return; }
-
-                them = result.value.them;
-                if (!them || !them.length) { callback([]); return; }
-
-                for (i = 0; i < them.length; i++) {
-                    var v: any;
-
-                    if ( !(v = them[i]) ) continue;
-                    if ( !(v = v.public_keys) ) continue;
-                    if ( !(v = v.primary) ) continue;
-                    if ( !(v = v.bundle) ) continue;
-
-                    keys.push(new Keys.PublicKey(v));
+            httpGet(this.baseUrl + "/user/autocomplete.json?q=" + escape(what), {}, (result) => {
+                if (!result.success) {
+                    callback([]);
+                    return;
                 }
 
-                callback(keys);
+                try {
+                    usernames = result.value.completions.map((i) => {
+                        return i.components.username.val;
+                    })
+                } catch (e) {
+                    callback([]);
+                    return;
+                }
+
+                httpGet(this.baseUrl + "/user/lookup.json?usernames=" + escape(usernames.join(",")), {}, (result) => {
+                    if (!result.success) {
+                        callback([]);
+                        return;
+                    }
+
+                    try {
+                        keys = result.value.them.map((i) => {
+                            return new Keys.PublicKey(i.public_keys.primary.bundle);
+                        })
+                    } catch(e) {
+                        callback([]);
+                        return;
+                    }
+
+                    callback(keys);
+                })
             });
+
         }
     }
 

@@ -20,7 +20,7 @@ class Preferences extends LocalStorage {
     setupNagCount: number = 0;
 
     // Lookup keys in Keybase
-    enableKeybase: boolean = true;
+    enableKeybase: boolean = false;
 
     //---------------------------------------------------------
 

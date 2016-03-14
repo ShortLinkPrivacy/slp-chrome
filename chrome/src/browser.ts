@@ -21,6 +21,17 @@ function sendElementMessage(msg: Interfaces.ContentMessage<any>, callback?: Inte
     chrome.tabs.sendMessage(tab.id, msg, callback);
 }
 
+function isInArray(item: Keys.KeyItem, array: Keys.KeyItemList): boolean {
+    var i: number;
+    for (i = 0; i < array.length; i++) {
+        var testItem = array[i];
+        if ( item.key.fingerprint() == testItem.key.fingerprint())
+            return true;
+    }
+
+    return false;
+}
+
 module Components {
     export class TextInput {
         value: string;
@@ -103,25 +114,14 @@ class Recepients {
         };
     }
 
-    private isInArray(item: Keys.KeyItem, array: Keys.KeyItemList): boolean {
-        var i: number;
-        for (i = 0; i < array.length; i++) {
-            var testItem = array[i];
-            if ( item.key.fingerprint() == testItem.key.fingerprint())
-                return true;
-        }
-
-        return false;
-    }
-
     // Checks if 'item' is already selected
     private isSelected(item: Keys.KeyItem): boolean {
-        return this.isInArray(item, this.selected);
+        return isInArray(item, this.selected);
     }
 
 
     private isFound(item: Keys.KeyItem): boolean {
-        return this.isInArray(item, this.found);
+        return isInArray(item, this.found);
     }
 
     setFromKeys(list: Array<Keys.PublicKey>): void {
@@ -181,7 +181,7 @@ class Recepients {
             for (i = 0; i < keys.length; i++) {
                 var keyItem = new Keys.KeyItem(keys[i], this.filter);
                 keyItem.isRemote = isRemote;
-                if ( !this.isSelected(keyItem) && !this.isFound(keyItem) )
+                if ( !this.isSelected(keyItem) && !isInArray(keyItem, found) )
                     found.push(keyItem);
             }
             this.found = found;
