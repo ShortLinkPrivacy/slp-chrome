@@ -87,13 +87,13 @@
           <div rv-hide="alreadyEncrypted">
             <textinput value="clearText"></textinput>
             <div rv-show="clearText">
-              <label for="filter">Recipients:</label>
+              <label for="filter">Recipients: <span rv-show="recepients.wait" class="wait">...searching keybase...</span></label>
               <ul class="selected-keys" rv-on-click="recepients.focus">
                 <li class="bead" rv-each-item="recepients.selected"><div class="name">{ item.getPrimaryUser }</div><div class="remove" rv-on-click="recepients.removeFromSelected">✖</div></li>
-                <li><input id="ftr" class="filter" rv-value="recepients.filter" rv-on-keyup="recepients.search"></li>
+                <li><input id="ftr" class="filter" rv-value="recepients.filter" rv-on-input="recepients.search"></li>
               </ul>
               <ul class="found-keys" rv-show="recepients.hasFound < found">
-                <li rv-on-click="recepients.moveToSelected" rv-each-item="recepients.found"><span>{ item.getPrimaryUser }</span></li>
+                <li rv-on-click="recepients.moveToSelected" rv-each-item="recepients.found"><span rv-class-remote="item.isRemote">{ item.getPrimaryUser }</span></li>
               </ul>
             </div><!-- clearText -->
             <div class="bottom">

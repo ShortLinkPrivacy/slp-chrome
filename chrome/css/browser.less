@@ -86,7 +86,7 @@ input[type=password] {
 }
 
 .pull-right {
-  float: right;
+  float: right !important;
 }
 
 // General button
@@ -258,6 +258,9 @@ article {
         color: @selectFg;
       }
     }
+    .remote {
+      color: #666;
+    }
   }
 
   .bottom {
@@ -277,6 +280,7 @@ article {
       float: left;
       padding: 2px;
       margin-right: 4px;
+      width: @beadWidth;
     }
 
     .filter {
@@ -327,3 +331,7 @@ article {
   }
 }
 
+.wait {
+  font-variant: small-caps;
+  font-weight: normal;
+}

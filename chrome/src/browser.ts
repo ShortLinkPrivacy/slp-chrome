@@ -102,6 +102,8 @@ class Recepients {
     filter: string;
     hasFound: BoolFunc;
     hasSelected: BoolFunc;
+    wait: boolean;
+    searchTimer: number;
 
     constructor(selected: Keys.KeyItemList) {
         this.found = [];
@@ -169,8 +171,12 @@ class Recepients {
 
     search(e: KeyboardEvent): void {
         var found: Keys.KeyItemList = [],
-            i: number;
+            i: number,
+            timer;
 
+        if (this.searchTimer) clearTimeout(this.searchTimer);
+
+        // Empty filter cleans out the dropdown
         if ( !this.filter ) {
             this.found = [];
             return;
@@ -191,11 +197,15 @@ class Recepients {
         bg.store.addressBook.search(this.filter, (keys) => {
             keysToItems(keys, false);
 
-            // Search also in keybase
+            // Also search in Keybase, but after a timeout
             if ( bg.preferences.enableKeybase && bg.config.enableKeybase ) {
-                keybase.search(this.filter, (keys) => {
-                    keysToItems(keys, true);
-                });
+                this.searchTimer = setTimeout(() => {
+                    this.wait = true;
+                    keybase.search(this.filter, (keys) => {
+                        keysToItems(keys, true);
+                        this.wait = false;
+                    });
+                }, 500);
             }
         });
     }
