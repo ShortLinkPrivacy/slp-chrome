@@ -18,8 +18,8 @@
   },
 
   "icons": {
-      "19": "images/browser24.png",
-      "128": "images/browser128.png"
+      "19": "images/24.png",
+      "128": "images/112.png"
   },
 
   "browser_action": {
