@@ -5,7 +5,7 @@
   "name": "__MSG_extName__",
   "short_name": "SLP",
   "description": "__MSG_extDescription__",
-  "version": "0.9.52",
+  "version": "0.9.60",
   "options_page": "settings.html",
 
   "background": {
@@ -50,5 +50,5 @@
       "images/*.png"
   ],
 
-  "author": "Albatros Grigorov"
+  "author": "xnix"
 }
