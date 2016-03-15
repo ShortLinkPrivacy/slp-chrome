@@ -30,7 +30,7 @@
     },
 
     "importKeySuccess": {
-        "message": "Your key was successfully imported. <b>Note!</b> You may have to refresh all browser tabs containing magic links in order to decrypt them with the new key.",
+        "message": "Your key was successfully imported.<p><b>Note!</b> You may have to refresh all browser tabs containing magic links in order to decrypt them with the new key.</p>",
         "description": "Message users see in the admin after they import a new key"
     },
 
