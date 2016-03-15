@@ -38,6 +38,7 @@ module Admin {
                     bg.store.privateKey.set(key, () => {
                         this.spinner = false;
                         bg._ga('admin', 'generateKeyPair');
+                        app.notify.clear();
                         app.notify.sticky = true;
                         app.notify.info = chrome.i18n.getMessage('generateKeySuccess');
                         window.location.hash = "#/key/view";

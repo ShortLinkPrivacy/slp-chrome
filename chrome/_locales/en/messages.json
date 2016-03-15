@@ -25,7 +25,7 @@
     },
 
     "generateKeySuccess": {
-        "message": "Your key was successfully created. <b>Note!</b> You may have to refresh all browser tabs containing magic links in order to decrypt them with the new key.",
+        "message": "Your key was successfully created.<p><b>Note!</b> You may have to refresh all browser tabs containing short privacy links in order to decrypt them with the new key.</p>",
         "description": "Message users see in the admin after they generate a new key"
     },
 
