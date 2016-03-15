@@ -6,14 +6,9 @@
 
 // Menu
 @menuHeight: 20px;
-@menuBg: #acd6ff;
-@menuFg: #002270;
+@menuBg: #775D7F;
+@menuFg: #B7ABBA;
 @menuHover: #fff;
-
-// Logo
-@logoBg: @menuBg;
-@logoFg: @menuFg;
-@logoBorder: none;
 
 // Article
 @articlePadding: 10px;
@@ -158,15 +153,15 @@ nav {
   line-height: @menuHeight - 1;
   background-color: @menuBg;
   border-bottom: 1px solid #aaa;
+  color: @menuFg;
 
   .logo {
     font-size: 115%;
     text-decoration: none;
     font-variant: small-caps;
-    color: @logoFg;
-    background-color: @logoBg;
     padding: 0 5px;
-    border-right: @logoBorder;
+    color: #fff;
+    text-shadow: 1px 1px #000;
   }
 
   ul {
