@@ -55,14 +55,7 @@
 
   </head>
   <body>
-    <div id="critical" rv-show="critical">
-      <b>Something went wrong with this extension.</b>
-      <p>
-        Don't worry, it's probably nothing. Try restarting your browser and it should be fine.
-        If you still get that message after, please contact us for help.
-      </p>
-    </div>
-    <div id="container" rv-hide="critical">
+    <div id="container">
       <div class="error" rv-if="error" rv-text="error"></div>
       <nav>
         <div class="logo pull-left">short link privacy</div>

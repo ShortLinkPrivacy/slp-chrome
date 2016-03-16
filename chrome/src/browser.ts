@@ -219,7 +219,6 @@ class Recepients {
 class App {
 
     error: string;
-    critical: boolean;
     password: string;
     wait: boolean;
 
@@ -234,7 +233,6 @@ class App {
     constructor() {
         this.timeToLive = 0;
         this.recepients = new Recepients([]);
-        this.critical = false;
 
         this.hasPrivateKey = function() {
             return bg.privateKey ? true : false;
@@ -398,6 +396,7 @@ class App {
         }
 
         bg._ga('browser', 'run');
+
     }
 }
 
@@ -424,9 +423,9 @@ function run(): void {
 }
 
 window.onerror = function(e) {
-    app.critical = true;
+    window.close();
     bg.console.log(e);
-    bg._ga('browser_critical', e);
+    bg._ga('browser_exception', e);
 };
 
 window.onload = run;
