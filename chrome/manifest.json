@@ -6,7 +6,7 @@
   "name": "__MSG_extName__",
   "short_name": "SLP",
   "description": "__MSG_extDescription__",
-  "version": "0.9.60",
+  "version": "0.9.61",
   "options_page": "settings.html",
 
   "background": {

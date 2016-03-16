@@ -1,4 +1,6 @@
 COMPRESS=java -jar yuicompressor-2.4.8.jar
+VERSION=$(shell cat manifest.json | perl -MJSON -E 'my @a=<>;print from_json(join("",@a))->{version}')
+UNAME=$(shell uname)
 
 help:
 	@echo "Available targets:"
@@ -100,6 +102,8 @@ dist:
 	cp bower_components/rivets/dist/rivets.bundled.min.js dist/lib
 	cp bower_components/openpgp/dist/openpgp.min.js dist/lib
 	cp bower_components/clipboard/dist/clipboard.min.js dist/lib
+	zip -r ShortLinkPrivacy-$(VERSION).zip dist/*
+	echo "Produced ShortLinkPrivacy-$(VERSION).zip"
 
 dist-clean:
 	rm -rfv dist
