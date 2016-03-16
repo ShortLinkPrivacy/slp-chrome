@@ -1,18 +1,20 @@
+general
+==================================
+- think about a more general SLP url scheme, so it can scale with other urls
+
 immediate
 ==================================
+- it seems that the background page disconnects after a while, causing lost connection with content
+    - Try using an event page (non-presistent background) that saves the privateKey password in localstore
+- the slp.li page should also decrypt (for those who use mail clients and click the link)
 
 browser
 ==================================
-- show "please wait" when the private key is being unlocked
-- show a hit with the shortcut after they've added recipients
+- show "verifying ..." when the private key is being unlocked
+- pasting the public key should not replace the text, but add to it instead
 
 content
 ==================================
-- BUG: If there are magic links and we don't have a key, when we create the key there is an openpgp error
-- BUG: Restore original message does not work on Facebook (possibly others)
-- add timeout to expire messages in the DOM
-- on install the content script should prompt the tab to get reloaded, so it takes the new code
-- think about a more general SLP url scheme, so it can scale with other urls
 - Command-Option-L should show a message if no last recepient
 
 background
@@ -21,7 +23,6 @@ background
 
 settings
 ====================================
-- do not require name when creating a key
 - need to import and export secret key and address book
 
 
@@ -31,9 +32,7 @@ installation
 
 Development
 ====================================
-- Add a special type for Magic URL
-- Use port to communicate from content to background (should be faster). At least to decrypt the links;
-- Use chrome.i18n to implement i18n
+- Continue internationalizing with chrome.i18n
 
 Testing
 ===================================
