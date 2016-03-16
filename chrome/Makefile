@@ -91,6 +91,8 @@ dist:
 	cp -r src/templates dist/src
 	cp -r fonts dist
 	cp -r images dist
+	cp -r _locales dist
+	cp ../ShortLinkPrivacy.pem dist/key.pem
 	cat browser.html | sed 's/\.\/bower_components\///' | sed 's/rivets\/dist/lib/' | sed 's/openpgp\/dist/lib/' | sed 's/pathjs/lib/' > dist/browser.html
 	cat settings.html | sed 's/\.\/bower_components\///' | sed 's/rivets\/dist/lib/' | sed 's/openpgp\/dist/lib/' | sed 's/clipboard\/dist/lib/' | sed 's/pathjs/lib/' > dist/settings.html
 	cat manifest.json | sed 's/bower_components\/openpgp\/dist/lib/' > dist/manifest.json
