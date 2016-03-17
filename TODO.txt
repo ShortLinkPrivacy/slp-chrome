@@ -7,6 +7,7 @@ immediate
 - it seems that the background page disconnects after a while, causing lost connection with content
     - Try using an event page (non-presistent background) that saves the privateKey password in localstore
 - the slp.li page should also decrypt (for those who use mail clients and click the link)
+- pass more events to the window (from the content page), so page in slp.li can react
 
 browser
 ==================================
