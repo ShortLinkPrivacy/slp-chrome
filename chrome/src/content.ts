@@ -156,7 +156,7 @@ class Editable {
         if ( !this.element ) return;
         return this.isTextarea() == true
             ? (<HTMLTextAreaElement>this.element).value
-            : (this.element.innerHTML || this.element.textContent);
+            : (this.element.innerText || this.element.textContent);
     }
 
     // Selects the contents of the element. Needed to paste
@@ -388,7 +388,7 @@ var traverseNodes = (function(){
             messageBgPage( 'decryptLink', { messageId: messageId }, (result: Interfaces.Success<Messages.ClearType>) => {
                 if ( result.success ) {
                     var clearMsg: Messages.ClearType = result.value;
-                    element.innerHTML = clearMsg.body;
+                    element.innerHTML = clearMsg.body.replace(/\n/g, '<br/>');
                     element.classList.add("__pgp_decrypted");
 
                     // Expiring?
