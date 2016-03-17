@@ -156,7 +156,7 @@ class Editable {
         if ( !this.element ) return;
         return this.isTextarea() == true
             ? (<HTMLTextAreaElement>this.element).value
-            : this.element.textContent;
+            : (this.element.innerHTML || this.element.textContent);
     }
 
     // Selects the contents of the element. Needed to paste
