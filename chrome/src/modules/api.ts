@@ -31,7 +31,12 @@ module API {
                     if ( r.status == 404 || r.status == 410 ) {
                         error = "Expired private message"
                     } else {
-                        error = "Message server error"
+                        try {
+                            json = JSON.parse(r.responseText)
+                        } catch (err) {
+                            json = { error: "Server error" };
+                        }
+                        error = json.error;
                     }
                     callback({ success: false, error: error });
                     return;
