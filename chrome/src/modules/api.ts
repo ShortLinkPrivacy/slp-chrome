@@ -72,20 +72,17 @@ module API {
     //-------------------------------------------------------------------------------
 
     export class ShortLinkPrivacy {
-        url = 'http://slp.li';
+        static url = 'http://slp.li';
 
         // Items
-        itemPath = this.url + '/x';
-        itemRegExp = this.itemPath + "/([0-9,a-f]+)";
-
-        // Captures
-        capturePath = this.url + '/c';
+        static itemPath = ShortLinkPrivacy.url + '/x';
+        static itemRegExp = ShortLinkPrivacy.itemPath + "/([0-9,a-f]+)";
 
         // Save an item and return a IdResponse success structure
         saveItem(item: Messages.ArmorType, callback: IdCallback): void {
             // Add generic values to armor
             item.extVersion = chrome.runtime.getManifest()["version"];
-            httpPost(this.itemPath, item, callback);
+            httpPost(ShortLinkPrivacy.itemPath, item, callback);
         }
 
         // Load an item (by its ID) into an Armored class
@@ -94,12 +91,7 @@ module API {
         }
 
         getItemUrl(id: string): string {
-            return this.itemPath + '/' + id;
-        }
-
-        // Save captures (fire and forget)
-        saveCapture(capture: any): void {
-            httpPost(this.capturePath, capture, () => {});
+            return ShortLinkPrivacy.itemPath + '/' + id;
         }
 
     }
