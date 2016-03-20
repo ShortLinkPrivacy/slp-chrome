@@ -44,6 +44,7 @@ modules:
 	src/modules/storage.ts \
 	src/modules/preferences.ts \
 	src/modules/api.ts \
+	src/modules/url.ts \
 	src/modules/application.ts \
 	src/modules/storage/AddressBook/IndexedDB.ts \
 	src/modules/storage/AddressBook.ts \
