@@ -254,7 +254,7 @@ class App {
             lastMessage: Interfaces.LastMessage,
             i: number;
 
-        re = new RegExp(bg.slp.itemRegExp);
+        re = new RegExp(API.ShortLinkPrivacy.itemRegExp);
 
         sendElementMessage({ action: 'getElementText' }, (response) => {
             if ( !response ) return;

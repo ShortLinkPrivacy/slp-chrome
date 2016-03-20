@@ -159,7 +159,7 @@ class Message {
     initVars(): void {
         var result: Interfaces.InitVars = {};
 
-        result.linkRe = slp.itemRegExp;
+        result.linkRe = API.ShortLinkPrivacy.itemRegExp;
         result.hasPrivateKey = privateKey ? true : false;
         result.isDecrypted = privateKey ? privateKey.isDecrypted() : false;
         result.config = config;
