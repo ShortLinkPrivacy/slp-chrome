@@ -35,6 +35,7 @@ module Admin {
             openpgp.generateKeyPair(options)
                .then((generated)=>{
                     var key = bg.privateKey = new Keys.PrivateKey(generated.privateKeyArmored);
+                    bg.privateKey.decrypt(this.passphrase);
                     bg.store.privateKey.set(key, () => {
                         this.spinner = false;
                         bg._ga('admin', 'generateKeyPair');
