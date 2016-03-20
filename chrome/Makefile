@@ -71,7 +71,9 @@ browser:
 	tsc --out src/browser.js src/browser.ts
 
 content:
-	tsc --out src/content.js src/content.ts
+	tsc --out src/content.js \
+		src/modules/url.ts \
+		src/content.ts
 
 background:
 	tsc --out src/background.js src/background.ts

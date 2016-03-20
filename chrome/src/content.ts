@@ -8,8 +8,8 @@ var init: Interfaces.InitVars;
 var observer: MutationObserver;
 
 // Regular expression for the url
-var urlRe: RegExp,
-    urlReg: RegExp;
+var urlRe = MagicURL.anyRegExp(),
+    urlReg = MagicURL.anyRegExp("g");
 
 // Has anything been done on this tab slp-wise. Used to determine if the tab
 // needs to get refreshed after upgrade
