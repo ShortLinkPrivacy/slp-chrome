@@ -254,7 +254,7 @@ class App {
             lastMessage: Interfaces.LastMessage,
             i: number;
 
-        re = new RegExp(API.ShortLinkPrivacy.itemRegExp);
+        re = MagicURL.anyRegExp();
 
         sendElementMessage({ action: 'getElementText' }, (response) => {
             if ( !response ) return;

@@ -26,8 +26,13 @@ module Interfaces {
         (result: Success<T>): void;
     }
 
+    export interface RecordCommon {
+        createdDate?: string;
+        timeToLive?: number;
+        extVersion?: string;
+    }
+
     export interface InitVars {
-        linkRe?: string;
         isDecrypted?: boolean;
         hasPrivateKey?: boolean;
         config?: Config;

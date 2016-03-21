@@ -13,6 +13,10 @@ module Keys {
     export type PublicKeyArray = Array<PublicKey>;
     export type KeyItemList = Array<KeyItem>;
 
+    export interface Record extends Interfaces.RecordCommon {
+        body: Key;
+    }
+
     export class Key {
         key: openpgp.key.Key;
 
@@ -81,6 +85,10 @@ module Keys {
             }
 
             return this.getPrimaryUser();
+        }
+
+        toJSON() {
+            return this.armored();
         }
 
     }

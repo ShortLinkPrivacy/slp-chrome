@@ -42,9 +42,8 @@ function isOSX(): boolean {
 //############################################################################
 
 // Creates a HTML snippet with a button to replace a public key armored message
-function makePublicKeyText(armor: Keys.Armor, messageId: Messages.Id, callback: Interfaces.ResultCallback<string>): void {
-    var key = new Keys.PublicKey(armor),
-        username = key.getPrimaryUser(),
+function makePublicKeyText(key: Keys.PublicKey, callback: Interfaces.ResultCallback<string>): void {
+    var username = key.getPrimaryUser(),
         classList: Array<string>,
         html: string;
 
@@ -52,7 +51,7 @@ function makePublicKeyText(armor: Keys.Armor, messageId: Messages.Id, callback: 
 
     store.addressBook.loadSingle(key.fingerprint(), (found) => {
         if ( found ) classList.push(config.pgpPKAdded);
-        html = "<span class='" + classList.join(' ') + "' rel='" + messageId + "'>" + username + "</span>";
+        html = "<span class='" + classList.join(' ') + "'>" + username + "</span>";
         callback(html);
     });
 }
@@ -64,10 +63,10 @@ function encryptMessage(msg: Messages.ClearType, keyList: Array<openpgp.key.Key>
     Messages.encrypt(msg, keyList, (result) => {
         if ( result.success ) {
             var armor = result.value;
-            slp.saveItem(armor, (result) => {
+            slp.saveMessage(armor, (result) => {
                 if ( result.success ) {
                     var umsg = <Messages.UrlType>armor;
-                    umsg.body = slp.getItemUrl(result.value.id);
+                    umsg.body = MagicURL.messageUrl(result.value.id);
                     callback({ success: true, value: umsg });
                 } else {
                     callback(_err(result));
@@ -81,7 +80,7 @@ function encryptMessage(msg: Messages.ClearType, keyList: Array<openpgp.key.Key>
 
 // Encrypt own public key and create a crypted url
 function encryptPublicKey(callback: Interfaces.SuccessCallback<Messages.UrlType>): void {
-    var armoredMessage: Messages.ArmorType,
+    var keyRecord: Keys.Record,
         url: Messages.Url;
 
     // If the url is already in the prefs, then use it DISABLED
@@ -92,15 +91,15 @@ function encryptPublicKey(callback: Interfaces.SuccessCallback<Messages.UrlType>
     }
     */
 
-    armoredMessage = {
-        body: privateKey.toPublic().armored()
+    keyRecord = {
+        body: privateKey.toPublic()
     };
 
-    slp.saveItem(armoredMessage, (result) => {
+    slp.saveKey(keyRecord, (result) => {
         if ( result.success == true ) {
 
             // Get the url of the public key and store it in the prefs
-            url = slp.getItemUrl(result.value.id);
+            url = MagicURL.keyUrl(result.value.id);
             preferences.publicKeyUrl = url;
             preferences.save();
 
@@ -145,7 +144,14 @@ function unlockKey(password: string): boolean {
 //############################################################################
 
 class Message {
-    private request: any;
+    private request: {
+        fullPath?: string,
+        lastMessage?: Interfaces.LastMessage;
+        text?: string;
+        frameId?: string;
+        elementId?: string;
+        properties?: any;
+    };
     private sender: chrome.runtime.MessageSender;
     private sendResponse: Interfaces.SuccessCallback<any>;
 
@@ -159,7 +165,6 @@ class Message {
     initVars(): void {
         var result: Interfaces.InitVars = {};
 
-        result.linkRe = API.ShortLinkPrivacy.itemRegExp;
         result.hasPrivateKey = privateKey ? true : false;
         result.isDecrypted = privateKey ? privateKey.isDecrypted() : false;
         result.config = config;
@@ -168,33 +173,28 @@ class Message {
     }
 
     decryptLink(): void {
-        var messageId: Messages.Id,
-            armorMsg: Messages.ArmorType;
+        var fullPath: string,
+            url: MagicURL;
 
-        messageId = this.request.messageId;
-
-        if (!messageId) {
+        if ( !(fullPath = this.request.fullPath) ) {
             this.sendResponse(_err('Wrong link ID'));
             return;
         }
 
-        slp.loadItem( messageId, (result) => {
-            if ( !result.success ) {
-               this.sendResponse(_err(result));
-               return;
-            }
-
-            armorMsg = result.value;
-            if ( Messages.isMessage(armorMsg) == true ) {
-                Messages.decrypt( armorMsg, privateKey, this.sendResponse );
-            } else if ( Messages.isPublicKey(armorMsg) == true ) {
-                makePublicKeyText(armorMsg.body, messageId, (html) => {
-                    var urlMsg = <Messages.UrlType>armorMsg;
-                    urlMsg.body = html;
-                    this.sendResponse({ success: true, value: urlMsg });
+        url = new MagicURL(MagicURL.domain + "/" + fullPath);
+        if ( url.isMessage() == true ) {
+            slp.loadMessage(url.id, (result) => {
+                Messages.decrypt( result.value, privateKey, this.sendResponse );
+            });
+        } else if ( url.isKey() == true ) {
+            slp.loadKey(url.id, (result) => {
+                makePublicKeyText(result.value, (html) => {
+                    this.sendResponse({ success: true, value: { body: html } });
                 });
-            }
-        });
+            })
+        } else {
+            this.sendResponse(_err("Invalid link"));
+        }
     }
 
     needPassword(): void {
@@ -205,25 +205,23 @@ class Message {
     // key url in it The request contains the messageId of the message url
     // containing the armored text of the public key
     addPublicKey(): void {
-        var key: Keys.PublicKey,
-            messageId: Messages.Id = this.request.messageId,
-            armored: Messages.ArmorType;
+        var fullPath: string = this.request.fullPath,
+            armored: Messages.ArmorType,
+            url: MagicURL;
 
-        slp.loadItem( messageId, (result) => {
+        url = new MagicURL(MagicURL.domain + "/" + fullPath);
+        if ( !url.isKey() ) {
+            this.sendResponse(_err("Invalid link"));
+            return;
+        }
+
+        slp.loadKey( url.id, (result) => {
             if ( !result.success ) {
                 this.sendResponse(_err(result));
                 return;
             }
 
-            armored = result.value;
-            try {
-                key = new Keys.PublicKey(armored.body);
-            } catch (err) {
-                this.sendResponse(_err(err));
-                return;
-            }
-
-            store.addressBook.save(key, () => {
+            store.addressBook.save(result.value, () => {
                 this.sendResponse({ success: true });
             });
         });

@@ -9,12 +9,9 @@ module Messages {
     export type Url = string;
 
     // Message structure
-    export interface Record<T> {
+    export interface Record<T> extends Interfaces.RecordCommon {
         body: T;
-        createdDate?: string;
-        timeToLive?: number;
         fingerprints?: Keys.FingerprintArray;
-        extVersion?: string;
     }
 
     // Clear and Armor message types

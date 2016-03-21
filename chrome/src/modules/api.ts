@@ -12,6 +12,8 @@ module API {
     // Success callback with value type armored object
     export type ArmorCallback = Interfaces.SuccessCallback<Messages.ArmorType>;
 
+    export type KeyCallback = Interfaces.SuccessCallback<Keys.Key>;
+
     // Return value types for http functions' callbacks
     export type AnySuccess = Interfaces.SuccessCallback<any>;
 
@@ -72,26 +74,39 @@ module API {
     //-------------------------------------------------------------------------------
 
     export class ShortLinkPrivacy {
-        static url = 'http://slp.li';
 
-        // Items
-        static itemPath = ShortLinkPrivacy.url + '/x';
-        static itemRegExp = ShortLinkPrivacy.itemPath + "/([0-9,a-f]+)";
-
-        // Save an item and return a IdResponse success structure
-        saveItem(item: Messages.ArmorType, callback: IdCallback): void {
+        // Saves a message and returns a IdResponse success structure
+        saveMessage(item: Messages.ArmorType, callback: IdCallback): void {
             // Add generic values to armor
             item.extVersion = chrome.runtime.getManifest()["version"];
-            httpPost(ShortLinkPrivacy.itemPath, item, callback);
+            httpPost(MagicURL.messageUrl(), item, callback);
         }
 
         // Load an item (by its ID) into an Armored class
-        loadItem(id: Messages.Id, callback: ArmorCallback): void {
-            httpGet(this.getItemUrl(id), {}, callback);
+        loadMessage(id: Messages.Id, callback: ArmorCallback): void {
+            httpGet(MagicURL.messageUrl(id), {}, callback);
         }
 
-        getItemUrl(id: string): string {
-            return ShortLinkPrivacy.itemPath + '/' + id;
+        // Saves a key and returns a IdResponse success structure
+        // The key should JSON-infy into its armor (see toJSON in Keys.Key)
+        saveKey(keyRecord: Keys.Record, callback: IdCallback): void {
+            // Add generic values to armor
+            keyRecord.extVersion = chrome.runtime.getManifest()["version"];
+            httpPost(MagicURL.keyUrl(), keyRecord, callback);
+        }
+
+        // Load an item (by its ID) into an Armored class
+        loadKey(id: Messages.Id, callback: KeyCallback ): void {
+            httpGet(MagicURL.keyUrl(id), {}, (result) => {
+                var key: Keys.PublicKey;
+                try {
+                    key = new Keys.PublicKey(result.value.body);
+                } catch (err) {
+                    callback({ success: false, error: err })
+                    return;
+                }
+                callback({ success: true, value: key });
+            });
         }
 
     }

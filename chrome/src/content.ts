@@ -28,7 +28,7 @@ function isOSX(): boolean {
 interface BgPageArgs {
     frameId?: string;
     elementId?: string;
-    messageId?: Messages.Id;
+    fullPath?: string;
     properties?: any;
     text?: string;
     lastMessage?: Interfaces.LastMessage;
@@ -220,7 +220,14 @@ var hotlinkPublicKeys = (function() {
         return function(e: MouseEvent): void {
             e.preventDefault();
             e.stopPropagation();
-            messageBgPage('addPublicKey', { messageId: el.getAttribute('rel') }, (result: Interfaces.Success<Messages.Id>) => {
+            var fullPath: string;
+            try {
+                fullPath = el.parentElement.getAttribute('rel');
+            } catch ( err ) {
+                // an error maybe one day
+            }
+            if (!fullPath) return;
+            messageBgPage('addPublicKey', { fullPath: fullPath }, (result: Interfaces.Success<Messages.Id>) => {
                 if ( result.success ) {
                     el.classList.add(init.config.pgpPKAdded);
                     el.removeEventListener('click', _bindOnClick(el));
@@ -380,12 +387,12 @@ var traverseNodes = (function(){
 
         var _decode = function(idx: number, done: Interfaces.Callback): void {
             var element = <HTMLElement>(els[idx]),
-                messageId: Messages.Id = element.getAttribute('rel');
+                fullPath: string = element.getAttribute('rel');
 
-            if (!messageId) return;
+            if (!fullPath) return;
 
             count++;
-            messageBgPage( 'decryptLink', { messageId: messageId }, (result: Interfaces.Success<Messages.ClearType>) => {
+            messageBgPage( 'decryptLink', { fullPath: fullPath }, (result: Interfaces.Success<Messages.ClearType>) => {
                 if ( result.success ) {
                     var clearMsg: Messages.ClearType = result.value;
                     element.innerHTML = clearMsg.body.replace(/\n/g, '<br/>');
