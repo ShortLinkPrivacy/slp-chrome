@@ -1,6 +1,6 @@
 class MagicURL {
     //static domain = "https?://slp.li";
-    static domain = "http://localhost:5000";
+    static domain = "http://slp:5000";
     static anyPath = "m|k";
     static messagePath = "m";
     static keyPath = "k";

@@ -4,15 +4,8 @@
 
 var slp = new API.ShortLinkPrivacy();
 
-function saveMessage(msg: Messages.ClearType, callback: API.IdCallback) {
-    console.log("Saving: ", msg);
-    slp.saveItem(msg, (result) => {
-        callback(result);
-    });
-}
-
 describe("API :: ShortLinkPrivacy", () => {
-    describe("saveItem", () => {
+    describe("saveMessage", () => {
         var result: Interfaces.Success<API.IdResponse>,
             message: Messages.ClearType = {
                 body: "test",
@@ -20,7 +13,7 @@ describe("API :: ShortLinkPrivacy", () => {
             };
 
         before((done) => {
-            saveMessage(message, (r) => {
+            slp.saveMessage(message, (r) => {
                 result = r;
                 done();
             })
@@ -36,16 +29,16 @@ describe("API :: ShortLinkPrivacy", () => {
     });
 
 
-    describe("loadItem", () => {
+    describe("loadMessage", () => {
         var result: Interfaces.Success<Messages.ArmorType>,
             message: Messages.ArmorType,
             id: Messages.Id;
 
         describe("current message", () => {
             before((done) => {
-                saveMessage({ body: "test1", timeToLive: 86400 }, (r) => {
+                slp.saveMessage({ body: "test1", timeToLive: 86400 }, (r) => {
                     id = r.value.id;
-                    slp.loadItem( id, (r2) => {
+                    slp.loadMessage( id, (r2) => {
                         result = r2;
                         message = r2.value;
                         done();
@@ -64,9 +57,9 @@ describe("API :: ShortLinkPrivacy", () => {
 
         describe("expired message", () => {
             before((done) => {
-                saveMessage({ body: "test2", timeToLive: -1 }, (r) => {
+                slp.saveMessage({ body: "test2", timeToLive: -1 }, (r) => {
                     id = r.value.id;
-                    slp.loadItem( id, (r2) => {
+                    slp.loadMessage( id, (r2) => {
                         result = r2;
                         message = r2.value;
                         done();

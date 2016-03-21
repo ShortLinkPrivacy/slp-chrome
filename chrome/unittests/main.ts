@@ -109,6 +109,6 @@ function saneLink() {
     })
 
     it("returns an SLP url in the message", () => {
-        assert.ok(message.body.match(/slp\.li/));
+        assert.ok(message.body.match(/slp/));
     })
 }

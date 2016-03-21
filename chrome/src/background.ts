@@ -184,13 +184,21 @@ class Message {
         url = new MagicURL(MagicURL.domain + "/" + fullPath);
         if ( url.isMessage() == true ) {
             slp.loadMessage(url.id, (result) => {
-                Messages.decrypt( result.value, privateKey, this.sendResponse );
+                if ( result.success ) {
+                    Messages.decrypt( result.value, privateKey, this.sendResponse );
+                } else {
+                    this.sendResponse(result);
+                }
             });
         } else if ( url.isKey() == true ) {
             slp.loadKey(url.id, (result) => {
-                makePublicKeyText(result.value, (html) => {
-                    this.sendResponse({ success: true, value: { body: html } });
-                });
+                if ( result.success ) {
+                    makePublicKeyText(result.value, (html) => {
+                        this.sendResponse({ success: true, value: { body: html } });
+                    });
+                } else {
+                    this.sendResponse(result);
+                }
             })
         } else {
             this.sendResponse(_err("Invalid link"));
