@@ -412,7 +412,7 @@ var traverseNodes = (function(){
     // Returns an array of nodes that contain short links. These nodes will be
     // of type TEXT.  Some nodes might have several short links in them mixed
     // inside unencrypted text.
-    function getNodeList(root: HTMLElement): Array<Node> {
+    function getNodeList(root: HTMLElement, re: RegExp): Array<Node> {
         var walk: TreeWalker,
             node: Node,
             nodeList: Array<Node> = [];
@@ -421,7 +421,9 @@ var traverseNodes = (function(){
         walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
 
         while (node = walk.nextNode()) {
-            if (node.nodeValue.match(urlRe) && !isInsideEditable(node)) nodeList.push(node);
+            if (!node.nodeValue.match(re)) continue;
+            if (isInsideEditable(node)) continue;
+            nodeList.push(node);
         }
 
         return nodeList;
@@ -435,20 +437,14 @@ var traverseNodes = (function(){
         fixLinks(root);
 
         // Gather a list of TEXT nodes that contain magic urls
-        nodeList = getNodeList(root);
+        // If the private key is not unlocked, then we only parse the key links
+        nodeList = getNodeList(root, init.isDecrypted ? MagicURL.anyRegExp() : MagicURL.keyRegExp());
 
         // If no nodes found, return
         if (nodeList.length == 0) return;
 
         // Found something to decrypt in the page, mark hasWorkDone
         hasWorkDone = true;
-
-        // If the private key has not been unlocked, then add a notification
-        // and return
-        if ( !init.isDecrypted ) {
-            messageBgPage('needPassword', {});
-            return;
-        }
 
         // Run over all found nodes, look for magic urls and turn them into
         // enchanted span elements
