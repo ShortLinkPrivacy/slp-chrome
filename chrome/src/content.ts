@@ -353,7 +353,7 @@ var traverseNodes = (function(){
         }
 
         // Replace all magic urls inside the link with magic <span> elements
-        text = node.nodeValue.replace(urlReg, "<span class='" + init.config.pgpEnchanted + "' rel='$1'>Decrypting ...</span>");
+        text = node.nodeValue.replace(urlReg, "<span class='" + init.config.pgpEnchanted + "' rel='$1/$2'>Decrypting ...</span>");
         parentEl.innerHTML = text;
 
         // Restart the observer
@@ -520,8 +520,6 @@ function startObserver() {
 function getInitVars(callback: Interfaces.Callback): void {
     messageBgPage('initVars', {}, (result: Interfaces.Success<Interfaces.InitVars>) => {
         init = result.value;
-        urlRe = new RegExp(init.linkRe);
-        urlReg = new RegExp(init.linkRe, 'g');
         callback()
     });
 }
