@@ -36,20 +36,23 @@ clean:
 # TODO: add a header file
 modules:
 	tsc --out src/modules.js --declaration \
-	src/modules/config.ts \
-	src/modules/interfaces.ts \
-	src/modules/keys.ts \
-	src/modules/keysource.ts \
-	src/modules/messages.ts \
-	src/modules/storage.ts \
-	src/modules/preferences.ts \
-	src/modules/api.ts \
-	src/modules/url.ts \
-	src/modules/application.ts \
-	src/modules/storage/AddressBook/IndexedDB.ts \
-	src/modules/storage/AddressBook.ts \
-	src/modules/storage/PrivateKey/Local.ts \
-	src/modules/storage/PrivateKey.ts
+		src/modules/config.ts \
+		src/modules/interfaces.ts \
+		src/modules/keys.ts \
+		src/modules/keysource.ts \
+		src/modules/messages.ts \
+		src/modules/storage.ts \
+		src/modules/preferences.ts \
+		src/modules/url.ts \
+		src/modules/api.ts \
+		src/modules/application.ts \
+		src/modules/storage/AddressBook/IndexedDB.ts \
+		src/modules/storage/AddressBook.ts \
+		src/modules/storage/PrivateKey/Local.ts \
+		src/modules/storage/PrivateKey.ts
+	tsc --out src/modlite.js \
+		src/modules/url.ts
+
 
 #------------------------------------------------------------------
 
@@ -71,9 +74,7 @@ browser:
 	tsc --out src/browser.js src/browser.ts
 
 content:
-	tsc --out src/content.js \
-		src/modules/url.ts \
-		src/content.ts
+	tsc --out src/content.js src/content.ts
 
 background:
 	tsc --out src/background.js src/background.ts
