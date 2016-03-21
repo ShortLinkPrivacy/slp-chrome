@@ -1,5 +1,6 @@
 class MagicURL {
-    static domain = "https?://slp.li";
+    //static domain = "https?://slp.li";
+    static domain = "http://localhost:5000";
     static anyPath = "m|k";
     static messagePath = "m";
     static keyPath = "k";
@@ -29,8 +30,22 @@ class MagicURL {
         return MagicURL.genericRe(MagicURL.messagePath, flags);
     }
 
-    static keyRegExp(flags) {
+    static keyRegExp(flags?: string): RegExp {
         return MagicURL.genericRe(MagicURL.keyPath, flags);
+    }
+
+    private static _url(path: string, id?: string): string {
+        var url = MagicURL.domain + "/" + path;
+        if ( id ) url += "/" + id;
+        return url;
+    }
+
+    static messageUrl(id?: string): string {
+        return MagicURL._url(MagicURL.messagePath, id);
+    }
+
+    static keyUrl(id?: string): string {
+        return MagicURL._url(MagicURL.keyPath, id);
     }
 
     isMessage(): boolean {
