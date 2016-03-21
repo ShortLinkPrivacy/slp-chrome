@@ -79,7 +79,7 @@ describe("Links", () => {
 
 describe("Editable links", () => {
   it("Does not decode level 1", () => {
-    assert.ok(document.getElementById('el1').innerText.match(/slp\.li/));
+    assert.ok(document.getElementById('el1').innerText.match(/slp/));
   })
   it("Preserves the A tag at level 1", () => {
     assert.ok(document.getElementById('el1').innerHTML.match(/\<a/i));
