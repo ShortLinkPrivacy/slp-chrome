@@ -443,9 +443,13 @@ var traverseNodes = (function(){
         // Fix links with altered magic urls in the innerText
         fixLinks(root);
 
-        // Gather a list of TEXT nodes that contain magic urls
-        // If the private key is not unlocked, then we only parse the key links
-        nodeList = getNodeList(root, init.isDecrypted ? MagicURL.anyRegExp() : MagicURL.keyRegExp());
+        // Gather a list of TEXT nodes that contain magic urls.  If the private
+        // key is decrypted, then we gather ALL matching magic links, otherwise
+        // we only collect the links with public keys.
+        let nodeRe = init.isDecrypted 
+            ? MagicURL.anyRegExp() 
+            : MagicURL.keyRegExp();
+        nodeList = getNodeList(root, nodeRe);
 
         // If no nodes found, return
         if (nodeList.length == 0) return;
@@ -672,10 +676,8 @@ getInitVars(() => {
         window.frameElement.id = idGenerator('frame');
     }
 
-    if ( init.hasPrivateKey ) {
-        new MessageListener();
-        eventObserver();
-        traverseNodes(document.body);
-        bindEditables(document.body);
-    }
+    new MessageListener();
+    eventObserver();
+    traverseNodes(document.body);
+    bindEditables(document.body);
 })

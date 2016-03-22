@@ -182,7 +182,11 @@ class Message {
         }
 
         url = new MagicURL(MagicURL.domain + "/" + fullPath);
-        if ( url.isMessage() == true ) {
+
+        // The below check for privateKey is probably not necessary, since the
+        // content script doesn't request the decryption of messages, unless the
+        // private key is decrypted.
+        if ( url.isMessage() == true && privateKey && privateKey.isDecrypted() ) {
             slp.loadMessage(url.id, (result) => {
                 if ( result.success ) {
                     Messages.decrypt( result.value, privateKey, this.sendResponse );
@@ -201,7 +205,7 @@ class Message {
                 }
             })
         } else {
-            this.sendResponse(_err("Invalid link"));
+            this.sendResponse(_err("Error decrypting"));
         }
     }
 
