@@ -306,6 +306,20 @@ contextMenuId = chrome.contextMenus.create({
     }
 });
 
+
+chrome.runtime.onInstalled.addListener((details) => {
+    if ( details.reason == "install" ) {
+        chrome.tabs.query({url: ["http://*/*", "https://*/*"]}, (tabs) => {
+            for (let i = 0; i < tabs.length; i++) {
+                let tab = tabs[i];
+                chrome.tabs.insertCSS(tab.id, {file: "css/content.css"});
+                chrome.tabs.executeScript(tab.id, {file: "src/modlite.js"});
+                chrome.tabs.executeScript(tab.id, {file: "src/content.js"});
+            }
+        });
+    }
+});
+
 //############################################################################
 // Google Analytics
 //----------------------------------------------------------------------------
