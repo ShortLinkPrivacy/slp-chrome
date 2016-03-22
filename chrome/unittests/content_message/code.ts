@@ -3,9 +3,13 @@
 
 var hasRun = false;
 
+function str(id: string): string {
+    return document.getElementById(id).innerText.replace(/(\t|\n)/, ' ').trim();
+}
+
 describe("Simple paragraph", () => {
   it("Converts to text", () => {
-    assert.equal(document.getElementById('p1').innerText, "test");
+    assert.equal(str('p1'), "test");
   })
   it("Creates a magic element", () => {
     assert.ok(document.getElementById('p1').innerHTML.match(/\<span/i));
@@ -14,66 +18,66 @@ describe("Simple paragraph", () => {
 
 describe("Link with other text", () => {
   it("Preserves the text to the right", () => {
-    assert.equal(document.getElementById('p2').innerText, 'test two');
+    assert.equal(str('p2'), 'test two');
   })
 
   it("Preserves the text to the left", () => {
-    assert.equal(document.getElementById('p3').innerText, 'one test');
+    assert.equal(str('p3'), 'one test');
   })
 
   it("Preserves the text on both sides", () => {
-    assert.equal(document.getElementById('p4').innerText, 'one test two');
+    assert.equal(str('p4'), 'one test two');
   })
 })
 
 describe("Multiple links in the same element", () => {
   it("Decodes links next to one another", () => {
-    assert.equal(document.getElementById('p5').innerText, 'test test');
+    assert.equal(str('p5'), 'test test');
   })
   it("Decodes links separated by a symbol", () => {
-    assert.equal(document.getElementById('p6').innerText, 'test|test');
+    assert.equal(str('p6'), 'test|test');
   })
 })
 
 describe("Connected text", () => {
   it("Preserves the text to the left", () => {
-    assert.equal(document.getElementById('c1').innerText, 'fronttest');
+    assert.equal(str('c1'), 'fronttest');
   })
   it("Preserves the text to the right", () => {
-    assert.equal(document.getElementById('c2').innerText, 'testzzz');
+    assert.equal(str('c2'), 'testzzz');
   })
 })
 
 describe("404", () => {
   it("Shows an error", () => {
-    assert.equal(document.getElementById('e1').innerText, 'Expired private message');
+    assert.equal(str('e1'), 'Expired private message');
   })
   it("Shows an error with connected text", () => {
-    assert.equal(document.getElementById('e2').innerText, 'Expired private messagezzz');
+    assert.equal(str('e2'), 'Expired private messagezzz');
   })
 })
 
 describe("Links", () => {
   it("Decodes regular links", () => {
-    assert.equal(document.getElementById('l1').innerText, 'test');
+    assert.equal(str('l1'), 'test');
   })
   it("Removes the href from the A tags", () => {
     assert.ok(!document.getElementById('l1').innerHTML.match(/href/i));
   })
   it("Decodes shortened links", () => {
-    assert.equal(document.getElementById('l2').innerText, 'test');
+    assert.equal(str('l2'), 'test');
   })
   it("Decodes distroyed links", () => {
-    assert.equal(document.getElementById('l3').innerText, 'test');
+    assert.equal(str('l3'), 'test');
   })
   it("Decodes links in data-expanded-url", () => {
-    assert.equal(document.getElementById('l4').innerText, 'test');
+    assert.equal(str('l4'), 'test');
   })
   it("Decodes links back to back", () => {
-    assert.equal(document.getElementById('l5').innerText, 'testtest');
+    assert.equal(str('l5'), 'testtest');
   })
   it("Decodes link and text back to back", () => {
-    assert.equal(document.getElementById('l6').innerText, 'testtwo');
+    assert.equal(str('l6'), 'testtwo');
   })
 })
 
