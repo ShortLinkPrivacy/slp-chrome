@@ -11,6 +11,7 @@ module Admin {
                 bg.privateKey = null;
                 bg.lockDown();
                 bg.preferences.setupNagCount = 0;
+                bg.preferences.publicKeyUrl = null;
                 bg.preferences.save();
                 view.hasPrivateKey = false;
                 bg._ga('admin', 'PrivateKeyRemove');

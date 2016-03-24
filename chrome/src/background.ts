@@ -83,13 +83,11 @@ function encryptPublicKey(callback: Interfaces.SuccessCallback<Messages.UrlType>
     var keyRecord: Keys.Record,
         url: Messages.Url;
 
-    // If the url is already in the prefs, then use it DISABLED
-    /*
-    if ( url = bg.preferences.publicKeyUrl ) {
-        callback({ success: true, value: url });
+    // If the url is already in the prefs, then use it
+    if ( url = preferences.publicKeyUrl ) {
+        callback({ success: true, value: { body: url } });
         return;
     }
-    */
 
     keyRecord = {
         body: privateKey.toPublic()
