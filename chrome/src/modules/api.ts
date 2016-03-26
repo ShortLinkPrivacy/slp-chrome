@@ -99,10 +99,14 @@ module API {
         loadKey(id: Messages.Id, callback: KeyCallback ): void {
             httpGet(MagicURL.keyUrl(id), {}, (result) => {
                 var key: Keys.PublicKey;
+                if ( !result.success ) {
+                    callback(result);
+                    return;
+                }
                 try {
                     key = new Keys.PublicKey(result.value.body);
                 } catch (err) {
-                    callback({ success: false, error: err })
+                    callback({ success: false, error: "Error reading the public key" })
                     return;
                 }
                 callback({ success: true, value: key });
