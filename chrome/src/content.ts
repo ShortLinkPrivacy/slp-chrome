@@ -15,6 +15,9 @@ var urlRe = MagicURL.anyRegExp(),
 // needs to get refreshed after upgrade
 var hasWorkDone: boolean;
 
+// Set this property name to true if the editable is encrypted
+const propEncrypted = 'encrypted';
+
 // Generator of element IDs
 function idGenerator (prefix: string) {
     if (typeof prefix == "undefined") prefix = "id";
@@ -108,7 +111,9 @@ class Editable {
 
     // Does the editable contain a magic url?
     isAlreadyEncrypted(): boolean {
-        return this.getText() && this.getText().match(urlRe) ? true : false;
+        var text = this.getText(),
+            encr = $data(this.element, propEncrypted);
+        return text && encr && encr == text;
     }
 
     // Do we have the last keys used to encrypt?
@@ -179,13 +184,11 @@ class Editable {
 
     // Set a new text value in the editable element while saving the original
     // value of the element so it can be restored
-    setText(text: string, noSave?: boolean): void {
+    setText(text: string): void {
         if ( !this.element ) return;
 
-        // Save original value
-        if (!noSave) {
-            this.savedValue = this.getText();
-        }
+        // Save the original value
+        this.savedValue = this.getText();
 
         // Focus the element and select all the text inside
         this.element.focus();
@@ -202,7 +205,7 @@ class Editable {
     restoreText(): boolean {
         if ( !this.element ) return;
         if ( typeof this.savedValue != "undefined" && this.savedValue != null ) {
-            this.setText(this.savedValue, true);
+            this.setText(this.savedValue);
             this.savedValue = null;
             return true;
         }
@@ -589,17 +592,18 @@ class MessageListener {
     }
 
     // Get the active element and its value
-    getElementText(sendResponse) {
+    getElementText(sendResponse: { (value: Interfaces.ElementTextMessage): void }) {
         if (!this.editable) return;
         sendResponse({
             value: this.editable.getText(),
+            isAlreadyEncrypted: this.editable.isAlreadyEncrypted(),
             lastMessage: this.editable.lastMessage
         });
     }
 
     // Set the active element and mark it as encrypted
     setElementText(sendResponse, msg: Interfaces.ContentMessage<Messages.UrlType>) {
-        var urlMsg: Messages.UrlType;
+        var urlMsg: Messages.UrlType; 
 
         if (!this.editable) {
             sendResponse({ success: false, error: "No editable input fields found" });
@@ -608,14 +612,18 @@ class MessageListener {
 
         urlMsg = msg.value;
 
-        this.editable.setText(urlMsg.body);
-
-        // Only set the last message if it has fingerprints. Otherwise it
-        // will be a public key link or other non-message type.
+        // If the message has fingerprints, we know we're dealing with an
+        // encrypted message (as opposed to a public key)
         if ( urlMsg.fingerprints && urlMsg.fingerprints.length ) {
             this.editable.lastMessage = urlMsg;
+
+            // Save the magic url in a property. We will use it to compare the
+            // editable text to it in order to determine if the editable is
+            // encrypted or not. See isAlreadyEncrypted() for reference.
+            $data(this.editable.element, propEncrypted, urlMsg.body);
         }
 
+        this.editable.setText(urlMsg.body);
         sendResponse({ success: true });
     }
 
@@ -629,7 +637,9 @@ class MessageListener {
     // Encrypt using the last used keys
     encryptLast() {
         if (!this.editable) return;
-        this.editable.encryptLast();
+        this.editable.encryptLast((url) => {
+            $data(this.editable.element, propEncrypted, url);
+        });
     }
 
     // Return all decrypted nodes to their original values

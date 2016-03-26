@@ -59,6 +59,12 @@ module Interfaces {
         value?: T;
     }
 
+    export interface ElementTextMessage {
+        value: string;
+        isAlreadyEncrypted: boolean;
+        lastMessage: LastMessage;
+    }
+
     export interface BackgroundPage extends Window {
         config: Config;
         store: StoreCollection;

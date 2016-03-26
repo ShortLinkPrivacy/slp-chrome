@@ -249,32 +249,26 @@ class App {
     }
 
     private getElementText(): void {
-        var re: RegExp,
-            text: string,
-            lastMessage: Interfaces.LastMessage,
+        var lastMessage: Interfaces.LastMessage,
             i: number;
 
-        re = MagicURL.anyRegExp();
-
-        sendElementMessage({ action: 'getElementText' }, (response) => {
+        sendElementMessage({ action: 'getElementText' }, (response: Interfaces.ElementTextMessage) => {
             if ( !response ) return;
 
-            text = response.value;
+            this.clearText = response.value;
+            this.alreadyEncrypted = response.isAlreadyEncrypted;
             lastMessage = response.lastMessage;
 
-            this.alreadyEncrypted = re.exec(text) ? true : false;
-            this.clearText = text;
-
             if ( lastMessage ) {
-                // lastMessage.body actually contains an array of fingerprints, so we
-                // have to look them up in the address book and translate them into
-                // keys
+
+                // Translate last message's fingerprints into keys
                 if ( lastMessage.fingerprints.length ) {
                     bg.store.addressBook.load(lastMessage.fingerprints, (keys) => {
                         this.recepients.setFromKeys(keys);
                     });
                 }
 
+                // Set the same expiration time
                 if ( lastMessage.timeToLive ) {
                     this.timeToLive = lastMessage.timeToLive;
                 }
