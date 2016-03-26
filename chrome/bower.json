@@ -17,9 +17,7 @@
   "dependencies": {
     "openpgp": "~1.2.0",
     "rivets": "~0.8.1",
-    "jquery": "~2.1.4",
-    "pathjs": "*",
-    "clipboard": "~1.5.5"
+    "pathjs": "*"
   },
   "devDependencies": {
     "less": "~2.5.3",

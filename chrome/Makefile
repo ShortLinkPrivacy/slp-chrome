@@ -93,6 +93,7 @@ dist:
 	$(COMPRESS) src/content.js -o dist/src/content.js
 	$(COMPRESS) src/admin.js -o dist/src/admin.js
 	$(COMPRESS) src/modules.js -o dist/src/modules.js
+	$(COMPRESS) src/modlite.js -o dist/src/modlite.js
 	cp css/*.css dist/css
 	cp -r src/templates dist/src
 	cp -r fonts dist
@@ -100,12 +101,10 @@ dist:
 	cp -r _locales dist
 	cp ../ShortLinkPrivacy.pem dist/key.pem
 	cat browser.html | sed 's/\.\/bower_components\///' | sed 's/rivets\/dist/lib/' | sed 's/openpgp\/dist/lib/' | sed 's/pathjs/lib/' > dist/browser.html
-	cat settings.html | sed 's/\.\/bower_components\///' | sed 's/rivets\/dist/lib/' | sed 's/openpgp\/dist/lib/' | sed 's/clipboard\/dist/lib/' | sed 's/pathjs/lib/' > dist/settings.html
 	cat manifest.json | sed 's/bower_components\/openpgp\/dist/lib/' > dist/manifest.json
 	cp bower_components/pathjs/path.min.js dist/lib
 	cp bower_components/rivets/dist/rivets.bundled.min.js dist/lib
 	cp bower_components/openpgp/dist/openpgp.min.js dist/lib
-	cp bower_components/clipboard/dist/clipboard.min.js dist/lib
 	zip -r ShortLinkPrivacy-$(VERSION).zip dist/*
 	echo "Produced ShortLinkPrivacy-$(VERSION).zip"
 
