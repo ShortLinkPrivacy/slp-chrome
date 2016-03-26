@@ -15,8 +15,16 @@ var urlRe = MagicURL.anyRegExp(),
 // needs to get refreshed after upgrade
 var hasWorkDone: boolean;
 
-// Set this property name to true if the editable is encrypted
+// Editable property name containing the magic link. Used to determine if the
+// editable is already encrypted by comparing to the text.
 const propEncrypted = 'encrypted';
+
+// Editable property containing the instance of the editable class
+const propInstance = 'instance';
+
+// Editable propery containing the original value of the editable
+const propOriginal = 'original';
+
 
 // Generator of element IDs
 function idGenerator (prefix: string) {
@@ -53,7 +61,7 @@ class Editable {
 
     constructor(el: HTMLElement) {
         // If the element was already initialized, then bail
-        if ( $data(el, init.config.pgpElAttr) ) return;
+        if ( $data(el, propInstance) ) return;
 
         // If the element has no id, then assign one to it
         if ( el.id == "" ) {
@@ -65,7 +73,7 @@ class Editable {
         this.bindEvents();
 
         // Save the new instance in an attribute on the element
-        $data(this.element, init.config.pgpElAttr, this);
+        $data(this.element, propInstance, this);
     }
 
     private bindEvents(): void {
@@ -151,6 +159,7 @@ class Editable {
             if ( result.success ) {
                 var umsg = result.value;
                 this.setText(umsg.body);
+                $data(this.element, propEncrypted, umsg.body);
                 if ( callback ) callback(umsg.body);
             }
         });
@@ -358,7 +367,7 @@ var traverseNodes = (function(){
 
         // Save the element value it its "memory" element, so it can be restored
         if ( !parentEl.classList.contains(init.config.pgpClassName) ) {
-            $data(parentEl, init.config.pgpData, parentEl.innerHTML);
+            $data(parentEl, propOriginal, parentEl.innerHTML);
             parentEl.classList.add(init.config.pgpClassName);
         }
 
@@ -535,14 +544,15 @@ function getInitVars(callback: Interfaces.Callback): void {
 }
 
 function $data(el: HTMLElement, name: string, value?: any): any {
+    var _name = "__" + name;
     if ( typeof value != "undefined" ) {
         if ( value == null )
-            delete el.attributes[name]
+            delete el.attributes[_name]
         else
-            el.attributes[name] = value;
+            el.attributes[_name] = value;
     }
 
-    return el.attributes[name];
+    return el.attributes[_name];
 }
 
 // Listen for messages from the extension
@@ -574,7 +584,7 @@ class MessageListener {
                 // others do some frame trickery that confuses the shit out of the
                 // content script)
                 if (element = document.getElementById(eloc.elementId)) {
-                    this.editable = $data(element, init.config.pgpElAttr);
+                    this.editable = $data(element, propInstance);
                 } else {
                     return;
                 }
@@ -637,9 +647,7 @@ class MessageListener {
     // Encrypt using the last used keys
     encryptLast() {
         if (!this.editable) return;
-        this.editable.encryptLast((url) => {
-            $data(this.editable.element, propEncrypted, url);
-        });
+        this.editable.encryptLast();
     }
 
     // Return all decrypted nodes to their original values
@@ -657,9 +665,9 @@ class MessageListener {
             for (i = els.length - 1; i >= 0; i--) {
                 parentEl = <HTMLElement>els[i];
                 parentEl.classList.remove(init.config.pgpClassName);
-                if ( orgValue = $data(parentEl, init.config.pgpData) ) {
+                if ( orgValue = $data(parentEl, propOriginal) ) {
                     parentEl.innerHTML = orgValue;
-                    $data(parentEl, init.config.pgpData, null);
+                    $data(parentEl, propOriginal, null);
                 }
             }
             startObserver();
