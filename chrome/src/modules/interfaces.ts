@@ -63,6 +63,7 @@ module Interfaces {
         value: string;
         isAlreadyEncrypted: boolean;
         lastMessage: LastMessage;
+        selectionRequired: boolean;
     }
 
     export interface BackgroundPage extends Window {

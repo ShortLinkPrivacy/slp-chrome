@@ -230,6 +230,8 @@ class App {
     recepients: Recepients;
     clearText: string;
 
+    selectionRequired: boolean;
+
     constructor() {
         this.timeToLive = 0;
         this.recepients = new Recepients([]);
@@ -258,6 +260,11 @@ class App {
             this.clearText = response.value;
             this.alreadyEncrypted = response.isAlreadyEncrypted;
             lastMessage = response.lastMessage;
+
+            if ( response.selectionRequired ) {
+                this.selectionRequired = true;
+                return;
+            }
 
             if ( lastMessage ) {
 

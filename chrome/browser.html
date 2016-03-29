@@ -77,31 +77,36 @@
         </div>
 
         <article rv-show="isDecrypted">
-          <div rv-hide="alreadyEncrypted">
-            <textinput value="clearText"></textinput>
-            <div rv-show="clearText">
-              <label for="filter">Recipients: <span rv-show="recepients.wait" class="wait">...searching keybase...</span></label>
-              <ul class="selected-keys" rv-on-click="recepients.focus">
-                <li class="bead" rv-each-item="recepients.selected"><div class="name">{ item.getPrimaryUser }</div><div class="remove" rv-on-click="recepients.removeFromSelected">✖</div></li>
-                <li><input id="ftr" class="filter" rv-value="recepients.filter" rv-on-input="recepients.search"></li>
-              </ul>
-              <ul class="found-keys" rv-show="recepients.hasFound < found">
-                <li rv-on-click="recepients.moveToSelected" rv-each-item="recepients.found"><span rv-class-remote="item.isRemote">{ item.getPrimaryUser }</span></li>
-              </ul>
-            </div><!-- clearText -->
-            <div class="bottom">
-              <span rv-show="clearText">
-                <span rv-show="recepients.hasSelected < selected">
-                  <button class="button" rv-disabled="wait" rv-on-click="sendMessage">Encrypt Message <span rv-show="wait"><i class="icon-spin5"></i></span></button>
-                  <expiration value="timeToLive"></expiration>
+          <div rv-show="selectionRequired">
+            Selection required
+          </div>
+          <div rv-hide="selectionRequired">
+            <div rv-hide="alreadyEncrypted">
+              <textinput value="clearText"></textinput>
+              <div rv-show="clearText">
+                <label for="filter">Recipients: <span rv-show="recepients.wait" class="wait">...searching keybase...</span></label>
+                <ul class="selected-keys" rv-on-click="recepients.focus">
+                  <li class="bead" rv-each-item="recepients.selected"><div class="name">{ item.getPrimaryUser }</div><div class="remove" rv-on-click="recepients.removeFromSelected">✖</div></li>
+                  <li><input id="ftr" class="filter" rv-value="recepients.filter" rv-on-input="recepients.search"></li>
+                </ul>
+                <ul class="found-keys" rv-show="recepients.hasFound < found">
+                  <li rv-on-click="recepients.moveToSelected" rv-each-item="recepients.found"><span rv-class-remote="item.isRemote">{ item.getPrimaryUser }</span></li>
+                </ul>
+              </div><!-- clearText -->
+              <div class="bottom">
+                <span rv-show="clearText">
+                  <span rv-show="recepients.hasSelected < selected">
+                    <button class="button" rv-disabled="wait" rv-on-click="sendMessage">Encrypt Message <span rv-show="wait"><i class="icon-spin5"></i></span></button>
+                    <expiration value="timeToLive"></expiration>
+                  </span>
                 </span>
-              </span>
-            </div><!-- .bottom -->
-          </div><!-- !alreadyEncrypted -->
-          <div rv-show="alreadyEncrypted" class="middle">
-            <p>This message has already been encrypted.</p>
-            <button class="button" rv-on-click="restoreMessage">Restore original message</button>
-          </div><!-- alreadyEncrypted -->
+              </div><!-- .bottom -->
+            </div><!-- !alreadyEncrypted -->
+            <div rv-show="alreadyEncrypted" class="middle">
+              <p>This message has already been encrypted.</p>
+              <button class="button" rv-on-click="restoreMessage">Restore original message</button>
+            </div><!-- alreadyEncrypted -->
+          </div><!-- selectionRequired -->
         </article><!-- #encrypted-tab -->
 
       </div><!-- hasPrivateKey -->

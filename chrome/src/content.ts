@@ -112,6 +112,31 @@ class Editable {
             && !this.isAlreadyEncrypted() ? true : false;
     }
 
+    selectionRequired(): boolean {
+        // No selection required unless it's one of these domains
+        if ( !window.location.host.match(/facebook.com$/)) return false;
+
+        // Get the selected text
+        var sel = document.getSelection();
+
+        // If no text is selected return true (i.e. yes, we require selection)
+        if ( !sel.toString().trim() ) return true;
+
+        var isDescendant = function(child: Node) {
+             var parent = child.parentElement;
+             while (parent != null) {
+                 if (parent == this.element) {
+                     return true;
+                 }
+                 parent = parent.parentElement;
+             }
+             return false;
+        }.bind(this);
+
+        return isDescendant(sel.anchorNode) && isDescendant(sel.focusNode);
+
+    }
+
     // Is the element a TEXTAREA?
     isTextarea(): boolean {
         return this.element.tagName == "TEXTAREA";
@@ -458,8 +483,8 @@ var traverseNodes = (function(){
         // Gather a list of TEXT nodes that contain magic urls.  If the private
         // key is decrypted, then we gather ALL matching magic links, otherwise
         // we only collect the links with public keys.
-        let nodeRe = init.isDecrypted 
-            ? MagicURL.anyRegExp() 
+        let nodeRe = init.isDecrypted
+            ? MagicURL.anyRegExp()
             : MagicURL.keyRegExp();
         nodeList = getNodeList(root, nodeRe);
 
@@ -607,13 +632,14 @@ class MessageListener {
         sendResponse({
             value: this.editable.getText(),
             isAlreadyEncrypted: this.editable.isAlreadyEncrypted(),
-            lastMessage: this.editable.lastMessage
+            lastMessage: this.editable.lastMessage,
+            selectionRequired: this.editable.selectionRequired()
         });
     }
 
     // Set the active element and mark it as encrypted
     setElementText(sendResponse, msg: Interfaces.ContentMessage<Messages.UrlType>) {
-        var urlMsg: Messages.UrlType; 
+        var urlMsg: Messages.UrlType;
 
         if (!this.editable) {
             sendResponse({ success: false, error: "No editable input fields found" });
