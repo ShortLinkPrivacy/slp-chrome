@@ -112,29 +112,35 @@ class Editable {
             && !this.isAlreadyEncrypted() ? true : false;
     }
 
+    // Tells if we're on a website that requires that the editable is selected
     selectionRequired(): boolean {
-        // No selection required unless it's one of these domains
-        if ( !window.location.host.match(/facebook.com$/)) return false;
+        var i: number;
 
-        // Get the selected text
+        for (i = 0; i < init.config.selectionRequired.length; i++) {
+            var re = new RegExp(init.config.selectionRequired[i], "i");
+            if ( window.location.host.match(re) ) return true;
+        }
+
+        return false;
+    }
+
+    // Get the selected text in the editable
+    getSelection(): string {
         var sel = document.getSelection();
-
-        // If no text is selected return true (i.e. yes, we require selection)
-        if ( !sel.toString().trim() ) return true;
+        if ( !sel.toString().trim() ) return null;
 
         var isDescendant = function(child: Node) {
-             var parent = child.parentElement;
+             var parent = child.parentNode;
              while (parent != null) {
-                 if (parent == this.element) {
-                     return true;
-                 }
-                 parent = parent.parentElement;
+                 if (parent == this.element) return true;
+                 parent = parent.parentNode;
              }
              return false;
         }.bind(this);
 
-        return isDescendant(sel.anchorNode) && isDescendant(sel.focusNode);
-
+        return isDescendant(sel.anchorNode) && isDescendant(sel.focusNode)
+            ? sel.toString()
+            : null;
     }
 
     // Is the element a TEXTAREA?
@@ -629,11 +635,14 @@ class MessageListener {
     // Get the active element and its value
     getElementText(sendResponse: { (value: Interfaces.ElementTextMessage): void }) {
         if (!this.editable) return;
+        var selectionRequired = this.editable.selectionRequired();
+        var value = selectionRequired ? this.editable.getSelection() : this.editable.getText();
+
         sendResponse({
-            value: this.editable.getText(),
+            value: value,
             isAlreadyEncrypted: this.editable.isAlreadyEncrypted(),
             lastMessage: this.editable.lastMessage,
-            selectionRequired: this.editable.selectionRequired()
+            selectionRequired: selectionRequired
         });
     }
 

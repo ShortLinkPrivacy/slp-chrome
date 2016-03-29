@@ -46,4 +46,10 @@ class Config {
 
     // Enable Keybase lookup
     enableKeybase = true;
+
+    // Sites that require that the editable is selected (because we can not
+    // simulate user selection)
+    selectionRequired: Array<string> = [
+        "facebook.com$"
+    ];
 }
