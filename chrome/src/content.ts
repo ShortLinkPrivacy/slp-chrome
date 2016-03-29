@@ -107,6 +107,9 @@ class Editable {
 
     // Tells if it's OK to encrypt for the last recepient
     private okToUseLast(): boolean {
+        if ( this.selectionRequired() && !this.getSelection() ) 
+            return false;
+
         return this.getText()
             && this.hasLastMessage()
             && !this.isAlreadyEncrypted() ? true : false;
@@ -129,6 +132,14 @@ class Editable {
         var sel = document.getSelection();
         if ( !sel.toString().trim() ) return null;
 
+        // If this is a textarea, then we just return the stringified selection
+        if ( this.isTextarea() ) {
+            var s = (<HTMLTextAreaElement>this.element).selectionStart;
+            var e = (<HTMLTextAreaElement>this.element).selectionEnd;
+            return this.getText().substring(s, e);
+        }
+
+        // Otherwise, we need to look for the anchor nodes insite the editable
         var isDescendant = function(child: Node) {
              var parent = child.parentNode;
              while (parent != null) {
@@ -207,6 +218,10 @@ class Editable {
     // Selects the contents of the element. Needed to paste
     // the new value
     private selectTextInElement(): void {
+
+        // Do not select if a selection already exists
+        if ( this.getSelection() ) return;
+
         if ( this.isTextarea() == true ) {
             this.element.focus();
             document.execCommand('selectAll', false, null);
@@ -635,8 +650,18 @@ class MessageListener {
     // Get the active element and its value
     getElementText(sendResponse: { (value: Interfaces.ElementTextMessage): void }) {
         if (!this.editable) return;
+
         var selectionRequired = this.editable.selectionRequired();
-        var value = selectionRequired ? this.editable.getSelection() : this.editable.getText();
+        var value: string;
+        
+        // If selection is required, then use the selected text as value to
+        // pass. Otherwise use the selected text with a fallback to the entire
+        // text.
+        if ( selectionRequired ) { 
+            value = this.editable.getSelection()
+        } else {
+            value = this.editable.getSelection() || this.editable.getText();
+        }
 
         sendResponse({
             value: value,
