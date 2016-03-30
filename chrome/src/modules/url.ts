@@ -4,7 +4,7 @@ class MagicURL {
     static anyPath = "m|k";
     static messagePath = "m";
     static keyPath = "k";
-    static id = "[0-9,a-f]+";
+    static id = "[0-9,a-f]{24}";
 
     path: string;
     id: string;
