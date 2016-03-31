@@ -117,11 +117,12 @@ class Editable {
 
     // Tells if we're on a website that requires that the editable is selected
     selectionRequired(): boolean {
-        var i: number;
-
-        for (i = 0; i < init.config.selectionRequired.length; i++) {
-            var re = new RegExp(init.config.selectionRequired[i], "i");
-            if ( window.location.host.match(re) ) return true;
+        // If it's Facebook, then we require selection for multiline text.
+        // Why? Because we're unable to simulate multi-line selection in
+        // Facebook.  It "seems" that we've selected the whole thing, but in
+        // reality we've only selected the current line.
+        if ( window.location.host.match(/facebook\.com$/) ) {
+            return this.getText().trim().match(/\n/) ? true : false;
         }
 
         return false;

@@ -289,6 +289,10 @@ class App {
         this.error = msg;
     }
 
+    close(e: Event) {
+        window.close();
+    }
+
     //---------------------------------------------------------------------------
     // Encrypt the message and paste the url back to the textarea
     //---------------------------------------------------------------------------
