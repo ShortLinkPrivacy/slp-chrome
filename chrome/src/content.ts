@@ -1,4 +1,4 @@
-/// <reference path="../typings/chrome/chrome.d.ts" />
+/// <reference path="../typings/tsd.d.ts" />
 /// <reference path="modules.d.ts" />
 
 // These get initialized by the background page
@@ -107,7 +107,7 @@ class Editable {
 
     // Tells if it's OK to encrypt for the last recepient
     private okToUseLast(): boolean {
-        if ( this.selectionRequired() && !this.getSelection() ) 
+        if ( this.selectionRequired() && !this.getSelection() )
             return false;
 
         return this.getText()
@@ -654,11 +654,11 @@ class MessageListener {
 
         var selectionRequired = this.editable.selectionRequired();
         var value: string;
-        
+
         // If selection is required, then use the selected text as value to
         // pass. Otherwise use the selected text with a fallback to the entire
         // text.
-        if ( selectionRequired ) { 
+        if ( selectionRequired ) {
             value = this.editable.getSelection()
         } else {
             value = this.editable.getSelection() || this.editable.getText();

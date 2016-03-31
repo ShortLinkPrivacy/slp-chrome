@@ -1,9 +1,3 @@
-/// <reference path="../../../../typings/chrome/chrome.d.ts" />
-/// <reference path="../../interfaces.ts" />
-/// <reference path="../../keys.ts" />
-/// <reference path="../../storage.ts" />
-/// <reference path="../PrivateKey.ts" />
-
 module PrivateKeyStore {
 
     export class Local extends LocalStorage implements Interface {

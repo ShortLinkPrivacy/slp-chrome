@@ -1,6 +1,4 @@
-/// <reference path="../typings/openpgp/openpgp.d.ts" />
-/// <reference path="../typings/rivets/rivets.d.ts" />
-/// <reference path="../typings/chrome/chrome.d.ts" />
+/// <reference path="../typings/tsd.d.ts" />
 /// <reference path="modules.d.ts" />
 
 var app: App,

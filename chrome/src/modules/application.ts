@@ -1,4 +1,3 @@
-/// <reference path="../../typings/rivets/rivets.d.ts" />
 
 module Application {
 

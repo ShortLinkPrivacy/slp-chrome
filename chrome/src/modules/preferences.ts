@@ -1,6 +1,3 @@
-/// <reference path="../../typings/chrome/chrome.d.ts" />
-/// <reference path="interfaces.ts" />
-
 class Preferences extends LocalStorage {
 
     // Configuration

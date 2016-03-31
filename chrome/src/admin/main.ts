@@ -1,7 +1,5 @@
+/// <reference path="../../typings/tsd.d.ts" />
 /// <reference path="../modules.d.ts" />
-/// <reference path="../../typings/openpgp/openpgp.d.ts" />
-/// <reference path="../../typings/rivets/rivets.d.ts" />
-/// <reference path="../../typings/pathjs/pathjs.d.ts" />
 
 declare var Clipboard: any;
 

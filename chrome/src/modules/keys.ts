@@ -1,5 +1,3 @@
-/// <reference path="../../typings/openpgp/openpgp.d.ts" />
-
 declare var exports: { [index: string]: any };
 
 module Keys {

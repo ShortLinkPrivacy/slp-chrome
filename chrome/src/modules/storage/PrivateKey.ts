@@ -1,8 +1,3 @@
-/// <reference path="../../../typings/chrome/chrome.d.ts" />
-/// <reference path="../../../typings/openpgp/openpgp.d.ts" />
-/// <reference path="../interfaces.ts" />
-/// <reference path="../keys.ts" />
-
 module PrivateKeyStore {
 
     // Callback interface for the function that returns the private key

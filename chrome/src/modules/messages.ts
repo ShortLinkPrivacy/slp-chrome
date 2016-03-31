@@ -1,4 +1,3 @@
-
 module Messages {
 
     // Regexp for PGP message types

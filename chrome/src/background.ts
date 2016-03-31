@@ -1,4 +1,4 @@
-/// <reference path="../typings/chrome/chrome.d.ts" />
+/// <reference path="../typings/tsd.d.ts" />
 /// <reference path="modules.d.ts" />
 
 // App Config

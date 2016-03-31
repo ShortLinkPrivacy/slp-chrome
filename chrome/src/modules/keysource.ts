@@ -1,4 +1,3 @@
-
 module KeySource {
 
     // Defines how we interface with remote key stores, like Keybase etc.

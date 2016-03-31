@@ -1,8 +1,3 @@
-/// <reference path="../../../../typings/chrome/chrome.d.ts" />
-/// <reference path="../../interfaces.ts" />
-/// <reference path="../../keys.ts" />
-/// <reference path="../AddressBook.ts" />
-
 module AddressBookStore {
 
     export class IndexedDB implements Interface {

@@ -1,5 +1,4 @@
-/// <reference path="../../typings/mocha/mocha.d.ts" />
-
+/// <reference path="../../typings/tsd.d.ts" />
 var hasRun = false;
 window.addEventListener("message", (e) => {
   if ( e.data == "slp_done_decoding" && !hasRun ) {

@@ -1,2 +1,2 @@
-/// <reference path="../../typings/mocha/mocha.d.ts" />
+/// <reference path="../../typings/tsd.d.ts" />
 mocha.setup('bdd');
