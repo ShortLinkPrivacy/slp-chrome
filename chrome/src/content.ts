@@ -652,6 +652,9 @@ class MessageListener {
             value = this.editable.getSelection() || this.editable.getText();
         }
 
+        // Facebook hack
+        if ( value.trim() == "" ) value = "";
+
         sendResponse({
             value: value,
             isAlreadyEncrypted: this.editable.isAlreadyEncrypted(),

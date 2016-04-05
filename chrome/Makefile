@@ -14,7 +14,6 @@ help:
 	@echo "build                   build all"
 	@echo "dist                    make a distribution"
 	@echo "dist-clean              cleanup the distribution"
-	@echo "build-dist              build and make dist"
 
 #------------------------------------------------------------------
 
@@ -93,5 +92,3 @@ dist:
 dist-clean:
 	rm -rfv dist
 	rm -v ShortLinkPrivacy-*.zip
-
-build-dist: dist-clean build dist
