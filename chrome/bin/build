@@ -56,8 +56,11 @@ cp -r _locales $DIR
 cp $PEMFILE $DIR/key.pem
 
 # Replace paths
-cat browser.html | sed 's/\.\/bower_components\///' | sed 's/rivets\/dist/lib/' | sed 's/openpgp\/dist/lib/' | sed 's/pathjs/lib/' > $DIR/browser.html
+cat browser.html  | sed 's/\.\/bower_components\///' | sed 's/rivets\/dist/lib/' | sed 's/openpgp\/dist/lib/' | sed 's/pathjs/lib/' > $DIR/browser.html
+cat settings.html | sed 's/\.\/bower_components\///' | sed 's/rivets\/dist/lib/' | sed 's/openpgp\/dist/lib/' | sed 's/pathjs/lib/' > $DIR/settings.html
 cat manifest.json | sed 's/bower_components\/openpgp\/dist/lib/' > $DIR/manifest.json
+
+# Vendor libs
 cp bower_components/pathjs/path.min.js $DIR/lib
 cp bower_components/rivets/dist/rivets.bundled.min.js $DIR/lib
 cp bower_components/openpgp/dist/openpgp.min.js $DIR/lib
