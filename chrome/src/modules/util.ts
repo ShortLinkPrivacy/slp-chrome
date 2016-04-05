@@ -1,13 +1,13 @@
 module Util {
-    function isOSX(): boolean {
+    export function isOSX(): boolean {
         return window.navigator.platform.match(/mac/i) != null;
     }
 
-    function isFacebook(): boolean {
+    export function isFacebook(): boolean {
         return window.location.host.match(/facebook\.com$/) != null;
     }
 
-    function isHangouts(): boolean {
+    export function isHangouts(): boolean {
         return window.location.host.match(/hangouts\.google\.com$/) != null;
     }
 }

@@ -11,10 +11,6 @@ var observer: MutationObserver;
 var urlRe = MagicURL.anyRegExp(),
     urlReg = MagicURL.anyRegExp("g");
 
-// Has anything been done on this tab slp-wise. Used to determine if the tab
-// needs to get refreshed after upgrade
-var hasWorkDone: boolean;
-
 // Editable property name containing the magic link. Used to determine if the
 // editable is already encrypted by comparing to the text.
 const propEncrypted = 'encrypted';
@@ -86,7 +82,7 @@ class Editable {
         // Quick encrypt shortcut
         this.element.addEventListener('keydown', (e: KeyboardEvent) => {
             var trigger: boolean;
-            if ( isOSX() ) {
+            if ( Util.isOSX() ) {
                 // Mac: Command-Option-L
                 trigger = e.keyCode == 76 && e.metaKey == true && e.altKey == true;
             } else {
@@ -509,9 +505,6 @@ var traverseNodes = (function(){
         // If no nodes found, return
         if (nodeList.length == 0) return;
 
-        // Found something to decrypt in the page, mark hasWorkDone
-        hasWorkDone = true;
-
         // Run over all found nodes, look for magic urls and turn them into
         // enchanted span elements
         for (i = 0; i < nodeList.length; i++) {
@@ -550,7 +543,6 @@ function bindEditables(root: HTMLElement): void {
     // Set the last one found as the active one
     if ( last && last.element ) {
         last.setAsActive();
-        hasWorkDone = true;
     }
 }
 
