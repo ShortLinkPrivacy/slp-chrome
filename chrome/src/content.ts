@@ -668,7 +668,8 @@ class MessageListener {
             value: value,
             isAlreadyEncrypted: this.editable.isAlreadyEncrypted(),
             lastMessage: this.editable.lastMessage,
-            selectionRequired: selectionRequired
+            selectionRequired: selectionRequired,
+            host: window.location.host
         });
     }
 

@@ -224,6 +224,7 @@ class App {
     isDecrypted: BoolFunc;
     alreadyEncrypted: boolean;
     timeToLive: number;
+    host: string;
 
     recepients: Recepients;
     clearText: string;
@@ -257,6 +258,7 @@ class App {
 
             this.clearText = response.value;
             this.alreadyEncrypted = response.isAlreadyEncrypted;
+            this.host = response.host;
             lastMessage = response.lastMessage;
 
             if ( response.selectionRequired && !response.value ) {
@@ -311,7 +313,8 @@ class App {
         // The clear message is a record
         clearMessage = {
             body: this.clearText,
-            timeToLive: this.timeToLive
+            timeToLive: this.timeToLive,
+            host: this.host
         };
 
         this.wait = true;

@@ -30,6 +30,7 @@ module Interfaces {
         createdDate?: string;
         timeToLive?: number;
         extVersion?: string;
+        host?: string;
     }
 
     export interface InitVars {
@@ -64,6 +65,7 @@ module Interfaces {
         isAlreadyEncrypted: boolean;
         lastMessage: LastMessage;
         selectionRequired: boolean;
+        host: string;
     }
 
     export interface BackgroundPage extends Window {
