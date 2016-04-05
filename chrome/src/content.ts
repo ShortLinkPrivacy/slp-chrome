@@ -32,10 +32,6 @@ function idGenerator (prefix: string) {
     return Math.random().toString(36).substr(2, 16);
 };
 
-function isOSX(): boolean {
-    return window.navigator.platform.match(/mac/i) != null;
-}
-
 interface BgPageArgs {
     frameId?: string;
     elementId?: string;
@@ -121,7 +117,7 @@ class Editable {
         // Why? Because we're unable to simulate multi-line selection in
         // Facebook.  It "seems" that we've selected the whole thing, but in
         // reality we've only selected the current line.
-        if ( window.location.host.match(/facebook\.com$/) ) {
+        if ( Util.isFacebook() ) {
             return this.getText().trim().match(/\n/) ? true : false;
         }
 
@@ -399,7 +395,7 @@ var traverseNodes = (function(){
         // this case we neuter the A element and reuse it as a container.
         if ( parentEl.tagName == "A" ) {
 
-            if ( window.location.host == 'hangouts.google.com') {
+            if ( Util.isHangouts() ) {
                 removeAllAttributes(<HTMLAnchorElement>parentEl);
                 parentEl.className = '__pgp_inherit';
             } else {

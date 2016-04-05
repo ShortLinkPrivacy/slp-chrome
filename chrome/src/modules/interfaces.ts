@@ -76,7 +76,6 @@ module Interfaces {
         preferences: Preferences;
         slp: API.ShortLinkPrivacy;
 
-        isOSX(): boolean;
         initialize(): InitVars;
         encryptMessage(msg: Messages.ClearType, keyList: Array<openpgp.key.Key>, callback: Interfaces.SuccessCallback<Messages.UrlType>): void;
         encryptPublicKey(callback: SuccessCallback<Messages.UrlType>): void;

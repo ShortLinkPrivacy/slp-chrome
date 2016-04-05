@@ -34,6 +34,7 @@ clean:
 modules:
 	tsc --out src/modules.js --declaration \
 		src/modules/typings.ts \
+		src/modules/util.ts \
 		src/modules/config.ts \
 		src/modules/interfaces.ts \
 		src/modules/keys.ts \
@@ -50,6 +51,7 @@ modules:
 		src/modules/storage/PrivateKey.ts
 	tsc --out src/modlite.js \
 		src/modules/typings.ts \
+		src/modules/util.ts \
 		src/modules/url.ts
 
 

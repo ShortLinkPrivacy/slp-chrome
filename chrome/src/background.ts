@@ -35,10 +35,6 @@ function _err(e: string|Interfaces.Success<any>): Interfaces.Success<any> {
     }
 }
 
-function isOSX(): boolean {
-    return window.navigator.platform.match(/mac/i) != null;
-}
-
 //############################################################################
 
 // Creates a HTML snippet with a button to replace a public key armored message
@@ -291,7 +287,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse: Interfaces.
 });
 
 contextMenuId = chrome.contextMenus.create({
-    title: chrome.i18n.getMessage("contextMenu", isOSX() ? "Command+Option+L" : "Ctrl+Shift+L"),
+    title: chrome.i18n.getMessage("contextMenu", Util.isOSX() ? "Command+Option+L" : "Ctrl+Shift+L"),
     contexts: ["editable"],
     enabled: false,
     onclick: (info, tab) => {
