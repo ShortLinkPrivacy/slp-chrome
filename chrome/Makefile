@@ -92,5 +92,6 @@ dist:
 
 dist-clean:
 	rm -rfv dist
+	rm -v ShortLinkPrivacy-*.zip
 
 build-dist: dist-clean build dist
