@@ -1,0 +1,68 @@
+#!/bin/sh
+
+COMPRESS="java -jar yuicompressor-2.4.8.jar"
+VERSION=$(cat manifest.json | perl -MJSON -E 'my @a=<>;print from_json(join("",@a))->{version}')
+DIR="dist"
+PEMFILE="../ShortLinkPrivacy.pem"
+ZIPFILE=ShortLinkPrivacy-$VERSION.zip
+
+if [ -z $VERSION ]
+then
+    echo "Dist version did not compute"
+    exit 255
+fi
+
+if [ ! -e $PEMFILE ]
+then
+    echo "PEM file $PEMFILE not found"
+    exit 255
+fi
+
+if [ -d $DIR ]
+then
+    echo "$DIR already exists"
+    exit 255
+fi
+
+# Make necessary dirs
+echo "Create '$DIR'"
+mkdir -p $DIR
+mkdir -p $DIR/src
+mkdir -p $DIR/css
+mkdir -p $DIR/fonts
+mkdir -p $DIR/lib
+
+# Compress files
+echo "Compressing ..."
+eval "$COMPRESS src/browser.js -o $DIR/src/browser.js"
+eval "$COMPRESS src/background.js -o $DIR/src/background.js"
+eval "$COMPRESS src/content.js -o $DIR/src/content.js"
+eval "$COMPRESS src/admin.js -o $DIR/src/admin.js"
+eval "$COMPRESS src/modules.js -o /tmp/modules.js"
+eval "$COMPRESS src/modlite.js -o /tmp/modlite.js"
+
+# Sed replace the local url with production url
+cat /tmp/modules.js | sed 's/:5000/.li/g' > $DIR/src/modules.js
+cat /tmp/modlite.js | sed 's/:5000/.li/g' > $DIR/src/modlite.js
+
+# Copy all static
+cp css/*.css $DIR/css
+cp -r src/templates $DIR/src
+cp -r fonts $DIR
+cp -r images $DIR
+cp -r _locales $DIR
+
+# PEM file
+cp $PEMFILE $DIR/key.pem
+
+# Replace paths
+cat browser.html | sed 's/\.\/bower_components\///' | sed 's/rivets\/dist/lib/' | sed 's/openpgp\/dist/lib/' | sed 's/pathjs/lib/' > $DIR/browser.html
+cat manifest.json | sed 's/bower_components\/openpgp\/dist/lib/' > $DIR/manifest.json
+cp bower_components/pathjs/path.min.js $DIR/lib
+cp bower_components/rivets/dist/rivets.bundled.min.js $DIR/lib
+cp bower_components/openpgp/dist/openpgp.min.js $DIR/lib
+
+# Zip
+echo "Packing $ZIPFILE ..."
+zip -rq $ZIPFILE $DIR/*
+echo "Done."
