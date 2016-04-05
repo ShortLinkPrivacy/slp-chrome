@@ -117,7 +117,7 @@ module Admin {
 
     window.onerror = function(e) {
         app.critical = true;
-        bg.console.log(e);
+        bg.console.trace(e);
         bg._ga('admin_critical', e);
     };
 

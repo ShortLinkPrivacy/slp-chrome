@@ -243,10 +243,12 @@ class App {
             return this.hasPrivateKey() ? bg.privateKey.isDecrypted() : false;
         }
 
-        chrome.tabs.query({ active: true }, (tabs) => {
-            tab = tabs[0];
-            this.getElementText();
-        })
+        if ( this.isDecrypted() ) {
+            chrome.tabs.query({ active: true }, (tabs) => {
+                tab = tabs[0];
+                this.getElementText();
+            })
+        }
     }
 
     private getElementText(): void {
@@ -371,9 +373,7 @@ class App {
     // Lock the privateKey
     //---------------------------------------------------------------------------
     lock(): void {
-        bg.privateKey.lock();
         bg.lockDown();
-        bg._ga('browser', 'lock');
         window.close();
     }
 
@@ -430,7 +430,7 @@ function run(): void {
 
 window.onerror = function(e) {
     window.close();
-    bg.console.log(e);
+    bg.console.trace(e);
     bg._ga('browser_exception', e);
 };
 

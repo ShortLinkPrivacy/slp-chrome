@@ -118,7 +118,12 @@ function broadcast(message: Interfaces.ContentMessage<any>, callback?: Interface
     });
 }
 
-function lockDown(): void {
+// Lock the PK. If hard is true, it will remove the PK.
+// A 'lock' broadcast is sent, which restores all magick links
+function lockDown(hard?: boolean): void {
+    privateKey.lock();
+    if ( hard ) privateKey = null;
+    _ga('background', 'lock');
     broadcast({action: 'lock'});
 }
 
