@@ -122,6 +122,7 @@ function broadcast(message: Interfaces.ContentMessage<any>, callback?: Interface
 // A 'lock' broadcast is sent, which restores all magick links
 function lockDown(hard?: boolean): void {
     privateKey.lock();
+    chrome.browserAction.setBadgeText({text: '*'});
     if ( hard ) privateKey = null;
     _ga('background', 'lock');
     broadcast({action: 'lock'});
@@ -133,7 +134,7 @@ function unlockKey(password: string): boolean {
     if ( privateKey.decrypt(password) ) {
         broadcast({ action: 'windowMessage', value: 'slp_key_unlocked' });
         broadcast({ action: 'traverse' });
-        //chrome.browserAction.setBadgeText({text: ""});
+        chrome.browserAction.setBadgeText({text: ""});
         return true;
     }
 
@@ -206,10 +207,6 @@ class Message {
         } else {
             this.sendResponse(_err("Error decrypting"));
         }
-    }
-
-    needPassword(): void {
-        //chrome.browserAction.setBadgeText({text: '*'});
     }
 
     // Called by the content script when the user clicks a button with public
@@ -363,6 +360,7 @@ preferences = new Preferences(function(){
         if ( pk ) {
             privateKey = pk;
             _ga('background', 'private key loaded');
+            chrome.browserAction.setBadgeText({text: '*'});
         } else if (preferences.setupNagCount < config.maxSetupNag) {
             _ga('background', 'no private key');
             preferences.setupNagCount++;
